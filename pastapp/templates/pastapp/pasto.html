@@ -6,16 +6,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wordle de Past Tense (Entrada Directa)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
     <style>
         /* --- ESTILOS CSS --- */
         body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
-  background-color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-}
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+        }
 
         #wordle-verbo-juego {
             background-color: white;
@@ -35,7 +37,14 @@
         .pista-verbo {
             font-size: 1.2em;
             font-weight: bold;
-            color: #007bff;
+            color: #18315e;
+            margin-top: 20px;
+            margin-bottom: 0px;
+        }
+
+        .pista-espa-verbo {
+            font-size: 1em;
+            color: #18315e;
             margin-bottom: 20px;
         }
 
@@ -67,18 +76,12 @@
             cursor: not-allowed;
         }
 
-        #boton-reiniciar {
-            background-color: #dc3545;
-            color: white;
-            margin-top: 20px;
-        }
-
         /* --- CUADRÍCULA WORDLE --- */
         .cuadricula-wordle {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .fila-intento {
@@ -136,62 +139,98 @@
         .mensaje-feedback.correcto { color: #28a745; }
         .mensaje-feedback.fallido { color: #dc3545; }
         .mensaje-feedback.error { color: orange; }
-        .mensaje-feedback.finalizado { color: #007bff; font-size: 1.5em; }
+        .mensaje-feedback.finalizado { color: #122b46; font-size: 1.5em; }
 
-#teclado-invisible {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100px;
-  height: 30px;
-  opacity: 0.01;
-  z-index: 10;
-}
+        #teclado-invisible {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 30px;
+            opacity: 0.01;
+            z-index: 10;
+        }
 
+        .form-check-label {
+            white-space: nowrap;
+        }
 
     </style>
 </head>
-<body>
-    <div id="wordle-verbo-juego" style="justify-items: center;">
+<body class="bg-light p-4 d-flex justify-content-center">
+    <div id="wordle-verbo-juego" style="justify-items: center;min-height: 500px;">
 
-        <h2>What is the simple past?</h2>
-
-<input id="teclado-invisible" type="text" autocomplete="off" autocorrect="off" spellcheck="false" />
-        
-        <p id="pista" class="pista-verbo">Infinitive: ___</p>
-        
-        <div id="contenedor-juego" class="cuadricula-wordle">
+        <div class="container" id="container_verbos" style="justify-items: center; display: block;">
+            
+            <!-- ************************************ -->
+            <!-- CARD DE SELECCIÓN DE GRUPOS -->
+            <!-- ************************************ -->
+            <div id="selector-verbos" class="card shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <h5 class="fs-5 fw-bold p-2 rounded hover-bg-light transition duration-150">
+                        Grupos de verbos
+                    </h5>
+                    <div class="mt-3 border-top pt-3">
+                        <!-- Lista de Checkboxes (generada por JS) -->
+                        <!-- Aplica grilla de 3 columnas en pantallas medianas (md) y superiores -->
+                        <div id="lista-checkboxes" class="verb-list row" style="justify-content: center;">
+                            <!-- Los checkboxes de los grupos irán aquí -->
+                        </div>
+                    </div>
+                </div>
             </div>
-        
-        <div class="entrada-usuario">
-            <button id="boton-enviar" style="display:none">Adivinar (ENTER)</button>
-        </div>
-        
-        <p id="mensaje" class="mensaje-feedback"></p>
-        <div class="row" id="finishImg" style="justify-content:center; display:none">
-		  <img src="{% static 'pastapp/img/win.png' %}" alt="image" style="width: 250px; height: 250px">
-	    </div>
-        <div class="row" id="finishImgLost" style="justify-content:center; display:none">
-		  <img src="{% static 'pastapp/img/lost.png' %}" alt="image" style="width: 250px; height: 250px">
-	    </div>
-        
-        <button id="boton-reiniciar" style="display:none;">Reiniciar Juego</button>
 
+            <!-- BOTÓN FILTRAR -->
+            <button id="boton-filtrar" class="btn btn-dark btn-sm py-2 fw-bold shadow-sm" style="min-width: 150px;">
+                Iniciar
+            </button>
+        </div>
+
+        <div class="container" id="container_juego" style="justify-items: center; display: none;">
+            
+            <h4 class="text-3xl fw-bold text-center mb-4 text-dark">What is the simple past?</h4>
+
+            <input id="teclado-invisible" type="text" autocomplete="off"  autocorrect="off" spellcheck="false" />
+            
+            <p id="pista" class="pista-verbo">Infinitive: ___</p>
+            <p id="pista_espa" class="pista-espa-verbo"></p>
+            
+            <div id="contenedor-juego" class="cuadricula-wordle">
+                </div>
+            
+            <div class="entrada-usuario">
+                <button id="boton-enviar" style="display:none">Adivinar (ENTER)</button>
+            </div>
+            
+        </div>
+        <p id="mensaje" class="mensaje-feedback" style="margin-top: 0px;"></p>
+        <div class="row" id="finishImgLost" style="justify-content:center; display:none">
+            <img src="{% static 'pastapp/img/lost.png' %}" alt="image" style="width: 250px; height: 250px">
+        </div>
+        <div class="row" id="finishImg" style="justify-content:center; display:none">
+            <img src="{% static 'pastapp/img/win.png' %}" alt="image" style="width: 250px; height: 250px">
+        </div>
+
+        <button id="boton-reiniciar" class="btn btn-danger btn-sm py-2 fw-bold shadow-sm" style="display:none; min-width: 150px;margin-top:25px;margin-bottom: 25px;">
+            Reiniciar
+        </button>
     </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
 <script>
     // --- LÓGICA JAVASCRIPT ---
     const verbosBase = [
-        {"group":"Irregular","infinitivo":"TO BE (I-HE-SHE-IT)","pasado":"WAS","option1":"WAS","opction2":"WERE","option3":"WHERE","espa":"ERA / ERAN"},
-        {"group":"Irregular","infinitivo":"TO BE (YOU-WE-THEY)","pasado":"WERE","option1":"WAS","opction2":"WERE","option3":"WHERE","espa":"ERA / ERAN"},
-        {"group":"Irregular","infinitivo":"TO BREAK","pasado":"BROKE","option1":"BROKE","opction2":"BROGHT","option3":"BROAK","espa":"ROMPER"},
-        {"group":"Irregular","infinitivo":"TO BRING","pasado":"BROUGHT","option1":"BROUGHT","opction2":"BROGHT","option3":"BRIGHT","espa":"TRAER"},
-        {"group":"Irregular","infinitivo":"TO BUY","pasado":"BOUGHT","option1":"BOUGHT","opction2":"BOGHT","option3":"BUGHT","espa":"COMPRAR"},
-        {"group":"Irregular","infinitivo":"TO CATCH","pasado":"CAUGHT","option1":"CAUGHT","opction2":"CAUCHT","option3":"CAGHT","espa":"ATRAPAR"},
-        {"group":"Irregular","infinitivo":"TO CHOOSE","pasado":"CHOSE","option1":"CHOSE","opction2":"CHUSE","option3":"CHOUSE","espa":"ELEGIR"},
-        {"group":"Irregular","infinitivo":"TO COME","pasado":"CAME","option1":"CAME","opction2":"COME","option3":"COM","espa":"VENIR"},
-        {"group":"Irregular","infinitivo":"TO CUT","pasado":"CUT","option1":"CUT","opction2":"COUGHT","option3":"CAT","espa":"CORTAR"},
-        {"group":"Irregular","infinitivo":"TO DO","pasado":"DID","espa":"HACER"}
+        {"group":"1","infinitivo":"BE (I-HE-SHE-IT)","pasado":"WAS","espa":"ERA"},
+        {"group":"1","infinitivo":"BE (YOU-WE-THEY)","pasado":"WERE","espa":"ERAN"},
+        {"group":"1","infinitivo":"BREAK","pasado":"BROKE","espa":"ROMPER"},
+        {"group":"1","infinitivo":"BRING","pasado":"BROUGHT","espa":"TRAER"},
+        {"group":"1","infinitivo":"BUY","pasado":"BOUGHT","espa":"COMPRAR"},
+        {"group":"2","infinitivo":"CATCH","pasado":"CAUGHT","espa":"ATRAPAR"},
+        {"group":"2","infinitivo":"CHOOSE","pasado":"CHOSE","espa":"ELEGIR"},
+        {"group":"2","infinitivo":"COME","pasado":"CAME","espa":"VENIR"},
+        {"group":"2","infinitivo":"CUT","pasado":"CUT","espa":"CORTAR"},
+        {"group":"2","infinitivo":"DO","pasado":"DID","espa":"HACER"}
     ];
 
     let verbosRestantes = []; 
@@ -204,6 +243,7 @@
 
     // Elementos del DOM
     const pistaEl = document.getElementById('pista');
+    const pistaEspaEl = document.getElementById('pista_espa');
     const juegoEl = document.getElementById('contenedor-juego');
     const mensajeEl = document.getElementById('mensaje');
     const enviarBtn = document.getElementById('boton-enviar');
@@ -242,74 +282,73 @@
     }
     
     function marcarCeldaActual() {
-    document.querySelectorAll('.letra-caja.letra-escribiendo').forEach(caja => {
-        caja.classList.remove('letra-escribiendo');
-        caja.style.borderColor = '#d3d6da';
-    });
-
-    const filaEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
-    if (!filaEl) return;
-
-    const celdas = filaEl.querySelectorAll('.letra-caja');
-    let colFoco = -1;
-
-    for (let i = 0; i < palabraObjetivo.length; i++) {
-        if (celdas[i].textContent === '') {
-            colFoco = i;
-            break;
-        }
-    }
-
-    if (colFoco === -1) {
-        colFoco = palabraObjetivo.length - 1;
-    }
-
-    const celda = celdas[colFoco];
-    if (celda) {
-        celda.classList.add('letra-escribiendo');
-        celda.style.borderColor = '#565758';
-
-        const input = document.getElementById('teclado-invisible');
-
-        // Posicionar el input dentro de la celda
-        const rect = celda.getBoundingClientRect();
-        input.style.position = 'fixed';
-        input.style.left = `${rect.left + 5}px`;
-        input.style.top = `${rect.top + 5}px`;
-        input.style.width = '30px';
-        input.style.height = '30px';
-        input.style.opacity = '0.01';
-        input.style.zIndex = '100';
-
-        input.focus();
-    }
-}
-
-function inicializarEntradaTactil() {
-    const inputInvisible = document.getElementById('teclado-invisible');
-
-    // Enfocar input al tocar cualquier celda
-    document.querySelectorAll('.letra-caja').forEach(celda => {
-        celda.addEventListener('touchstart', () => {
-            marcarCeldaActual(); // marca visual
-            inputInvisible.focus(); // muestra teclado
+        document.querySelectorAll('.letra-caja.letra-escribiendo').forEach(caja => {
+            caja.classList.remove('letra-escribiendo');
+            caja.style.borderColor = '#d3d6da';
         });
-    });
 
-    // Captura letras ingresadas
-    inputInvisible.addEventListener('input', function(e) {
-        const letra = e.target.value.toUpperCase();
-        e.target.value = '';
+        const filaEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
+        if (!filaEl) return;
 
-        const celda = document.querySelector('.letra-caja.letra-escribiendo');
-        if (celda && letra.match(/^[A-Z]$/)) {
-            celda.textContent = letra;
-            celda.classList.remove('letra-escribiendo');
-            marcarCeldaActual(); // avanzar
+        const celdas = filaEl.querySelectorAll('.letra-caja');
+        let colFoco = -1;
+
+        for (let i = 0; i < palabraObjetivo.length; i++) {
+            if (celdas[i].textContent === '') {
+                colFoco = i;
+                break;
+            }
         }
-    });
-}
 
+        if (colFoco === -1) {
+            colFoco = palabraObjetivo.length - 1;
+        }
+
+        const celda = celdas[colFoco];
+        if (celda) {
+            celda.classList.add('letra-escribiendo');
+            celda.style.borderColor = '#565758';
+
+            const input = document.getElementById('teclado-invisible');
+
+            // Posicionar el input dentro de la celda
+            const rect = celda.getBoundingClientRect();
+            input.style.position = 'fixed';
+            input.style.left = `${rect.left + 5}px`;
+            input.style.top = `${rect.top + 5}px`;
+            input.style.width = '30px';
+            input.style.height = '30px';
+            input.style.opacity = '0.01';
+            input.style.zIndex = '100';
+
+            input.focus();
+        }
+    }
+
+    function inicializarEntradaTactil() {
+        const inputInvisible = document.getElementById('teclado-invisible');
+
+        // Enfocar input al tocar cualquier celda
+        document.querySelectorAll('.letra-caja').forEach(celda => {
+            celda.addEventListener('touchstart', () => {
+                marcarCeldaActual(); // marca visual
+                inputInvisible.focus(); // muestra teclado
+            });
+        });
+
+        // Captura letras ingresadas
+        inputInvisible.addEventListener('input', function(e) {
+            const letra = e.target.value.toUpperCase();
+            e.target.value = '';
+
+            const celda = document.querySelector('.letra-caja.letra-escribiendo');
+            if (celda && letra.match(/^[A-Z]$/)) {
+                celda.textContent = letra;
+                celda.classList.remove('letra-escribiendo');
+                marcarCeldaActual(); // avanzar
+            }
+        });
+    }
 
     function colorearFilaActual(intento, feedback) {
         const filaEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
@@ -377,7 +416,7 @@ function inicializarEntradaTactil() {
         
         // 2. Validación de longitud
         if (intento.length !== palabraObjetivo.length) {
-            mostrarMensaje(`Debes llenar ${palabraObjetivo.length} letras antes de enviar.`, "error");
+            mostrarMensaje(`Completar antes de enviar.`, "error");
             return;
         }
 
@@ -387,7 +426,7 @@ function inicializarEntradaTactil() {
             const feedback = generarFeedback(intento, palabraObjetivo);
             colorearFilaActual(intento, feedback); 
 
-            mostrarMensaje(`¡Correcto! ✅`, "correcto");
+            mostrarMensaje(`¡Correct! ✅`, "correcto");
             rondaTerminada = true;
             enviarBtn.disabled = true;
             setTimeout(iniciarRonda, 3000);
@@ -398,13 +437,13 @@ function inicializarEntradaTactil() {
             filaActual++; // Avanza a la siguiente fila
 
             if (filaActual >= MAX_INTENTOS) {
-                mostrarMensaje(`¡Fallaste! El pasado era **${palabraObjetivo}**. ❌`, "fallido");
+                mostrarMensaje(`Oops! >> La correcta es **<b>${palabraObjetivo}</b>**. ❌`, "fallido");
                 rondaTerminada = true;
                 enviarBtn.disabled = true;
                 finishImgLost.style.display = 'block'
                 setTimeout(iniciarRonda, 4000);
             } else {
-                mostrarMensaje(`Intento ${intentos} de ${MAX_INTENTOS}. ¡Sigue intentando!`, "error");
+                //mostrarMensaje(`Intento ${intentos} de ${MAX_INTENTOS}. ¡Sigue intentando!`, "error");
                 marcarCeldaActual(); // Marca la primera celda de la nueva fila
             }
         }
@@ -430,7 +469,7 @@ function inicializarEntradaTactil() {
             if (intento.length === longitudObjetivo) {
                 verificarIntento();
             } else {
-                 mostrarMensaje(`Debes llenar ${longitudObjetivo} letras.`, "error");
+                 mostrarMensaje(`Completar antes de enviar.`, "error");
             }
             return;
         }
@@ -458,8 +497,8 @@ function inicializarEntradaTactil() {
             return;
         }
 
-	const input = document.getElementById('teclado-invisible');
-	if (document.activeElement === input) return; // evitar duplicado
+        const input = document.getElementById('teclado-invisible');
+        if (document.activeElement === input) return; // evitar duplicado
 
         // 3. Manejar Letras (A-Z)
         if (tecla.match(/[A-Z]/) && tecla.length === 1) {
@@ -482,18 +521,18 @@ function inicializarEntradaTactil() {
         }
     }
 
-
     function iniciarRonda() {
-	const inputInvisible = document.getElementById('teclado-invisible');
+        const inputInvisible = document.getElementById('teclado-invisible');
         inputInvisible.focus();
+        mostrarMensaje("","limpiar")
 
         finishImg.style.display = 'none'
         finishImgLost.style.display = 'none'
         if (verbosRestantes.length === 0) {
-            mostrarMensaje("¡Felicidades! 🎉", "finalizado");
+            mostrarMensaje("Congrats! 🎉", "finalizado");
             finishImg.style.display = 'block';
             enviarBtn.disabled = true;
-            reiniciarBtn.style.display = 'block';
+            container_juego.style.display = 'none';
             return;
         }
 
@@ -503,70 +542,198 @@ function inicializarEntradaTactil() {
         intentos = 0;
         rondaTerminada = false;
 
-        pistaEl.textContent = `Infinitive: ${verboActual.infinitivo}`;
-        mostrarMensaje(`Adivina el pasado (Past Tense). La palabra tiene ${palabraObjetivo.length} letras.`, "");
+        pistaEl.textContent = `Infinitive: TO ${verboActual.infinitivo}`;
+        pistaEspaEl.textContent = `( ${verboActual.espa} )`;
+        /*mostrarMensaje(`Adivina el pasado (Past Tense). La palabra tiene ${palabraObjetivo.length} letras.`, "");*/
         
         enviarBtn.disabled = false;
-        reiniciarBtn.style.display = 'none';
-
+        
         limpiarCuadricula();
         inicializarEntradaTactil();
         marcarCeldaActual(); // Marca la celda 1 de la fila 0 al inicio
     }
     
-    function inicializarJuego() {
-        verbosRestantes = [...verbosBase]; 
+    function inicializarJuego(verbosBaseFiltrado) {
+        reiniciarBtn.style.display = 'block';
+        container_juego.style.display = 'block';
+        container_verbos.style.display = 'none';
+        btnFiltrar.style.display = 'none';
+        mensajeEl.innerHTML = "";
+        verbosRestantes = [...verbosBaseFiltrado]; 
         iniciarRonda();
     }
-
 
     // ------------------------------------
     // 3. EVENT LISTENERS
     // ------------------------------------
 
     document.addEventListener('DOMContentLoaded', () => {
-        inicializarJuego();
-
+        
         // El botón enviar llama a la función de verificación
         enviarBtn.addEventListener('click', verificarIntento);
+        reiniciarBtn.addEventListener('click', reiniciar);
         
         // El listener principal que captura las teclas A-Z, ENTER, y BACKSPACE
         document.addEventListener('keydown', manejarTeclado);
 
-        // Evento para reiniciar todo el juego (todos los verbos)
-        reiniciarBtn.addEventListener('click', inicializarJuego);
     });
 
-document.getElementById('teclado-invisible').addEventListener('input', function(e) {
-    const letra = e.target.value.toUpperCase();
-    e.target.value = '';
+    document.getElementById('teclado-invisible').addEventListener('input', function(e) {
+        const letra = e.target.value.toUpperCase();
+        e.target.value = '';
 
-    const celda = document.querySelector('.letra-caja.letra-escribiendo');
-    if (celda && letra.match(/^[A-Z]$/)) {
-      celda.textContent = letra;
-      celda.classList.remove('letra-escribiendo');
-      marcarCeldaActual(); // avanzar al siguiente
+        const celda = document.querySelector('.letra-caja.letra-escribiendo');
+        if (celda && letra.match(/^[A-Z]$/)) {
+        celda.textContent = letra;
+        celda.classList.remove('letra-escribiendo');
+        marcarCeldaActual(); // avanzar al siguiente
+        }
+    });
+
+    document.querySelectorAll('.letra-caja').forEach(celda => {
+        celda.addEventListener('touchstart', () => {
+            marcarCeldaActual();
+
+            const input = document.getElementById('teclado-invisible');
+
+            // Enfocar con delay para evitar que se pierda el foco
+            setTimeout(() => {
+                input.focus();
+            }, 100);
+        });
+    });
+
+    // Activar al cargar
+    window.addEventListener('load', () => {
+      marcarCeldaActual();
+    });
+
+    // --- REFERENCIAS DOM ---
+    const btnFiltrar = document.getElementById('boton-filtrar');
+    const listaCheckboxes = document.getElementById('lista-checkboxes');
+    const listaDesc = document.getElementById('lista-desc');
+    const mensajeSeleccion = document.getElementById('mensaje-seleccion');
+
+    // --- FUNCIONES DE LÓGICA ---
+
+    /**
+     * Rellena el card desplegable con checkboxes para cada grupo de verbos.
+     */
+    function generarCheckboxes() {
+        listaCheckboxes.innerHTML = '';
+        
+        // 1. Obtener grupos únicos y ordenados
+        const uniqueGroups = [...new Set(verbosBase.map(v => v.group))].sort();
+
+        // 2. Generar checkboxes por grupo
+        uniqueGroups.forEach((group) => {
+            // El wrapper es una columna de la grilla de Bootstrap
+            const wrapper = document.createElement('div');
+            wrapper.className = 'row'; 
+            wrapper.style = "max-width:150px";
+            
+            const formCheck = document.createElement('div');
+            formCheck.className = 'form-check';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.value = group; // El valor es el ID del grupo
+            input.id = `group-${group}`;
+            input.className = 'form-check-input';
+            input.checked = true; // Por defecto todos están seleccionados
+
+            // 3. Preparar el contenido del popover
+            const infinitivos = verbosBase
+                .filter(v => v.group === group)
+                .map(v => {
+                    // Consolidar las formas específicas de "BE" a solo "BE"
+                    if (v.infinitivo === "BE (I-HE-SHE-IT)" || v.infinitivo === "BE (YOU-WE-THEY)") {
+                        return "BE";
+                    }
+                    return v.infinitivo;
+                });
+            
+            // Obtener infinitivos únicos y unirlos para el popover
+            const uniqueInfinitivos = [...new Set(infinitivos)];
+            const verbosDelGrupo = uniqueInfinitivos.join(' - ');
+
+            const label = document.createElement('label');
+            label.htmlFor = input.id;
+            label.textContent = `Group ${group}`; // Mostrar "Group X"
+            label.className = 'form-check-label text cursor-pointer';
+
+            // ATRIBUTOS PARA EL POPOVER
+            label.setAttribute('data-bs-toggle', 'popover');
+            label.setAttribute('data-bs-trigger', 'hover focus'); // Se activa al pasar el mouse o al enfocarse (para accesibilidad)
+            label.setAttribute('data-bs-placement', 'right'); // Posición del popover
+            label.setAttribute('data-bs-content', verbosDelGrupo); // Contenido de los verbos
+
+            formCheck.appendChild(input);
+            formCheck.appendChild(label);
+            wrapper.appendChild(formCheck);
+            listaCheckboxes.appendChild(wrapper);
+
+            const wrapper2 = document.createElement('div');
+            wrapper.className = 'row'; 
+            wrapper.style = "max-width:150px";
+
+            const label2 = document.createElement('label');
+            label2.htmlFor = input.id;
+            label2.textContent = `${verbosDelGrupo}`; // Mostrar "Group X"
+            label2.className = 'text-secondary cursor-pointer';
+            label2.style = "font-size: small; margin-bottom: 5px";
+            wrapper2.appendChild(label2);
+            listaCheckboxes.appendChild(wrapper2);
+        });
+        
+        // 4. Inicializar los popovers después de que los elementos están en el DOM
+        //inicializarPopovers();
     }
-  });
 
-document.querySelectorAll('.letra-caja').forEach(celda => {
-    celda.addEventListener('touchstart', () => {
-        marcarCeldaActual();
+    /**
+     * Inicializa todos los popovers en la página.
+     */
+    function inicializarPopovers() {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        popoverTriggerList.map(function (popoverTriggerEl) {
+          return new bootstrap.Popover(popoverTriggerEl, {
+            container: 'body' // Asegura que el popover se muestre correctamente en el contenedor.
+          })
+        })
+    }
 
-        const input = document.getElementById('teclado-invisible');
+    /**
+     * Lógica al hacer click en el botón "Mostrar Listado Filtrado".
+     */
+    btnFiltrar.addEventListener('click', () => {
+        // 1. Recoger los IDs de grupo seleccionados (ej: ['1', '2'])
+        const gruposSeleccionados = [];
+        const checkboxes = listaCheckboxes.querySelectorAll('input[type="checkbox"]');
+        
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                // El valor del checkbox es el ID del grupo (string)
+                gruposSeleccionados.push(cb.value); 
+            }
+        });
 
-        // Enfocar con delay para evitar que se pierda el foco
-        setTimeout(() => {
-            input.focus();
-        }, 100);
+        // 2. Filtrar el array base: solo se incluyen verbos cuyo 'group' esté en los seleccionados
+        const resultadoFiltrado = verbosBase.filter(verbo => 
+            gruposSeleccionados.includes(verbo.group)
+        );
+
+        inicializarJuego(resultadoFiltrado)
+
     });
-});
 
-  // Activar al cargar
-  window.addEventListener('load', () => {
-    marcarCeldaActual();
-  });
+    function reiniciar() {
+        window.location.reload();
+    }
 
+    // --- INICIALIZACIÓN ---
+    window.onload = () => {
+        generarCheckboxes();
+    };
 
 </script>
 
