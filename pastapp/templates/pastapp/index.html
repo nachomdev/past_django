@@ -1,0 +1,52 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basurero</title>
+    <style>
+        /* CSS para el fondo de pantalla completo */
+        body, html {
+            height: 100%;
+            margin: 0; /* Elimina el margen predeterminado del body */
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .background-image {
+            /* 1. Establecer la imagen y centrarla */
+            background-image: url("{% static 'pastapp/img/cover.jpg' %}");
+            background-repeat: no-repeat;
+            background-position: center center;
+            
+            /* 2. Asegurar que la imagen cubra toda la pantalla */
+            background-size: cover;
+            
+            /* 3. Fijar la imagen para que no se mueva al hacer scroll */
+            background-attachment: fixed;
+            
+            /* 4. Asegurar que el div ocupe todo el viewport */
+            height: 100vh;
+            width: 100vw;
+            
+            /* (Opcional) Overlay oscuro para mejorar la legibilidad del texto */
+            background-color: rgba(0, 0, 0, 0.4); 
+            background-blend-mode: overlay;
+        }
+
+        .content {
+            padding-top: 20%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-image">
+	<div class="content">
+        </div>
+    </div>
+
+</body>
+</html>

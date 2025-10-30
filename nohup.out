@@ -1,0 +1,574 @@
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[23/Oct/2025 19:36:33] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:36:33] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[23/Oct/2025 19:36:33] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:36:33] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38295
+[23/Oct/2025 19:57:09] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:57:10] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38295
+[23/Oct/2025 19:57:10] "GET /static/pastapp/img/finish.gif HTTP/1.1" 200 890663
+Not Found: /favicon.ico
+[23/Oct/2025 19:57:11] "GET /favicon.ico HTTP/1.1" 404 2464
+[23/Oct/2025 19:57:13] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:58:27] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:58:29] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:58:42] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:58:43] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:58:45] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 19:59:04] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:00:39] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:01:15] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:01:41] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:01:43] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:01:46] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:04:00] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:04:15] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:07:03] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:10:50] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:10:51] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[23/Oct/2025 20:10:53] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:10:59] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:14:31] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:15:04] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:15:18,507] - Broken pipe from ('190.210.36.189', 60256)
+[23/Oct/2025 20:15:18,509] - Broken pipe from ('190.210.36.189', 60334)
+[23/Oct/2025 20:18:36,874] - Broken pipe from ('190.210.36.189', 60388)
+[23/Oct/2025 20:18:36,875] - Broken pipe from ('190.210.36.189', 60382)
+[23/Oct/2025 20:19:17] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:19:18] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38295
+[23/Oct/2025 20:19:19] "GET /static/pastapp/img/finish.gif HTTP/1.1" 200 890663
+Not Found: /favicon.ico
+[23/Oct/2025 20:19:19] "GET /favicon.ico HTTP/1.1" 404 2464
+[23/Oct/2025 20:19:29] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:19:30] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38295
+[23/Oct/2025 20:19:30] "GET /static/pastapp/img/finish.gif HTTP/1.1" 200 890663
+[23/Oct/2025 20:28:57] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:28:58] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38295
+[23/Oct/2025 20:28:58] "GET /static/pastapp/img/finish.gif HTTP/1.1" 200 890663
+[23/Oct/2025 20:29:04] "GET / HTTP/1.1" 200 6436
+[23/Oct/2025 20:38:29] "GET / HTTP/1.1" 200 6546
+[23/Oct/2025 20:38:29] "GET /static/pastapp/img/incorrect.png HTTP/1.1" 404 1894
+[23/Oct/2025 20:38:29] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+Not Found: /favicon.ico
+[23/Oct/2025 20:38:30] "GET /favicon.ico HTTP/1.1" 404 2464
+[23/Oct/2025 20:38:32] "GET / HTTP/1.1" 200 6546
+[23/Oct/2025 20:38:33] "GET /static/pastapp/img/incorrect.png HTTP/1.1" 404 1894
+[23/Oct/2025 20:40:04] "GET / HTTP/1.1" 200 6546
+[23/Oct/2025 20:40:04] "GET /static/pastapp/img/incorrect.png HTTP/1.1" 404 1894
+[23/Oct/2025 20:41:49,314] - Broken pipe from ('190.210.36.189', 60292)
+[23/Oct/2025 20:41:49,314] - Broken pipe from ('190.210.36.189', 60336)
+[23/Oct/2025 21:00:02,487] - Broken pipe from ('190.210.36.189', 60200)
+[23/Oct/2025 21:00:02,489] - Broken pipe from ('190.210.36.189', 60294)
+Performing system checks...
+
+October 23, 2025 - 19:36:22
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[23/Oct/2025 21:12:30] "GET / HTTP/1.1" 200 6894
+[23/Oct/2025 21:12:31] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 404 1888
+[23/Oct/2025 21:12:31] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 404 1894
+[23/Oct/2025 21:12:31] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38471
+[23/Oct/2025 21:12:51,866] - Broken pipe from ('190.210.36.189', 60182)
+[23/Oct/2025 21:12:51,867] - Broken pipe from ('190.210.36.189', 60170)
+Performing system checks...
+
+October 23, 2025 - 21:12:21
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[23/Oct/2025 21:13:42] "GET / HTTP/1.1" 200 6894
+[23/Oct/2025 21:13:42] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 200 25952
+[23/Oct/2025 21:13:43] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[23/Oct/2025 21:13:43] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 200 1025538
+[23/Oct/2025 21:14:06,543] - Broken pipe from ('190.210.36.189', 60248)
+[23/Oct/2025 21:14:06,545] - Broken pipe from ('190.210.36.189', 60302)
+[23/Oct/2025 21:14:06,584] - Broken pipe from ('190.210.36.189', 60366)
+[23/Oct/2025 21:28:41,981] - Broken pipe from ('181.9.209.204', 23570)
+[23/Oct/2025 21:28:41,982] - Broken pipe from ('181.9.209.204', 23571)
+[23/Oct/2025 21:37:30] "GET / HTTP/1.1" 200 6894
+[23/Oct/2025 21:37:30] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 304 0
+[23/Oct/2025 21:37:30] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 304 0
+[23/Oct/2025 21:37:30] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[23/Oct/2025 21:37:52,668] - Broken pipe from ('181.9.209.204', 50131)
+[23/Oct/2025 21:37:52,668] - Broken pipe from ('181.9.209.204', 50130)
+[23/Oct/2025 21:37:52,669] - Broken pipe from ('181.9.209.204', 23879)
+[23/Oct/2025 21:37:52,669] - Broken pipe from ('181.9.209.204', 23876)
+[23/Oct/2025 23:44:14] code 400, message Bad request version ("¯nãY»bhlÿ(=':©\x82ÙoÈ¢×\x93\x98´ï\x80å¹\x90\x00(À")
+[23/Oct/2025 23:44:14] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 00:03:57] code 400, message Bad request syntax ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03e\x1d')
+[24/Oct/2025 00:03:57] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 00:03:57] code 400, message Bad request syntax ('MGLNDD_74.208.153.135_8443')
+[24/Oct/2025 00:03:57] "MGLNDD_74.208.153.135_8443" 400 -
+Not Found: /favicon.ico
+[24/Oct/2025 00:09:28] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 00:10:29,053] - Broken pipe from ('181.9.209.204', 50092)
+[24/Oct/2025 00:10:29,053] - Broken pipe from ('181.9.209.204', 50091)
+[24/Oct/2025 00:55:50] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 00:55:50] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 304 0
+[24/Oct/2025 00:55:50] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[24/Oct/2025 00:55:50] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 304 0
+Not Found: /favicon.ico
+[24/Oct/2025 00:55:51] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 00:56:12,421] - Broken pipe from ('181.9.209.204', 49725)
+[24/Oct/2025 00:56:12,422] - Broken pipe from ('181.9.209.204', 49726)
+[24/Oct/2025 00:56:12,430] - Broken pipe from ('181.9.209.204', 49721)
+[24/Oct/2025 01:10:10,639] - Broken pipe from ('152.171.150.179', 57426)
+[24/Oct/2025 01:10:10,641] - Broken pipe from ('152.171.150.179', 57418)
+[24/Oct/2025 03:14:28] code 400, message Bad request version ('\x9aò«')
+[24/Oct/2025 03:14:28] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 03:14:29] code 400, message Bad request version ('À(À$À\x14À')
+[24/Oct/2025 03:14:29] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 04:29:12] code 400, message Bad request version ('\x00\x9eÌ¨Ìª\x003\x00=\x00\x16À')
+[24/Oct/2025 04:29:12] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 04:29:23] "GET / HTTP/1.1" 200 6894
+Not Found: /favicon.ico
+[24/Oct/2025 04:29:42] "GET /favicon.ico HTTP/1.1" 404 2464
+Not Found: /robots.txt
+[24/Oct/2025 04:29:43] "GET /robots.txt HTTP/1.1" 404 2461
+Not Found: /sitemap.xml
+[24/Oct/2025 04:29:43] "GET /sitemap.xml HTTP/1.1" 404 2464
+[24/Oct/2025 04:29:44] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38471
+Not Found: /config.json
+[24/Oct/2025 04:29:45] "GET /config.json HTTP/1.1" 404 2464
+[24/Oct/2025 04:45:47] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 04:45:47] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 04:45:51] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 04:45:53] code 505, message Invalid HTTP version (2.0)
+[24/Oct/2025 04:45:53] "PRI * HTTP/2.0" 505 -
+Not Found: /favicon.ico
+[24/Oct/2025 04:45:54] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 04:46:22] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 04:46:22] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /version
+[24/Oct/2025 04:46:23] "GET /version HTTP/1.1" 404 2452
+[24/Oct/2025 06:49:06] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 06:49:06] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 06:49:06] code 400, message Bad request syntax ('MGLNDD_74.208.153.135_8443')
+[24/Oct/2025 06:49:06] "MGLNDD_74.208.153.135_8443" 400 -
+[24/Oct/2025 07:06:58] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:06:58] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:12:17] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:12:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:19:02] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:19:02] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:22:13] code 400, message Bad request syntax ('\x16\x03\x01\x05¨\x01\x00\x05¤\x03\x03')
+[24/Oct/2025 07:22:13] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:34:20] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:34:20] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:37:01] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:37:01] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:37:04] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 07:37:04] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:44:58] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 07:44:58] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:50:59] code 400, message Bad request version ('6®')
+[24/Oct/2025 07:50:59] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 07:58:18] code 400, message Bad request version ('\x10\\?\x05\x81!\x904')
+[24/Oct/2025 07:58:18] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 08:01:53] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 08:01:53] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 08:09:43] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x01\x05¨\x01\x00\x05¤\x03\x036Kº')
+[24/Oct/2025 08:09:43] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 08:14:09] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 08:14:09] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 08:21:12] code 400, message Bad request version ('À\x13À')
+[24/Oct/2025 08:21:12] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 08:29:39] code 400, message Bad request syntax ('MGLNDD_74.208.153.135_8443')
+[24/Oct/2025 08:29:39] "MGLNDD_74.208.153.135_8443" 400 -
+[24/Oct/2025 09:31:37] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 09:31:37] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 09:37:16] code 400, message Bad request version ('À')
+[24/Oct/2025 09:37:16] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 10:01:50] code 400, message Bad request version ('À')
+[24/Oct/2025 10:01:50] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 10:12:33] code 400, message Bad request syntax ('\x16\x03\x01\x01')
+[24/Oct/2025 10:12:33] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 10:12:48] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 10:20:26] code 400, message Bad request version ('À')
+[24/Oct/2025 10:20:26] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 10:33:11] code 400, message Bad request version ('À')
+[24/Oct/2025 10:33:11] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 11:53:18] code 400, message Bad request syntax ("\x16\x03\x01\x00î\x01\x00\x00ê\x03\x03ðyScèr'Ð")
+[24/Oct/2025 11:53:18] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 11:53:19] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 11:53:20] code 505, message Invalid HTTP version (2.0)
+[24/Oct/2025 11:53:20] "PRI * HTTP/2.0" 505 -
+Not Found: /favicon.ico
+[24/Oct/2025 11:53:20] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 11:53:27] code 400, message Bad request syntax ('\x16\x03\x01\x00î\x01\x00\x00ê\x03\x030B\x08y+w®X\x11P:-×@´\x84ýè\x80ãÈ')
+[24/Oct/2025 11:53:27] You're accessing the development server over HTTPS, but it only supports HTTP.
+Not Found: /version
+[24/Oct/2025 11:53:27] "GET /version HTTP/1.1" 404 2452
+[24/Oct/2025 12:02:10] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 12:02:10] code 400, message Bad request syntax ('MGLNDD_74.208.153.135_8443')
+[24/Oct/2025 12:02:10] "MGLNDD_74.208.153.135_8443" 400 -
+[24/Oct/2025 12:26:57] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 12:27:04] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 12:30:26] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 12:30:26] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 12:31:14] code 400, message Bad request syntax ('SSH-2.0-Go')
+[24/Oct/2025 12:31:14] "SSH-2.0-Go" 400 -
+[24/Oct/2025 12:33:04] code 400, message Bad request syntax ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x03\x9eÙ\x9e\x8cÜï')
+[24/Oct/2025 12:33:04] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 14:14:25] code 400, message Bad HTTP/0.9 request type ('\x03\x00\x00/*à\x00\x00\x00\x00\x00Cookie:')
+[24/Oct/2025 14:14:25] "  /*à     Cookie: mstshash=Administr" 400 -
+[24/Oct/2025 14:44:42] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 14:44:42] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 17:31:15] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 17:31:16] "GET /static/pastapp/js/past.js HTTP/1.1" 200 38471
+[24/Oct/2025 17:31:16] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 200 25952
+[24/Oct/2025 17:31:17] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 200 1025538
+[24/Oct/2025 17:31:17] "GET /static/pastapp/img/finish.gif HTTP/1.1" 200 1558306
+Not Found: /favicon.ico
+[24/Oct/2025 17:31:18] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 17:41:07] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 17:41:08] code 400, message Bad request syntax ('MGLNDD_74.208.153.135_8443')
+[24/Oct/2025 17:41:08] "MGLNDD_74.208.153.135_8443" 400 -
+[24/Oct/2025 19:03:08] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 19:03:08] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 19:06:59] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 19:06:59] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 19:07:30] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 19:07:30] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 19:07:50] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 19:07:50] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 20:24:19] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:24:20] "GET /static/pastapp/js/past.js HTTP/1.1" 304 0
+[24/Oct/2025 20:24:20] "GET /static/pastapp/img/correct.jpg HTTP/1.1" 304 0
+[24/Oct/2025 20:24:20] "GET /static/pastapp/img/incorrect.jpg HTTP/1.1" 304 0
+Not Found: /favicon.ico
+[24/Oct/2025 20:24:20] "GET /favicon.ico HTTP/1.1" 404 2464
+[24/Oct/2025 20:24:22] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:25:40] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:25:44] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:25:45] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:25:48] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:28:40] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:27] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:31] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:33] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:51] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:54] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:31:57] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:32:08] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:36:25] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:36:34] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:36:40] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:36:43] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:36:46] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:38:59] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:39:23] "GET / HTTP/1.1" 200 6894
+[24/Oct/2025 20:39:34,090] - Broken pipe from ('190.210.36.189', 60166)
+[24/Oct/2025 20:39:34,095] - Broken pipe from ('190.210.36.189', 60168)
+/home/comaneci/proyectos/past_django/pastapp/urls.py changed, reloading.
+Performing system checks...
+
+October 23, 2025 - 21:13:33
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+/home/comaneci/proyectos/past_django/pastapp/views.py changed, reloading.
+Performing system checks...
+
+October 24, 2025 - 20:39:38
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+/home/comaneci/proyectos/past_django/pastapp/urls.py changed, reloading.
+Performing system checks...
+
+October 24, 2025 - 20:40:17
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 510, in parse
+    compile_func = self.tags[command]
+                   ~~~~~~~~~^^^^^^^^^
+KeyError: 'static'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/proyectos/past_django/pastapp/views.py", line 5, in index
+    return render(request, 'pastapp/pasto.html', {})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/backends/django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 512, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 577, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 156: 'static'. Did you forget to register or load this tag?
+[24/Oct/2025 20:41:16] "GET / HTTP/1.1" 500 137889
+Performing system checks...
+
+October 24, 2025 - 20:40:39
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[24/Oct/2025 20:43:00] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 20:43:00] You're accessing the development server over HTTPS, but it only supports HTTP.
+Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 510, in parse
+    compile_func = self.tags[command]
+                   ~~~~~~~~~^^^^^^^^^
+KeyError: 'static'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/proyectos/past_django/pastapp/views.py", line 5, in index
+    return render(request, 'pastapp/pasto.html', {})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/backends/django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 512, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "/home/comaneci/my_env/lib/python3.11/site-packages/django/template/base.py", line 577, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 156: 'static'. Did you forget to register or load this tag?
+[24/Oct/2025 20:43:06] "GET / HTTP/1.1" 500 137636
+[24/Oct/2025 20:43:56,543] - Broken pipe from ('190.210.36.189', 60288)
+[24/Oct/2025 20:43:56,547] - Broken pipe from ('190.210.36.189', 60408)
+Performing system checks...
+
+October 24, 2025 - 20:42:52
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[24/Oct/2025 20:44:27] "GET / HTTP/1.1" 200 16960
+[24/Oct/2025 20:44:27] "GET /static/img/win.png HTTP/1.1" 404 1852
+[24/Oct/2025 20:44:27] "GET /static/img/lost.png HTTP/1.1" 404 1855
+[24/Oct/2025 20:44:51,640] - Broken pipe from ('190.210.36.189', 60224)
+[24/Oct/2025 20:44:51,641] - Broken pipe from ('190.210.36.189', 60216)
+[24/Oct/2025 20:45:33] "GET / HTTP/1.1" 200 16960
+[24/Oct/2025 20:45:33] "GET /static/img/win.png HTTP/1.1" 404 1852
+[24/Oct/2025 20:45:33] "GET /static/img/lost.png HTTP/1.1" 404 1855
+Not Found: /favicon.ico
+[24/Oct/2025 20:45:33] "GET /favicon.ico HTTP/1.1" 404 2715
+[24/Oct/2025 20:50:56] "GET / HTTP/1.1" 200 16960
+[24/Oct/2025 20:50:56] "GET /static/img/win.png HTTP/1.1" 404 1852
+[24/Oct/2025 20:50:56] "GET /static/img/lost.png HTTP/1.1" 404 1855
+Not Found: /favicon.ico
+[24/Oct/2025 20:50:56] "GET /favicon.ico HTTP/1.1" 404 2715
+[24/Oct/2025 20:51:03] "GET /static/img/lost.png HTTP/1.1" 404 1855
+[24/Oct/2025 20:51:13] "GET /static/img/win.png HTTP/1.1" 404 1852
+Performing system checks...
+
+October 24, 2025 - 20:44:25
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/home/comaneci/proyectos/past_django/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+[24/Oct/2025 20:54:02] "GET / HTTP/1.1" 200 16976
+[24/Oct/2025 20:54:03] "GET /static/pastapp/img/lost.png HTTP/1.1" 200 814694
+[24/Oct/2025 20:54:03] "GET /static/pastapp/img/win.png HTTP/1.1" 200 1307003
+[24/Oct/2025 21:08:34,787] - Broken pipe from ('190.210.36.189', 60242)
+[24/Oct/2025 21:08:34,788] - Broken pipe from ('190.210.36.189', 60304)
+[24/Oct/2025 21:50:48] code 400, message Bad request syntax ('\x16\x03\x01\x00{\x01\x00\x00w\x03\x031ÿ')
+[24/Oct/2025 21:50:48] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:49] code 400, message Bad request version ('À\x14À')
+[24/Oct/2025 21:50:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:49] code 400, message Bad HTTP/0.9 request type ('\x16\x03\x03\x01§\x01\x00\x01£\x03\x03Ùs\x03ûÃ\x01ngú¼µ÷ü,®\x08ÇCéT\x890³*ñ¡w^Ò\x8bþe')
+[24/Oct/2025 21:50:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:49] code 400, message Bad request version ('À\x9c\x00<\x00/\x00')
+[24/Oct/2025 21:50:49] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:50] code 400, message Bad request version ('\x02TNc}e\x16\x86\x1b\x1a\x0e\x1a4\x06g7}PùÀ@ýeüÚá\x07ß*1þ\x81\x00FÀ\x12À\x07Ì\x14\x13\x01\x13\x02Ì©ÀsÀrÀ,À¯À\xadÀ$À')
+[24/Oct/2025 21:50:50] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:50] code 400, message Bad request version ("b\x0fP\x00DÀ\x13À'À/À\x14À(À0À`ÀaÀvÀwÌ¨\x13\x05\x13\x04\x13\x03Ì\x13À\x11\x00")
+[24/Oct/2025 21:50:50] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:51] code 400, message Bad request version ("ê°JÏaMóÚÛçCî\x11)NE\x91\x00\x8cÚÚÀ\x12À\x13À\x07À'Ì\x14À/\x13\x01À\x14\x13\x02À(Ì©À0ÀsÀ`ÀrÀaÀ,ÀvÀ¯ÀwÀ\xadÌ¨À$\x13\x05À")
+[24/Oct/2025 21:50:51] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:51] code 400, message Bad request version ('À#À¬À®À+À')
+[24/Oct/2025 21:50:51] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:52] code 400, message Bad request version ('À#À¬À®À+À')
+[24/Oct/2025 21:50:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:52] code 400, message Bad request version ('À\x9c\x00<\x00/\x00')
+[24/Oct/2025 21:50:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:52] code 400, message Bad request version ('À#À¬À®À+À')
+[24/Oct/2025 21:50:52] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:53] code 400, message Bad request version ("ådo\x9f\x00\x8cjjÀ\x12À\x13À\x07À'Ì\x14À/\x13\x01À\x14\x13\x02À(Ì©À0ÀsÀ`ÀrÀaÀ,ÀvÀ¯ÀwÀ\xadÌ¨À$\x13\x05À")
+[24/Oct/2025 21:50:53] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 21:50:53] "GET / HTTP/1.1" 200 16976
+Not Found: /favicon.ico
+[24/Oct/2025 21:59:51] "GET /favicon.ico HTTP/1.1" 404 2715
+[24/Oct/2025 22:00:23,227] - Broken pipe from ('181.13.78.205', 50674)
+[24/Oct/2025 22:00:23,228] - Broken pipe from ('181.13.78.205', 50675)
+[24/Oct/2025 22:58:23] code 400, message Bad request version ('À')
+[24/Oct/2025 22:58:23] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 23:01:17] code 400, message Bad request version ('À')
+[24/Oct/2025 23:01:17] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 23:19:42] code 400, message Bad request version ('À')
+[24/Oct/2025 23:19:42] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 23:39:03] code 400, message Bad request version ('À')
+[24/Oct/2025 23:39:03] You're accessing the development server over HTTPS, but it only supports HTTP.
+[24/Oct/2025 23:43:40] "GET / HTTP/1.1" 200 16976
+[24/Oct/2025 23:43:41] "GET /static/pastapp/img/win.png HTTP/1.1" 304 0
+[24/Oct/2025 23:43:41] "GET /static/pastapp/img/lost.png HTTP/1.1" 304 0
+Not Found: /favicon.ico
+[24/Oct/2025 23:43:41] "GET /favicon.ico HTTP/1.1" 404 2715
+Performing system checks...
+
+October 24, 2025 - 20:53:48
+Django version 5.2.7, using settings 'past_django.settings'
+Starting development server at http://0.0.0.0:8443/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/

@@ -1,0 +1,45 @@
+/* Estilos opcionales para mejorar la apariencia de la aplicación */
+
+h1 {
+    text-align: center;
+}
+
+#piano {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+
+.tecla {
+    width: 40px;
+    height: 120px;
+    border: 1px solid #000;
+    margin: 0px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.tecla.negra {
+    background-color: black;
+    width: 20px;
+    height: 80px;
+    margin-left: -10px;
+    margin-right: -10px;
+    z-index: 1;
+    position: relative;
+}
+
+.nombre-nota {
+    font-size: 14px; /* Tamaño de fuente del nombre de la nota */
+    margin-top: 5px; /* Espacio entre la tecla y el nombre de la nota */
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}

@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+*.pylintrc
+.venv/
+venv/
+env/
+my_env/
+
+# Django / Bases de datos
+db.sqlite3
+/media/
+
+# Archivos de entorno
+.env
+*.log
+
+id_ed25519*

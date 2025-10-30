@@ -1,0 +1,5 @@
+.incorrect-word {
+    text-decoration: underline;
+    text-decoration-color: #FF0000;
+    text-decoration-style: solid;
+  }
