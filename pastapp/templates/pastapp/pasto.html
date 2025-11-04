@@ -138,6 +138,7 @@
 
         .mensaje-feedback.correcto { color: #28a745; }
         .mensaje-feedback.fallido { color: #dc3545; }
+        .mensaje-feedback.singrupo { color: #dc3545; margin-top: 10px;}
         .mensaje-feedback.error { color: orange; }
         .mensaje-feedback.finalizado { color: #122b46; font-size: 1.5em; }
 
@@ -162,13 +163,14 @@
 
         <div class="container" id="container_verbos" style="justify-items: center; display: block;">
             
+            <h3 style="margin-bottom:20px">Past time</h3>
             <!-- ************************************ -->
             <!-- CARD DE SELECCIÓN DE GRUPOS -->
             <!-- ************************************ -->
             <div id="selector-verbos" class="card shadow-sm mb-4">
                 <div class="card-body p-3">
                     <h5 class="fs-5 fw-bold p-2 rounded hover-bg-light transition duration-150">
-                        Grupos de verbos
+                        Select groups
                     </h5>
                     <div class="mt-3 border-top pt-3">
                         <!-- Lista de Checkboxes (generada por JS) -->
@@ -181,15 +183,13 @@
             </div>
 
             <!-- BOTÓN FILTRAR -->
-            <button id="boton-filtrar" class="btn btn-dark btn-sm py-2 fw-bold shadow-sm" style="min-width: 150px;">
+            <button id="boton-filtrar" class="btn btn-dark btn-sm py-2 fw-bold shadow-sm" style="min-width: 150px; margin-top: 10px;">
                 Iniciar
             </button>
         </div>
 
         <div class="container" id="container_juego" style="justify-items: center; display: none;">
             
-            <h4 class="text-3xl fw-bold text-center mb-4 text-dark">What is the simple past?</h4>
-
             <input id="teclado-invisible" type="text" autocomplete="off"  autocorrect="off" spellcheck="false" />
             
             <p id="pista" class="pista-verbo">Infinitive: ___</p>
@@ -203,7 +203,7 @@
             </div>
             
         </div>
-        <p id="mensaje" class="mensaje-feedback" style="margin-top: 0px;"></p>
+        <p id="mensaje" class="mensaje-feedback" style="margin-top: 10px;"></p>
         <div class="row" id="finishImgLost" style="justify-content:center; display:none">
             <img src="{% static 'pastapp/img/lost.png' %}" alt="image" style="width: 250px; height: 250px">
         </div>
@@ -226,21 +226,21 @@
         {"group":"1","infinitivo":"BREAK","pasado":"BROKE","espa":"ROMPER"},
         {"group":"1","infinitivo":"BRING","pasado":"BROUGHT","espa":"TRAER"},
         {"group":"1","infinitivo":"BUY","pasado":"BOUGHT","espa":"COMPRAR"},
-        {"group":"2","infinitivo":"CATCH","pasado":"CAUGHT","espa":"ATRAPAR"},
-        {"group":"2","infinitivo":"CHOOSE","pasado":"CHOSE","espa":"ELEGIR"},
-        {"group":"2","infinitivo":"COME","pasado":"CAME","espa":"VENIR"},
-        {"group":"2","infinitivo":"CUT","pasado":"CUT","espa":"CORTAR"},
-        {"group":"2","infinitivo":"DO","pasado":"DID","espa":"HACER"},
-        {"group":"3","infinitivo":"DRINK","pasado":"DRANK","espa":"BEBER"},
-        {"group":"3","infinitivo":"DRIVE","pasado":"DROVE","espa":"CONDUCIR"},
-        {"group":"3","infinitivo":"EAT","pasado":"ATE","espa":"COMER"},
-        {"group":"3","infinitivo":"FALL","pasado":"FELL","espa":"CAER"},
-        {"group":"3","infinitivo":"FIGHT","pasado":"FOUGHT","espa":"PELEAR"},
-        {"group":"4","infinitivo":"FIND","pasado":"FOUND","espa":"ENCONTRAR"},
-        {"group":"4","infinitivo":"FLY","pasado":"FLEW","espa":"VOLAR"},
-        {"group":"4","infinitivo":"FORGET","pasado":"FORGOT","espa":"OLVIDAR"},
-        {"group":"4","infinitivo":"GIVE","pasado":"GAVE","espa":"DAR"},
-        {"group":"4","infinitivo":"GET","pasado":"GOT","espa":"CONSEGUIR"},
+        {"group":"1","infinitivo":"CATCH","pasado":"CAUGHT","espa":"ATRAPAR"},
+        {"group":"1","infinitivo":"CHOOSE","pasado":"CHOSE","espa":"ELEGIR"},
+        {"group":"1","infinitivo":"COME","pasado":"CAME","espa":"VENIR"},
+        {"group":"1","infinitivo":"CUT","pasado":"CUT","espa":"CORTAR"},
+        {"group":"1","infinitivo":"DO","pasado":"DID","espa":"HACER"},
+        {"group":"2","infinitivo":"DRINK","pasado":"DRANK","espa":"BEBER"},
+        {"group":"2","infinitivo":"DRIVE","pasado":"DROVE","espa":"CONDUCIR"},
+        {"group":"2","infinitivo":"EAT","pasado":"ATE","espa":"COMER"},
+        {"group":"2","infinitivo":"FALL","pasado":"FELL","espa":"CAER"},
+        {"group":"2","infinitivo":"FIGHT","pasado":"FOUGHT","espa":"PELEAR"},
+        {"group":"2","infinitivo":"FIND","pasado":"FOUND","espa":"ENCONTRAR"},
+        {"group":"2","infinitivo":"FLY","pasado":"FLEW","espa":"VOLAR"},
+        {"group":"2","infinitivo":"FORGET","pasado":"FORGOT","espa":"OLVIDAR"},
+        {"group":"2","infinitivo":"GIVE","pasado":"GAVE","espa":"DAR"},
+        {"group":"2","infinitivo":"GET","pasado":"GOT","espa":"CONSEGUIR"},
     ];
 
     let verbosRestantes = []; 
@@ -732,8 +732,11 @@
             gruposSeleccionados.includes(verbo.group)
         );
 
-        inicializarJuego(resultadoFiltrado)
-
+        if (resultadoFiltrado.length === 0) {
+            mostrarMensaje(`Selecionar al menos un grupo.`, "singrupo");     
+        } else {
+            inicializarJuego(resultadoFiltrado)
+        }
     });
 
     function reiniciar() {
