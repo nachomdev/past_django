@@ -141,6 +141,7 @@
         .mensaje-feedback.singrupo { color: #dc3545; margin-top: 10px;}
         .mensaje-feedback.error { color: orange; }
         .mensaje-feedback.finalizado { color: #122b46; font-size: 1.5em; }
+        .mensaje-feedback.intento { color: #122b46; font-size: 1.5em; }
 
         #teclado-invisible {
             position: absolute;
@@ -205,6 +206,7 @@
             </div>
             
         </div>
+        <p id="intentos" class="mensaje-feedback" style="margin-top: 10px;"></p>
         <p id="mensaje" class="mensaje-feedback" style="margin-top: 10px;"></p>
         <div class="row" id="finishImgLost" style="justify-content:center; display:none">
             <img src="{% static 'pastapp/img/lost.png' %}" alt="image" style="width: 250px; height: 250px">
@@ -259,6 +261,8 @@
     let verboActual = null;
     let palabraObjetivo = "";
     let intentos = 0;
+    let intentos_totales = 0;
+    let totales = 4*verbosRestantes.length;
     const MAX_INTENTOS = 4;
     let rondaTerminada = false;
     let filaActual = 0; // Fila donde se está escribiendo
@@ -268,6 +272,7 @@
     const pistaEspaEl = document.getElementById('pista_espa');
     const juegoEl = document.getElementById('contenedor-juego');
     const mensajeEl = document.getElementById('mensaje');
+    const mendajeIntento = document.getElementById('intentos');
     const enviarBtn = document.getElementById('boton-enviar');
     const reiniciarBtn = document.getElementById('boton-reiniciar');
 
@@ -276,6 +281,11 @@
     // ------------------------------------
 
     function mostrarMensaje(texto, tipo = "") {
+        mendajeIntento.innerHTML = texto;
+        mendajeIntento.className = 'mensaje-feedback ' + tipo;
+    }
+
+    function mostrarIntentoMensaje(texto, tipo = "") {
         mensajeEl.innerHTML = texto;
         mensajeEl.className = 'mensaje-feedback ' + tipo;
     }
@@ -443,6 +453,8 @@
         }
 
         intentos++;
+        mostrarIntentoMensaje(intentos+` / `+intentos_totales, "intento")
+        intentos_totales++;
 
         if (intento === palabraObjetivo) {
             const feedback = generarFeedback(intento, palabraObjetivo);
@@ -580,6 +592,7 @@
         container_juego.style.display = 'block';
         container_verbos.style.display = 'none';
         btnFiltrar.style.display = 'none';
+        intentos_totales = 0;
         mensajeEl.innerHTML = "";
         verbosRestantes = [...verbosBaseFiltrado]; 
         iniciarRonda();
