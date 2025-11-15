@@ -255,13 +255,25 @@
         {"group":"3","infinitivo":"MAKE","pasado":"MADE","espa":"HACER"},
         {"group":"3","infinitivo":"MEET","pasado":"MET","espa":"ENCONTRARSE"},
         {"group":"3","infinitivo":"PAY","pasado":"PAID","espa":"PAGAR"},
+        {"group":"4","infinitivo":"PUT","pasado":"PUT","espa":"PONER"},
+        {"group":"4","infinitivo":"READ","pasado":"READ","espa":"LEER"},
+        {"group":"4","infinitivo":"RIDE","pasado":"RODE","espa":"CONDUCIR"},
+        {"group":"4","infinitivo":"RUN","pasado":"RAN","espa":"CORRER"},
+        {"group":"4","infinitivo":"SAY","pasado":"SAID","espa":"DECIR"},
+        {"group":"4","infinitivo":"SEE","pasado":"SAW","espa":"VER"},
+        {"group":"4","infinitivo":"SELL","pasado":"SOLD","espa":"VENDER"},
+        {"group":"4","infinitivo":"SEND","pasado":"SENT","espa":"ENVIAR"},
+        {"group":"4","infinitivo":"SHUT","pasado":"SHUT","espa":"CERRAR"},
+        {"group":"4","infinitivo":"SING","pasado":"SANG","espa":"CANTAR"},
     ];
 
     let verbosRestantes = []; 
     let verboActual = null;
     let palabraObjetivo = "";
     let intentos = 0;
-    let intentos_totales = 0;
+    let verbos_jugados = 0;
+    let verbos_totales = 0;
+    intento = {}
     let totales = 0;
     const MAX_INTENTOS = 4;
     let rondaTerminada = false;
@@ -452,10 +464,6 @@
             return;
         }
 
-        intentos++;
-        mostrarIntentoMensaje(intentos_totales+` / `+totales, "intento")
-        intentos_totales++;
-
         if (intento === palabraObjetivo) {
             const feedback = generarFeedback(intento, palabraObjetivo);
             colorearFilaActual(intento, feedback); 
@@ -560,6 +568,11 @@
         inputInvisible.focus();
         mostrarMensaje("","limpiar")
 
+        verbos_jugados = (verbos_totales - verbosRestantes.length);
+        if (verbos_jugados != verbos_totales) {
+            verbos_jugados++;
+        }
+        
         finishImg.style.display = 'none'
         finishImgLost.style.display = 'none'
         if (verbosRestantes.length === 0) {
@@ -596,6 +609,7 @@
         mensajeEl.innerHTML = "";
         verbosRestantes = [...verbosBaseFiltrado]; 
         totales=verbosRestantes.length;
+        verbos_totales = verbosRestantes.length;
         iniciarRonda();
     }
 
