@@ -1,0 +1,831 @@
+{% load static %} 
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle de Past Tense (Entrada Directa)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <style>
+        /* --- ESTILOS CSS --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+        }
+
+        #wordle-verbo-juego {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .pista-verbo {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #18315e;
+            margin-top: 20px;
+            margin-bottom: 0px;
+        }
+
+        .pista-espa-verbo {
+            font-size: 1em;
+            color: #18315e;
+            margin-bottom: 20px;
+        }
+
+        .entrada-usuario {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #boton-enviar {
+            background-color: #28a745;
+            color: white;
+            /* Estilo para que se vea como un botón de acción */
+            flex-grow: 1; 
+        }
+
+        #boton-enviar:disabled {
+            background-color: #90ee90;
+            cursor: not-allowed;
+        }
+
+        /* --- CUADRÍCULA WORDLE --- */
+        .cuadricula-wordle {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .fila-intento {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .letra-caja {
+            width: 50px; /* Un poco más grande para mejor visibilidad */
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em; /* Letra más grande */
+            font-weight: bold;
+            border: 2px solid #d3d6da;
+            color: black;
+            transition: background-color 0.5s, transform 0.1s;
+        }
+        
+        /* Efecto al escribir (para indicar foco) */
+        .letra-caja.letra-escribiendo {
+            border-color: #565758;
+            transform: scale(1.05);
+        }
+
+        /* Colores de Feedback */
+        .letra-caja.correcto {
+            background-color: #6aaa64; /* Verde */
+            border-color: #6aaa64;
+            color: white;
+        }
+
+        .letra-caja.presente {
+            background-color: #c9b458; /* Amarillo */
+            border-color: #c9b458;
+            color: white;
+        }
+
+        .letra-caja.ausente {
+            background-color: #787c7e; /* Gris */
+            border-color: #787c7e;
+            color: white;
+        }
+
+        /* Mensajes de Feedback */
+        .mensaje-feedback {
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .mensaje-feedback.correcto { color: #28a745; }
+        .mensaje-feedback.fallido { color: #dc3545; }
+        .mensaje-feedback.singrupo { color: #dc3545; margin-top: 10px;}
+        .mensaje-feedback.error { color: orange; }
+        .mensaje-feedback.finalizado { color: #122b46; font-size: 1.5em; }
+        .mensaje-feedback.intento { color: #122b46; font-size: 1em; }
+        
+        #teclado-invisible {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 30px;
+            opacity: 0.01;
+            z-index: 10;
+        }
+
+        .form-check-label {
+            white-space: nowrap;
+        }
+
+    </style>
+</head>
+<body class="bg-light p-4 d-flex justify-content-center">
+    <div id="wordle-verbo-juego" style="justify-items: center;min-height: 500px;">
+
+        <div class="container" id="container_verbos" style="justify-items: center; display: block;">
+            
+            <h3 style="margin-bottom:20px">Past time</h3>
+            <!-- ************************************ -->
+            <!-- CARD DE SELECCIÓN DE GRUPOS -->
+            <!-- ************************************ -->
+            <div id="selector-verbos" class="card shadow-sm mb-4">
+                <div class="card-body p-3">
+                    <h5 class="fs-5 fw-bold p-2 rounded hover-bg-light transition duration-150">
+                        Ingresar nombre
+                    </h5>
+                    <input class="form-control" type="text" id="name-id" name="name-id" placeholder="Nombre..." minlength="1" required></input>
+                </div>
+            </div>
+
+            <!-- BOTÓN FILTRAR -->
+            <button id="boton-filtrar" class="btn btn-dark btn-sm py-2 fw-bold shadow-sm" style="min-width: 150px; margin-top: 10px;">
+                Iniciar
+            </button>
+        </div>
+
+        <div class="container" id="container_juego" style="justify-items: center; display: none;">
+            <h4 class="text-3xl fw-bold text-center mb-4 text-dark">Hi <b><span id="nameP" style="color: darkslategray;"></span></b>!, complete simple past</h4>
+
+            <input id="teclado-invisible" type="text" autocomplete="off"  autocorrect="off" spellcheck="false" />
+            
+            <p id="pista" class="pista-verbo">Infinitive: ___</p>
+            <p id="pista_espa" class="pista-espa-verbo"></p>
+            
+            <div id="contenedor-juego" class="cuadricula-wordle">
+                </div>
+            
+            <div class="entrada-usuario">
+                <button id="boton-enviar" style="display:none">Adivinar (ENTER)</button>
+            </div>
+            
+        </div>
+        <p id="intentos" class="mensaje-feedback" style="margin-top: 10px;"></p>
+        <p id="mensaje" class="mensaje-feedback" style="margin-top: 10px;"></p>
+        <div class="row" id="finishImgLost" style="justify-content:center; display:none">
+            <img src="{% static 'pastapp/img/lost.png' %}" alt="image" style="width: 250px; height: 250px">
+        </div>
+        <div class="row" id="finishImg" style="justify-content:center; display:none">
+            <img src="{% static 'pastapp/img/win.png' %}" alt="image" style="width: 250px; height: 250px">
+        </div>
+
+        <button id="boton-reiniciar" class="btn btn-danger btn-sm py-2 fw-bold shadow-sm" style="display:none; min-width: 150px;margin-top:25px;margin-bottom: 25px;">
+            Reiniciar
+        </button>
+        <label id="log" class="text" style="display: block; color: darkred;"></label> 
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+    // --- LÓGICA JAVASCRIPT ---
+    const verbosBase = [
+        {"group":"1","infinitivo":"BE (I-HE-SHE-IT)","pasado":"WAS","espa":"ERA"},
+        {"group":"1","infinitivo":"BE (YOU-WE-THEY)","pasado":"WERE","espa":"ERAN"},
+        {"group":"1","infinitivo":"BREAK","pasado":"BROKE","espa":"ROMPER"},
+        {"group":"1","infinitivo":"BRING","pasado":"BROUGHT","espa":"TRAER"},
+        {"group":"1","infinitivo":"BUY","pasado":"BOUGHT","espa":"COMPRAR"},
+        {"group":"1","infinitivo":"CATCH","pasado":"CAUGHT","espa":"ATRAPAR"},
+        {"group":"1","infinitivo":"CHOOSE","pasado":"CHOSE","espa":"ELEGIR"},
+        {"group":"1","infinitivo":"COME","pasado":"CAME","espa":"VENIR"},
+        {"group":"1","infinitivo":"CUT","pasado":"CUT","espa":"CORTAR"},
+        {"group":"1","infinitivo":"DO","pasado":"DID","espa":"HACER"},
+        {"group":"2","infinitivo":"DRINK","pasado":"DRANK","espa":"BEBER"},
+        {"group":"2","infinitivo":"DRIVE","pasado":"DROVE","espa":"CONDUCIR"},
+        {"group":"2","infinitivo":"EAT","pasado":"ATE","espa":"COMER"},
+        {"group":"2","infinitivo":"FALL","pasado":"FELL","espa":"CAER"},
+        {"group":"2","infinitivo":"FIGHT","pasado":"FOUGHT","espa":"PELEAR"},
+        {"group":"2","infinitivo":"FIND","pasado":"FOUND","espa":"ENCONTRAR"},
+        {"group":"2","infinitivo":"FLY","pasado":"FLEW","espa":"VOLAR"},
+        {"group":"2","infinitivo":"FORGET","pasado":"FORGOT","espa":"OLVIDAR"},
+        {"group":"2","infinitivo":"GIVE","pasado":"GAVE","espa":"DAR"},
+        {"group":"2","infinitivo":"GET","pasado":"GOT","espa":"CONSEGUIR"},
+        {"group":"3","infinitivo":"GO","pasado":"WENT","espa":"IR"},
+        {"group":"3","infinitivo":"HAVE","pasado":"HAD","espa":"TENER"},
+        {"group":"3","infinitivo":"KEEP","pasado":"KEPT","espa":"MANTENER"},
+        {"group":"3","infinitivo":"KNOW","pasado":"KNEW","espa":"SABER"},
+        {"group":"3","infinitivo":"LEARN","pasado":"LEARNT","espa":"APRENDER"},
+        {"group":"3","infinitivo":"LEAVE","pasado":"LEFT","espa":"DEJAR"},
+        {"group":"3","infinitivo":"LOSE","pasado":"LOST","espa":"PERDER"},
+        {"group":"3","infinitivo":"MAKE","pasado":"MADE","espa":"HACER"},
+        {"group":"3","infinitivo":"MEET","pasado":"MET","espa":"ENCONTRARSE"},
+        {"group":"3","infinitivo":"PAY","pasado":"PAID","espa":"PAGAR"},
+        {"group":"4","infinitivo":"PUT","pasado":"PUT","espa":"PONER"},
+        {"group":"4","infinitivo":"READ","pasado":"READ","espa":"LEER"},
+        {"group":"4","infinitivo":"RIDE","pasado":"RODE","espa":"CONDUCIR"},
+        {"group":"4","infinitivo":"RUN","pasado":"RAN","espa":"CORRER"},
+        {"group":"4","infinitivo":"SAY","pasado":"SAID","espa":"DECIR"},
+        {"group":"4","infinitivo":"SEE","pasado":"SAW","espa":"VER"},
+        {"group":"4","infinitivo":"SELL","pasado":"SOLD","espa":"VENDER"},
+        {"group":"4","infinitivo":"SEND","pasado":"SENT","espa":"ENVIAR"},
+        {"group":"4","infinitivo":"SHUT","pasado":"SHUT","espa":"CERRAR"},
+        {"group":"4","infinitivo":"SING","pasado":"SANG","espa":"CANTAR"},
+        {"group":"5","infinitivo":"SIT","pasado":"SAT","espa":"SENTARSE"},
+        {"group":"5","infinitivo":"SLEEP","pasado":"SLEPT","espa":"DORMIR"},
+        {"group":"5","infinitivo":"SPEAK","pasado":"SPOKE","espa":"HABLAR"},
+        {"group":"5","infinitivo":"STAND","pasado":"STOOD","espa":"PARARSE"},
+        {"group":"5","infinitivo":"SWIM","pasado":"SWAM","espa":"NADAR"},
+        {"group":"5","infinitivo":"TAKE","pasado":"TOOK","espa":"LLEVAR"},
+        {"group":"5","infinitivo":"TEACH","pasado":"TAUGHT","espa":"ENSEÑAR"},
+        {"group":"5","infinitivo":"TELL","pasado":"TOLD","espa":"DECIR"},
+        {"group":"5","infinitivo":"THINK","pasado":"THOUGHT","espa":"PENSAR"},
+        {"group":"5","infinitivo":"WEAR","pasado":"WORE","espa":"VESTIR"},
+        {"group":"5","infinitivo":"WRITE","pasado":"WROTE","espa":"ESCRIBIR"},
+        {"group":"5","infinitivo":"WAKE","pasado":"WOKE","espa":"DESPERTAR"},
+    ];
+
+    let verbosRestantes = []; 
+    let verboActual = null;
+    let palabraObjetivo = "";
+    let intentos = 0;
+    let verbos_jugados = 0;
+    let verbos_totales = 0;
+    intento = {}
+    let totales = 0;
+    const MAX_INTENTOS = 4;
+    let rondaTerminada = false;
+    let filaActual = 0; // Fila donde se está escribiendo
+
+    // Elementos del DOM
+    const pistaEl = document.getElementById('pista');
+    const pistaEspaEl = document.getElementById('pista_espa');
+    const juegoEl = document.getElementById('contenedor-juego');
+    const mensajeEl = document.getElementById('mensaje');
+    const mensajeIntento = document.getElementById('intentos');
+    const nameInput = document.getElementById('name-id');
+    const enviarBtn = document.getElementById('boton-enviar');
+    const reiniciarBtn = document.getElementById('boton-reiniciar');
+    const name = document.getElementById('nameP');
+    const log = document.getElementById('log');
+    let logPartial = "";
+
+    // ------------------------------------
+    // 1. FUNCIONES DE UI (VISUAL)
+    // ------------------------------------
+
+    function mostrarMensaje(texto, tipo = "") {
+        mensajeEl.innerHTML = texto;
+        mensajeEl.className = 'mensaje-feedback ' + tipo;
+    }
+
+    function mostrarIntentoMensaje(texto, tipo = "") {
+        mensajeIntento.innerHTML = texto;
+        mensajeIntento.className = 'mensaje-feedback ' + tipo;
+    }
+
+    function limpiarCuadricula() {
+        juegoEl.innerHTML = '';
+        filaActual = 0;
+
+        // Crea las filas y celdas vacías
+        for (let i = 0; i < MAX_INTENTOS; i++) {
+            const filaEl = document.createElement('div');
+            filaEl.className = 'fila-intento';
+            filaEl.dataset.fila = i;
+            
+            const longitud = palabraObjetivo.length;
+            
+            for (let j = 0; j < longitud; j++) {
+                const caja = document.createElement('div');
+                caja.className = 'letra-caja';
+                caja.dataset.col = j;
+                caja.textContent = '';
+                filaEl.appendChild(caja);
+            }
+            juegoEl.appendChild(filaEl);
+        }
+    }
+    
+    function marcarCeldaActual() {
+        document.querySelectorAll('.letra-caja.letra-escribiendo').forEach(caja => {
+            caja.classList.remove('letra-escribiendo');
+            caja.style.borderColor = '#d3d6da';
+        });
+
+        const filaEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
+        if (!filaEl) return;
+
+        const celdas = filaEl.querySelectorAll('.letra-caja');
+        let colFoco = -1;
+
+        for (let i = 0; i < palabraObjetivo.length; i++) {
+            if (celdas[i].textContent === '') {
+                colFoco = i;
+                break;
+            }
+        }
+
+        if (colFoco === -1) {
+            colFoco = palabraObjetivo.length - 1;
+        }
+
+        const celda = celdas[colFoco];
+        if (celda) {
+            celda.classList.add('letra-escribiendo');
+            celda.style.borderColor = '#565758';
+
+            const input = document.getElementById('teclado-invisible');
+
+            // Posicionar el input dentro de la celda
+            const rect = celda.getBoundingClientRect();
+            input.style.position = 'fixed';
+            input.style.left = `${rect.left + 5}px`;
+            input.style.top = `${rect.top + 5}px`;
+            input.style.width = '30px';
+            input.style.height = '30px';
+            input.style.opacity = '0.01';
+            input.style.zIndex = '100';
+
+            input.focus();
+        }
+    }
+
+    function inicializarEntradaTactil() {
+        const inputInvisible = document.getElementById('teclado-invisible');
+
+        // Enfocar input al tocar cualquier celda
+        document.querySelectorAll('.letra-caja').forEach(celda => {
+            celda.addEventListener('touchstart', () => {
+                marcarCeldaActual(); // marca visual
+                inputInvisible.focus(); // muestra teclado
+            });
+        });
+
+        // Captura letras ingresadas
+        inputInvisible.addEventListener('input', function(e) {
+            const letra = e.target.value.toUpperCase();
+            e.target.value = '';
+
+            const celda = document.querySelector('.letra-caja.letra-escribiendo');
+            if (celda && letra.match(/^[A-Z]$/)) {
+                celda.textContent = letra;
+                celda.classList.remove('letra-escribiendo');
+                marcarCeldaActual(); // avanzar
+            }
+        });
+    }
+
+    function colorearFilaActual(intento, feedback) {
+        const filaEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
+        if (!filaEl) return;
+
+        const celdas = filaEl.querySelectorAll('.letra-caja');
+
+        // Itera sobre las celdas para aplicar el color y la letra
+        for (let i = 0; i < intento.length; i++) {
+            const caja = celdas[i];
+            
+            // Remueve la clase temporal de foco
+            caja.classList.remove('letra-escribiendo'); 
+            
+            // Aplica el color con un pequeño delay
+            setTimeout(() => {
+                caja.classList.add(feedback[i]);
+                caja.style.borderColor = ''; // Deja que el CSS de color controle el borde
+            }, i * 300);
+        }
+    }
+
+    // ------------------------------------
+    // 2. LÓGICA DEL JUEGO Y TECLADO
+    // ------------------------------------
+
+    function generarFeedback(intento, objetivo) {
+        const resultado = Array(objetivo.length).fill('ausente');
+        const objetivoChars = objetivo.split('');
+        const intentoChars = intento.split('');
+
+        // 1. Marcar 'correcto' (verde)
+        for (let i = 0; i < objetivo.length; i++) {
+            if (intentoChars[i] === objetivoChars[i]) {
+                resultado[i] = 'correcto';
+                objetivoChars[i] = null;
+            }
+        }
+
+        // 2. Marcar 'presente' (amarillo)
+        for (let i = 0; i < objetivo.length; i++) {
+            if (resultado[i] !== 'correcto') {
+                const indexEnObjetivo = objetivoChars.indexOf(intentoChars[i]);
+                if (indexEnObjetivo > -1) {
+                    resultado[i] = 'presente';
+                    objetivoChars[indexEnObjetivo] = null;
+                }
+            }
+        }
+        return resultado;
+    }
+
+    function verificarIntento(intentoManual = null) {
+        if (rondaTerminada) return;
+        
+        const filaActualEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
+        if (!filaActualEl) return;
+        
+        // 1. Construye el intento a partir de las celdas de la cuadrícula
+        const celdas = filaActualEl.querySelectorAll('.letra-caja');
+        let intento = '';
+        celdas.forEach(caja => {
+            intento += caja.textContent;
+        });
+        
+        // 2. Validación de longitud
+        if (intento.length !== palabraObjetivo.length) {
+            mostrarMensaje(`Completar antes de enviar.`, "error");
+            return;
+        }
+
+        
+        if(logPartial == "") {
+            logPartial = intento;
+        } else {
+            logPartial = logPartial + " - " +intento;
+        }
+        console.log(name.textContent+" : "+logPartial);
+
+        if (intento === palabraObjetivo) {
+            const feedback = generarFeedback(intento, palabraObjetivo);
+            colorearFilaActual(intento, feedback); 
+
+            mostrarMensaje(`¡Correct! ✅`, "correcto");
+            rondaTerminada = true;
+            enviarBtn.disabled = true;
+            setTimeout(iniciarRonda, 3000);
+        } else {
+            const feedback = generarFeedback(intento, palabraObjetivo);
+            colorearFilaActual(intento, feedback);
+
+            filaActual++; // Avanza a la siguiente fila
+
+            if (filaActual >= MAX_INTENTOS) {
+                mostrarMensaje(`Oops! >> La correcta es **<b>${palabraObjetivo}</b>**. ❌`, "fallido");
+                rondaTerminada = true;
+                enviarBtn.disabled = true;
+                finishImgLost.style.display = 'block'
+                setTimeout(iniciarRonda, 4000);
+            } else {
+                //mostrarMensaje(`Intento ${intentos} de ${MAX_INTENTOS}. ¡Sigue intentando!`, "error");
+                marcarCeldaActual(); // Marca la primera celda de la nueva fila
+            }
+        }
+    }
+
+    function manejarTeclado(evento) {
+        if (rondaTerminada) return;
+
+        const tecla = evento.key.toUpperCase();
+        const longitudObjetivo = palabraObjetivo.length;
+        const filaActualEl = document.querySelector(`.fila-intento[data-fila="${filaActual}"]`);
+        if (!filaActualEl) return;
+        const celdas = filaActualEl.querySelectorAll('.letra-caja');
+
+        // 1. Manejar Enter (Enviar)
+        if (tecla === 'ENTER') {
+            // Previene el comportamiento por defecto (e.g., enviar formularios)
+            //evento.preventDefault();
+            
+            let intento = '';
+            celdas.forEach(caja => { intento += caja.textContent; });
+
+            if (intento.length === longitudObjetivo) {
+                verificarIntento();
+            } else {
+                 mostrarMensaje(`Completar antes de enviar.`, "error");
+            }
+            return;
+        }
+
+        // 2. Manejar Backspace (Borrar)
+        if (tecla === 'BACKSPACE') {
+            evento.preventDefault();
+            
+            let colBorrar = -1;
+            
+            // Busca la última celda no vacía para borrar
+            for (let i = longitudObjetivo - 1; i >= 0; i--) {
+                if (celdas[i].textContent !== '') {
+                    colBorrar = i;
+                    break;
+                }
+            }
+
+            if (colBorrar >= 0) {
+                celdas[colBorrar].textContent = '';
+                celdas[colBorrar].className = 'letra-caja'; // Limpia el estilo de foco/escritura
+                celdas[colBorrar].style.borderColor = '#d3d6da';
+            }
+            marcarCeldaActual(); // Vuelve a marcar la celda de enfoque
+            return;
+        }
+
+        const input = document.getElementById('teclado-invisible');
+        if (document.activeElement === input) return; // evitar duplicado
+
+        // 3. Manejar Letras (A-Z)
+        if (tecla.match(/[A-Z]/) && tecla.length === 1) {
+            let colEscribir = -1;
+            
+            // Busca la primera celda vacía para escribir
+            for (let i = 0; i < longitudObjetivo; i++) {
+                if (celdas[i].textContent === '') {
+                    colEscribir = i;
+                    break;
+                }
+            }
+
+            if (colEscribir !== -1) {
+                celdas[colEscribir].textContent = tecla;
+                celdas[colEscribir].className = 'letra-caja';
+                celdas[colEscribir].classList.add('letra-escribiendo');
+            }
+             marcarCeldaActual(); // Mueve el foco a la siguiente celda vacía (o la última)
+        }
+    }
+
+    function iniciarRonda() {
+        const inputInvisible = document.getElementById('teclado-invisible');
+        inputInvisible.focus();
+        mostrarMensaje("","limpiar")
+        mensajeIntento.style.display = 'block';
+        
+        verbos_jugados = (verbos_totales - verbosRestantes.length);
+        if (verbos_jugados != verbos_totales) {
+            verbos_jugados++;
+        }
+
+        mensajeIntento.textContent = verbos_jugados + " / " + verbos_totales
+        
+        finishImg.style.display = 'none'
+        finishImgLost.style.display = 'none'
+        if (verbosRestantes.length === 0) {
+            mostrarMensaje("Congrats! 🎉", "finalizado");
+            finishImg.style.display = 'block';
+            enviarBtn.disabled = true;
+            container_juego.style.display = 'none';
+            return;
+        }
+
+        const indice = Math.floor(Math.random() * verbosRestantes.length);
+        verboActual = verbosRestantes.splice(indice, 1)[0];
+        palabraObjetivo = verboActual.pasado.toUpperCase();
+        rondaTerminada = false;
+
+        pistaEl.textContent = `Infinitive: TO ${verboActual.infinitivo}`;
+        pistaEspaEl.textContent = `( ${verboActual.espa} )`;
+        /*mostrarMensaje(`Adivina el pasado (Past Tense). La palabra tiene ${palabraObjetivo.length} letras.`, "");*/
+        
+        enviarBtn.disabled = false;
+        
+        limpiarCuadricula();
+        inicializarEntradaTactil();
+        marcarCeldaActual(); // Marca la celda 1 de la fila 0 al inicio
+    }
+    
+    function inicializarJuego(verbosBaseFiltrado, name) {
+        reiniciarBtn.style.display = 'block';
+        container_juego.style.display = 'block';
+        container_verbos.style.display = 'none';
+        btnFiltrar.style.display = 'none';
+        nameP.textContent = name;
+        mensajeEl.innerHTML = "";
+        verbosRestantes = [...verbosBaseFiltrado]; 
+        totales=verbosRestantes.length;
+        verbos_totales = verbosRestantes.length;
+        iniciarRonda();
+    }
+
+    // ------------------------------------
+    // 3. EVENT LISTENERS
+    // ------------------------------------
+
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // El botón enviar llama a la función de verificación
+        enviarBtn.addEventListener('click', verificarIntento);
+        reiniciarBtn.addEventListener('click', reiniciar);
+        
+        // El listener principal que captura las teclas A-Z, ENTER, y BACKSPACE
+        document.addEventListener('keydown', manejarTeclado);
+
+    });
+
+    document.getElementById('teclado-invisible').addEventListener('input', function(e) {
+        const letra = e.target.value.toUpperCase();
+        e.target.value = '';
+
+        const celda = document.querySelector('.letra-caja.letra-escribiendo');
+        if (celda && letra.match(/^[A-Z]$/)) {
+        celda.textContent = letra;
+        celda.classList.remove('letra-escribiendo');
+        marcarCeldaActual(); // avanzar al siguiente
+        }
+    });
+
+    document.querySelectorAll('.letra-caja').forEach(celda => {
+        celda.addEventListener('touchstart', () => {
+            marcarCeldaActual();
+
+            const input = document.getElementById('teclado-invisible');
+
+            // Enfocar con delay para evitar que se pierda el foco
+            setTimeout(() => {
+                input.focus();
+            }, 100);
+        });
+    });
+
+    // Activar al cargar
+    window.addEventListener('load', () => {
+      marcarCeldaActual();
+    });
+
+    // --- REFERENCIAS DOM ---
+    const btnFiltrar = document.getElementById('boton-filtrar');
+    //const listaCheckboxes = document.getElementById('lista-checkboxes');
+    const listaDesc = document.getElementById('lista-desc');
+    const mensajeSeleccion = document.getElementById('mensaje-seleccion');
+
+    // --- FUNCIONES DE LÓGICA ---
+
+    /**
+     * Rellena el card desplegable con checkboxes para cada grupo de verbos.
+     */
+    function generarCheckboxes() {
+        listaCheckboxes.innerHTML = '';
+        
+        // 1. Obtener grupos únicos y ordenados
+        const uniqueGroups = [...new Set(verbosBase.map(v => v.group))].sort();
+
+        // 2. Generar checkboxes por grupo
+        uniqueGroups.forEach((group) => {
+            // El wrapper es una columna de la grilla de Bootstrap
+            const wrapper = document.createElement('div');
+            wrapper.className = 'row'; 
+            wrapper.style = "max-width:150px";
+            
+            const formCheck = document.createElement('div');
+            formCheck.className = 'form-check';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.value = group; // El valor es el ID del grupo
+            input.id = `group-${group}`;
+            input.className = 'form-check-input';
+            input.checked = true; // Por defecto todos están seleccionados
+
+            // 3. Preparar el contenido del popover
+            const infinitivos = verbosBase
+                .filter(v => v.group === group)
+                .map(v => {
+                    // Consolidar las formas específicas de "BE" a solo "BE"
+                    if (v.infinitivo === "BE (I-HE-SHE-IT)" || v.infinitivo === "BE (YOU-WE-THEY)") {
+                        return "BE";
+                    }
+                    return v.infinitivo;
+                });
+            
+            // Obtener infinitivos únicos y unirlos para el popover
+            const uniqueInfinitivos = [...new Set(infinitivos)];
+            const verbosDelGrupo = uniqueInfinitivos.join(' - ');
+
+            const label = document.createElement('label');
+            label.htmlFor = input.id;
+            label.textContent = `Group ${group}`; // Mostrar "Group X"
+            label.className = 'form-check-label text cursor-pointer';
+
+            // ATRIBUTOS PARA EL POPOVER
+            label.setAttribute('data-bs-toggle', 'popover');
+            label.setAttribute('data-bs-trigger', 'hover focus'); // Se activa al pasar el mouse o al enfocarse (para accesibilidad)
+            label.setAttribute('data-bs-placement', 'right'); // Posición del popover
+            label.setAttribute('data-bs-content', verbosDelGrupo); // Contenido de los verbos
+
+            formCheck.appendChild(input);
+            formCheck.appendChild(label);
+            wrapper.appendChild(formCheck);
+            listaCheckboxes.appendChild(wrapper);
+
+            const wrapper2 = document.createElement('div');
+            wrapper.className = 'row'; 
+            wrapper.style = "max-width:150px";
+
+            const label2 = document.createElement('label');
+            label2.htmlFor = input.id;
+            label2.textContent = `${verbosDelGrupo}`; // Mostrar "Group X"
+            label2.className = 'text-secondary cursor-pointer';
+            label2.style = "font-size: small; margin-bottom: 5px";
+            wrapper2.appendChild(label2);
+            listaCheckboxes.appendChild(wrapper2);
+        });
+        
+        // 4. Inicializar los popovers después de que los elementos están en el DOM
+        //inicializarPopovers();
+    }
+
+    /**
+     * Inicializa todos los popovers en la página.
+     */
+    function inicializarPopovers() {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        popoverTriggerList.map(function (popoverTriggerEl) {
+          return new bootstrap.Popover(popoverTriggerEl, {
+            container: 'body' // Asegura que el popover se muestre correctamente en el contenedor.
+          })
+        })
+    }
+
+    /**
+     * Lógica al hacer click en el botón "Mostrar Listado Filtrado".
+     */
+    btnFiltrar.addEventListener('click', () => {
+        // 1. Recoger los IDs de grupo seleccionados (ej: ['1', '2'])
+        const gruposSeleccionados = [];
+        const name = document.getElementById('name-id').value;
+        //const checkboxes = listaCheckboxes.querySelectorAll('input[type="checkbox"]');
+        
+        /*checkboxes.forEach(cb => {
+            if (cb.checked) {
+                // El valor del checkbox es el ID del grupo (string)
+                gruposSeleccionados.push(cb.value); 
+            }
+        });*/
+
+        // 2. Filtrar el array base: solo se incluyen verbos cuyo 'group' esté en los seleccionados
+        const resultadoFiltrado = obtenerElementosAleatorios(verbosBase, 10)
+        
+        if (resultadoFiltrado.length === 0) {
+            mostrarMensaje(`Selecionar al menos un grupo.`, "singrupo");     
+        } else {
+            inicializarJuego(resultadoFiltrado, name)
+        }
+    });
+
+    function reiniciar() {
+        window.location.reload();
+    }
+
+    // --- INICIALIZACIÓN ---
+    window.onload = () => {
+        //generarCheckboxes();
+    };
+
+    function obtenerElementosAleatorios(arr, cantidad) {
+        // 1. Crear una copia superficial del array para no modificar el original
+        const arrayCopia = [...arr]; 
+        
+        // 2. Mezclar el array (Algoritmo de Fisher-Yates)
+        for (let i = arrayCopia.length - 1; i > 0; i--) {
+            // Generar un índice aleatorio j menor o igual a i
+            const j = Math.floor(Math.random() * (i + 1));
+            
+            // Intercambiar el elemento en i con el elemento en j
+            [arrayCopia[i], arrayCopia[j]] = [arrayCopia[j], arrayCopia[i]];
+        }
+        
+        // 3. Devolver los primeros 'cantidad' elementos
+        // Usa Math.min para no intentar tomar más elementos de los que hay
+        return arrayCopia.slice(0, Math.min(cantidad, arr.length));
+    }
+
+</script>
+
+</body>
+</html>
