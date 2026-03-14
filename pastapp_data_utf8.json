@@ -1,0 +1,1587 @@
+[
+{
+  "model": "pastapp.verb",
+  "pk": 1,
+  "fields": {
+    "group": "1",
+    "infinitive": "BE (I-HE-SHE-IT)",
+    "past_tense": "WAS",
+    "spanish": "ERA"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 2,
+  "fields": {
+    "group": "1",
+    "infinitive": "BE (YOU-WE-THEY)",
+    "past_tense": "WERE",
+    "spanish": "ERAN"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 3,
+  "fields": {
+    "group": "1",
+    "infinitive": "BREAK",
+    "past_tense": "BROKE",
+    "spanish": "ROMPER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 4,
+  "fields": {
+    "group": "1",
+    "infinitive": "BRING",
+    "past_tense": "BROUGHT",
+    "spanish": "TRAER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 5,
+  "fields": {
+    "group": "1",
+    "infinitive": "BUY",
+    "past_tense": "BOUGHT",
+    "spanish": "COMPRAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 6,
+  "fields": {
+    "group": "1",
+    "infinitive": "CATCH",
+    "past_tense": "CAUGHT",
+    "spanish": "ATRAPAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 7,
+  "fields": {
+    "group": "1",
+    "infinitive": "CHOOSE",
+    "past_tense": "CHOSE",
+    "spanish": "ELEGIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 8,
+  "fields": {
+    "group": "1",
+    "infinitive": "COME",
+    "past_tense": "CAME",
+    "spanish": "VENIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 9,
+  "fields": {
+    "group": "1",
+    "infinitive": "CUT",
+    "past_tense": "CUT",
+    "spanish": "CORTAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 10,
+  "fields": {
+    "group": "2",
+    "infinitive": "DO",
+    "past_tense": "DID",
+    "spanish": "HACER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 11,
+  "fields": {
+    "group": "2",
+    "infinitive": "DRINK",
+    "past_tense": "DRANK",
+    "spanish": "BEBER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 12,
+  "fields": {
+    "group": "2",
+    "infinitive": "DRIVE",
+    "past_tense": "DROVE",
+    "spanish": "CONDUCIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 13,
+  "fields": {
+    "group": "2",
+    "infinitive": "EAT",
+    "past_tense": "ATE",
+    "spanish": "COMER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 14,
+  "fields": {
+    "group": "2",
+    "infinitive": "FALL",
+    "past_tense": "FELL",
+    "spanish": "CAER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 15,
+  "fields": {
+    "group": "2",
+    "infinitive": "FIGHT",
+    "past_tense": "FOUGHT",
+    "spanish": "PELEAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 16,
+  "fields": {
+    "group": "2",
+    "infinitive": "FIND",
+    "past_tense": "FOUND",
+    "spanish": "ENCONTRAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 17,
+  "fields": {
+    "group": "2",
+    "infinitive": "FLY",
+    "past_tense": "FLEW",
+    "spanish": "VOLAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 18,
+  "fields": {
+    "group": "2",
+    "infinitive": "FORGET",
+    "past_tense": "FORGOT",
+    "spanish": "OLVIDAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 19,
+  "fields": {
+    "group": "3",
+    "infinitive": "GIVE",
+    "past_tense": "GAVE",
+    "spanish": "DAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 20,
+  "fields": {
+    "group": "2",
+    "infinitive": "GET",
+    "past_tense": "GOT",
+    "spanish": "CONSEGUIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 21,
+  "fields": {
+    "group": "3",
+    "infinitive": "GO",
+    "past_tense": "WENT",
+    "spanish": "IR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 22,
+  "fields": {
+    "group": "3",
+    "infinitive": "HAVE",
+    "past_tense": "HAD",
+    "spanish": "TENER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 23,
+  "fields": {
+    "group": "3",
+    "infinitive": "KEEP",
+    "past_tense": "KEPT",
+    "spanish": "MANTENER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 24,
+  "fields": {
+    "group": "3",
+    "infinitive": "KNOW",
+    "past_tense": "KNEW",
+    "spanish": "SABER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 25,
+  "fields": {
+    "group": "3",
+    "infinitive": "LEARN",
+    "past_tense": "LEARNT",
+    "spanish": "APRENDER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 26,
+  "fields": {
+    "group": "4",
+    "infinitive": "LEAVE",
+    "past_tense": "LEFT",
+    "spanish": "DEJAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 27,
+  "fields": {
+    "group": "4",
+    "infinitive": "LOSE",
+    "past_tense": "LOST",
+    "spanish": "PERDER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 28,
+  "fields": {
+    "group": "3",
+    "infinitive": "MAKE",
+    "past_tense": "MADE",
+    "spanish": "HACER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 29,
+  "fields": {
+    "group": "4",
+    "infinitive": "MEET",
+    "past_tense": "MET",
+    "spanish": "ENCONTRARSE"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 30,
+  "fields": {
+    "group": "4",
+    "infinitive": "PAY",
+    "past_tense": "PAID",
+    "spanish": "PAGAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 31,
+  "fields": {
+    "group": "4",
+    "infinitive": "PUT",
+    "past_tense": "PUT",
+    "spanish": "PONER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 32,
+  "fields": {
+    "group": "4",
+    "infinitive": "READ",
+    "past_tense": "READ",
+    "spanish": "LEER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 33,
+  "fields": {
+    "group": "4",
+    "infinitive": "RIDE",
+    "past_tense": "RODE",
+    "spanish": "CONDUCIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 34,
+  "fields": {
+    "group": "5",
+    "infinitive": "RUN",
+    "past_tense": "RAN",
+    "spanish": "CORRER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 35,
+  "fields": {
+    "group": "5",
+    "infinitive": "SAY",
+    "past_tense": "SAID",
+    "spanish": "DECIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 36,
+  "fields": {
+    "group": "5",
+    "infinitive": "SEE",
+    "past_tense": "SAW",
+    "spanish": "VER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 37,
+  "fields": {
+    "group": "5",
+    "infinitive": "SELL",
+    "past_tense": "SOLD",
+    "spanish": "VENDER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 38,
+  "fields": {
+    "group": "5",
+    "infinitive": "SEND",
+    "past_tense": "SENT",
+    "spanish": "ENVIAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 39,
+  "fields": {
+    "group": "5",
+    "infinitive": "SHUT",
+    "past_tense": "SHUT",
+    "spanish": "CERRAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 40,
+  "fields": {
+    "group": "5",
+    "infinitive": "SING",
+    "past_tense": "SANG",
+    "spanish": "CANTAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 41,
+  "fields": {
+    "group": "5",
+    "infinitive": "SIT",
+    "past_tense": "SAT",
+    "spanish": "SENTARSE"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 42,
+  "fields": {
+    "group": "5",
+    "infinitive": "SLEEP",
+    "past_tense": "SLEPT",
+    "spanish": "DORMIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 43,
+  "fields": {
+    "group": "5",
+    "infinitive": "SPEAK",
+    "past_tense": "SPOKE",
+    "spanish": "HABLAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 44,
+  "fields": {
+    "group": "6",
+    "infinitive": "STAND",
+    "past_tense": "STOOD",
+    "spanish": "PARARSE"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 45,
+  "fields": {
+    "group": "6",
+    "infinitive": "SWIM",
+    "past_tense": "SWAM",
+    "spanish": "NADAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 46,
+  "fields": {
+    "group": "6",
+    "infinitive": "TAKE",
+    "past_tense": "TOOK",
+    "spanish": "LLEVAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 47,
+  "fields": {
+    "group": "6",
+    "infinitive": "TEACH",
+    "past_tense": "TAUGHT",
+    "spanish": "ENSEÑAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 48,
+  "fields": {
+    "group": "6",
+    "infinitive": "TELL",
+    "past_tense": "TOLD",
+    "spanish": "DECIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 49,
+  "fields": {
+    "group": "6",
+    "infinitive": "THINK",
+    "past_tense": "THOUGHT",
+    "spanish": "PENSAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 50,
+  "fields": {
+    "group": "6",
+    "infinitive": "WEAR",
+    "past_tense": "WORE",
+    "spanish": "VESTIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 51,
+  "fields": {
+    "group": "6",
+    "infinitive": "WRITE",
+    "past_tense": "WROTE",
+    "spanish": "ESCRIBIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 52,
+  "fields": {
+    "group": "6",
+    "infinitive": "WAKE",
+    "past_tense": "WOKE",
+    "spanish": "DESPERTAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 53,
+  "fields": {
+    "group": "1",
+    "infinitive": "BEGIN",
+    "past_tense": "BEGAN",
+    "spanish": "COMENZAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 54,
+  "fields": {
+    "group": "1",
+    "infinitive": "BUILD",
+    "past_tense": "BUILT",
+    "spanish": "CONSTRUIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 55,
+  "fields": {
+    "group": "2",
+    "infinitive": "FEEL",
+    "past_tense": "FELT",
+    "spanish": "SENTIR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 56,
+  "fields": {
+    "group": "3",
+    "infinitive": "GROW",
+    "past_tense": "GREW",
+    "spanish": "CRECER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 57,
+  "fields": {
+    "group": "3",
+    "infinitive": "HEAR",
+    "past_tense": "HEARD",
+    "spanish": "ESCUCHAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 58,
+  "fields": {
+    "group": "3",
+    "infinitive": "HIDE",
+    "past_tense": "HID",
+    "spanish": "ESCONDER"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 59,
+  "fields": {
+    "group": "3",
+    "infinitive": "HIT",
+    "past_tense": "HIT",
+    "spanish": "GOLPEAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 60,
+  "fields": {
+    "group": "3",
+    "infinitive": "HURT",
+    "past_tense": "HURT",
+    "spanish": "LASTIMAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 61,
+  "fields": {
+    "group": "4",
+    "infinitive": "LEND",
+    "past_tense": "LET",
+    "spanish": "PRESTAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 62,
+  "fields": {
+    "group": "4",
+    "infinitive": "LET",
+    "past_tense": "LET",
+    "spanish": "DEJAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 63,
+  "fields": {
+    "group": "5",
+    "infinitive": "RING",
+    "past_tense": "RANG",
+    "spanish": "SONAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 64,
+  "fields": {
+    "group": "6",
+    "infinitive": "THROW",
+    "past_tense": "THREW",
+    "spanish": "TIRAR"
+  }
+},
+{
+  "model": "pastapp.verb",
+  "pk": 65,
+  "fields": {
+    "group": "6",
+    "infinitive": "WIN",
+    "past_tense": "WON",
+    "spanish": "GANAR"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 1,
+  "fields": {
+    "player_name": "test_user2",
+    "target_verb": "RODE",
+    "attempt_word": "AAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:14:05.543Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 2,
+  "fields": {
+    "player_name": "test_user2",
+    "target_verb": "RODE",
+    "attempt_word": "RODE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:14:23.324Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 3,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "DID",
+    "attempt_word": "DID",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:16:12.135Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 4,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "BOUGHT",
+    "attempt_word": "BOUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:16:19.472Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 5,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "CAUGHT",
+    "attempt_word": "CAUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:16:27.487Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 6,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "WAS",
+    "attempt_word": "WAS",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:16:47.857Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 7,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOUS",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:16:54.946Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 8,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOSE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:16:59.457Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 9,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:17:07.169Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 10,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "CAME",
+    "attempt_word": "CAME",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:17:17.273Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 11,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "WERE",
+    "attempt_word": "WERE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:17:26.026Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 12,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "CUT",
+    "attempt_word": "CUT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:17:32.346Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 13,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "BROKE",
+    "attempt_word": "CROKE",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:17:38.563Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 14,
+  "fields": {
+    "player_name": "po",
+    "target_verb": "BROKE",
+    "attempt_word": "BROKE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:17:41.954Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 15,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:11.339Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 16,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:12.032Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 17,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:12.767Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 18,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:13.230Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 19,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "TAUGHT",
+    "attempt_word": "AAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:39.112Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 20,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "TAUGHT",
+    "attempt_word": "AAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:39.805Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 21,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "TAUGHT",
+    "attempt_word": "AAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:40.515Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 22,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "TAUGHT",
+    "attempt_word": "AAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:21:40.885Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 23,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "WAS",
+    "attempt_word": "AAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:07.390Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 24,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "WAS",
+    "attempt_word": "AAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:08.091Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 25,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "WAS",
+    "attempt_word": "AAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:08.809Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 26,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "WAS",
+    "attempt_word": "AAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:09.230Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 27,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROUGHT",
+    "attempt_word": "AAAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:30.397Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 28,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROUGHT",
+    "attempt_word": "AAAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:31.088Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 29,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROUGHT",
+    "attempt_word": "AAAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:31.795Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 30,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROUGHT",
+    "attempt_word": "AAAAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:22:32.591Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 31,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:23:21.435Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 32,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:23:22.121Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 33,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:23:22.742Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 34,
+  "fields": {
+    "player_name": "test_mobile",
+    "target_verb": "BROKE",
+    "attempt_word": "AAAAA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:23:23.338Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 35,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "BOUGHT",
+    "attempt_word": "BOUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:25:37.440Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 36,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "BROKE",
+    "attempt_word": "BROKE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:25:44.313Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 37,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "CAUGHT",
+    "attempt_word": "CAUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:25:50.951Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 38,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "DID",
+    "attempt_word": "DID",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:25:57.113Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 39,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "CAME",
+    "attempt_word": "CAME",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:26:03.920Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 40,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "WAS",
+    "attempt_word": "WAS",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:26:10.497Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 41,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "WERE",
+    "attempt_word": "WASS",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:26:16.291Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 42,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "WERE",
+    "attempt_word": "WERR",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:26:18.930Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 43,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "WERE",
+    "attempt_word": "WERS",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:26:21.635Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 44,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "WERE",
+    "attempt_word": "WESR",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:26:24.673Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 45,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOSE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:26:31.867Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 46,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "CUT",
+    "attempt_word": "CUT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:26:37.718Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 47,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "BROUGHT",
+    "attempt_word": "CROGUHT",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:26:43.857Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 48,
+  "fields": {
+    "player_name": "Betu",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:26:47.675Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 49,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:28:54.151Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 50,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "DID",
+    "attempt_word": "DID",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:00.735Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 51,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "WERE",
+    "attempt_word": "WERE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:08.407Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 52,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "BROKE",
+    "attempt_word": "BROKE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:16.800Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 53,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "CUT",
+    "attempt_word": "CUT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:23.456Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 54,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "CAME",
+    "attempt_word": "CAME",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:31.359Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 55,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "CAUGHT",
+    "attempt_word": "CAUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:37.185Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 56,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "BOUGHT",
+    "attempt_word": "BOUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:45.505Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 57,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOSE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:51.648Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 58,
+  "fields": {
+    "player_name": "dsa",
+    "target_verb": "WAS",
+    "attempt_word": "WAS",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:29:57.649Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 59,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOSE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:50:47.598Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 60,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "BOUGHT",
+    "attempt_word": "BOUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:50:54.334Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 61,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "BROKE",
+    "attempt_word": "BROKE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:01.679Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 62,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:08.263Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 63,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "BUILT",
+    "attempt_word": "BUILT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:14.998Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 64,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "WAS",
+    "attempt_word": "WAS",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:20.871Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 65,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "CUT",
+    "attempt_word": "CUT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:26.888Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 66,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "BEGAN",
+    "attempt_word": "BEGAN",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:34.008Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 67,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "CAME",
+    "attempt_word": "CAME",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:39.871Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 68,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "WERE",
+    "attempt_word": "WERE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:46.807Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 69,
+  "fields": {
+    "player_name": "nacho",
+    "target_verb": "CAUGHT",
+    "attempt_word": "CAUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:51:56.621Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 70,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "CAUGHT",
+    "attempt_word": "CAUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:52:50.475Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 71,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "CHOSE",
+    "attempt_word": "CHOSE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:52:57.442Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 72,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "WERE",
+    "attempt_word": "WERE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:04.106Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 73,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BEGAN",
+    "attempt_word": "BEGAN",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:10.339Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 74,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BUILT",
+    "attempt_word": "CASDA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:53:16.227Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 75,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BUILT",
+    "attempt_word": "DSADS",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:53:18.780Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 76,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BUILT",
+    "attempt_word": "BADSA",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:53:21.444Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 77,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BUILT",
+    "attempt_word": "BFFLD",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:53:25.187Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 78,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "CAME",
+    "attempt_word": "CAME",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:32.100Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 79,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "WAS",
+    "attempt_word": "WAS",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:37.923Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 80,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BROKE",
+    "attempt_word": "BROKE",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:44.548Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 81,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BOUGHT",
+    "attempt_word": "BOUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:53:50.828Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 82,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROGUHT",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:53:58.659Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 83,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BRPUGHT",
+    "is_correct": false,
+    "timestamp": "2026-03-14T15:54:02.643Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 84,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "BROUGHT",
+    "attempt_word": "BROUGHT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:54:07.780Z"
+  }
+},
+{
+  "model": "pastapp.playlog",
+  "pk": 85,
+  "fields": {
+    "player_name": "codo",
+    "target_verb": "CUT",
+    "attempt_word": "CUT",
+    "is_correct": true,
+    "timestamp": "2026-03-14T15:54:13.932Z"
+  }
+}
+]
