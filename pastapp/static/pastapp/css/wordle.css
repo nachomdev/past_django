@@ -1,0 +1,275 @@
+
+/* WORDLE PREMIUM THEME */
+:root {
+    --color-bg: #121213;
+    --color-surface: #1e1e1e;
+    --color-tone-1: #d7dadc;
+    --color-tone-2: #818384;
+    --color-tone-3: #565758;
+    --color-tone-4: #3a3a3c;
+    --color-tone-5: #272729;
+    --color-correct: #538d4e;
+    --color-present: #b59f3b;
+    --color-absent: #3a3a3c;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-tone-1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#wordle-verbo-juego {
+    background-color: transparent;
+    padding: 10px;
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: none;
+}
+
+header {
+    width: 100%;
+    border-bottom: 1px solid var(--color-tone-4);
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    margin: 0;
+    color: var(--color-tone-1);
+}
+
+.pista-verbo {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-top: 5px;
+    margin-bottom: 0px;
+    color: var(--color-tone-1);
+}
+
+.pista-espa-verbo {
+    font-size: 1em;
+    color: var(--color-tone-2);
+    margin-bottom: 15px;
+}
+
+.cuadricula-wordle {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.fila-intento {
+    display: flex;
+    gap: 6px;
+}
+
+.letra-caja {
+    width: 62px; 
+    height: 62px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem; 
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 2px solid var(--color-tone-4);
+    color: var(--color-tone-1);
+    background-color: transparent;
+    box-sizing: border-box;
+    transition: border-color 0.1s;
+    user-select: none;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.8); }
+    40% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.letra-caja.tiene-letra {
+    border-color: var(--color-tone-3);
+    animation: pop 0.1s ease-in-out;
+}
+
+.letra-caja.letra-escribiendo {
+    border-color: var(--color-tone-2);
+    border-bottom: 4px solid var(--color-tone-1);
+}
+
+@keyframes flipIn {
+    0% { transform: rotateX(0); }
+    100% { transform: rotateX(-90deg); }
+}
+@keyframes flipOut {
+    0% { transform: rotateX(-90deg); }
+    100% { transform: rotateX(0); }
+}
+
+.letra-caja.flip-in {
+    animation: flipIn 0.25s ease-in forwards;
+}
+
+.letra-caja.correcto {
+    background-color: var(--color-correct); 
+    border-color: var(--color-correct);
+    color: white;
+    animation: flipOut 0.25s ease-in forwards;
+}
+.letra-caja.presente {
+    background-color: var(--color-present); 
+    border-color: var(--color-present);
+    color: white;
+    animation: flipOut 0.25s ease-in forwards;
+}
+.letra-caja.ausente {
+    background-color: var(--color-absent); 
+    border-color: var(--color-absent);
+    color: white;
+    animation: flipOut 0.25s ease-in forwards;
+}
+
+#mensaje {
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: var(--color-tone-5);
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 0.3s;
+    color: var(--color-tone-1);
+}
+#mensaje.show {
+    opacity: 1;
+}
+
+.mensaje-feedback.correcto { color: var(--color-tone-1); }
+.mensaje-feedback.fallido { color: var(--color-tone-1); }
+.mensaje-feedback.singrupo { color: #f87171; background: transparent !important; }
+.mensaje-feedback.error { color: var(--color-tone-1); }
+.mensaje-feedback.finalizado { color: var(--color-correct); font-size: 1.5em; background: transparent !important; }
+.mensaje-feedback.intento { color: var(--color-tone-2); font-size: 1em; }
+
+#teclado-invisible {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    opacity: 0.01;
+    z-index: -10;
+}
+
+.card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-tone-4);
+    border-radius: 8px;
+    color: var(--color-tone-1);
+}
+
+.form-check-label {
+    white-space: normal;
+    color: var(--color-tone-1) !important;
+}
+.form-check-input {
+    background-color: var(--color-tone-4);
+    border-color: var(--color-tone-3);
+}
+.form-check-input:checked {
+    background-color: var(--color-correct);
+    border-color: var(--color-correct);
+}
+.cursor-pointer { cursor: pointer; }
+.text-secondary { color: var(--color-tone-2) !important; }
+
+input.form-control {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-tone-4);
+    color: var(--color-tone-1);
+}
+input.form-control:focus {
+    background-color: var(--color-bg);
+    color: var(--color-tone-1);
+    border-color: var(--color-tone-2);
+    box-shadow: none;
+}
+button.btn-dark {
+    background-color: var(--color-tone-3);
+    border-color: var(--color-tone-3);
+    color: var(--color-tone-1);
+    font-size: 1.1rem;
+    padding: 10px 0;
+    border-radius: 4px;
+}
+button.btn-dark:hover {
+    background-color: var(--color-tone-2);
+    border-color: var(--color-tone-2);
+}
+
+#keyboard {
+    position: relative;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    margin-top: auto;
+    padding-bottom: 20px;
+}
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+.kbd-key {
+    background-color: var(--color-tone-2);
+    color: var(--color-tone-1);
+    border-radius: 4px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 58px;
+    cursor: pointer;
+    text-transform: uppercase;
+    flex: 1;
+    font-size: 1.2rem;
+    transition: background-color 0.1s;
+}
+.kbd-key.large {
+    flex: 1.5;
+    font-size: 1rem;
+}
+.kbd-key.invisible {
+    background-color: transparent;
+    cursor: default;
+}
+.kbd-key:active:not(.invisible) {
+    transform: scale(0.95);
+}
+.kbd-key.correcto { background-color: var(--color-correct); }
+.kbd-key.presente { background-color: var(--color-present); }
+.kbd-key.ausente { background-color: var(--color-tone-4); }
+
+@media (max-width: 400px) {
+    .letra-caja { width: 50px; height: 50px; font-size: 1.6rem; }
+    .kbd-key { height: 48px; font-size: 1rem; }
+}

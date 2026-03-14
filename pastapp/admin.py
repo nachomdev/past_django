@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Verb, PlayLog
 
-# Register your models here.
+admin.site.register(Verb)
+admin.site.register(PlayLog)
