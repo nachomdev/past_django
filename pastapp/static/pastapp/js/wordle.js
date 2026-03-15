@@ -347,7 +347,42 @@ function inicializarJuego(verbosBaseFiltrado, name) {
 
     document.getElementById('container_juego').style.display = 'flex';
     document.getElementById('container_verbos').style.display = 'none';
-    keyboardEl.style.display = 'flex';
+    
+    // Solo mostrar teclado si es mobile o tiene soporte touch
+    const isMobile = window.matchMedia("(max-width: 768px)").matches || 
+                     ('ontouchstart' in window) || 
+                     navigator.maxTouchPoints > 0;
+    
+    if (isMobile) {
+        keyboardEl.style.display = 'flex';
+    } else {
+        keyboardEl.style.display = 'none';
+    }
+
+    // Popup de inicio con efecto con pequeño retardo para asegurar que el DOM se asentó
+    setTimeout(() => {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: '¡A darle átomos!',
+                color: '#fff',
+                background: 'var(--color-surface)',
+                showConfirmButton: false,
+                timer: 2000,
+                showClass: {
+                    popup: 'animate__animated animate__bounceIn'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOut'
+                },
+                backdrop: `
+                    rgba(83, 141, 78, 0.4)
+                    url("https://sweetalert2.github.io/images/nyan-cat.gif")
+                    left top
+                    no-repeat
+                `
+            });
+        }
+    }, 150);
 
     // Crear contenedor de historial si no existe
     if (!document.getElementById('historial-intentos')) {
