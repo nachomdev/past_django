@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Geografía - Argentina</title>
+    <!-- Include SweetAlert2 for nice alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include D3 and TopoJSON -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1e293b, var(--bg-dark));
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 1.5rem 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: row;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 2rem;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+            align-items: stretch;
+            padding-bottom: 2rem;
+            box-sizing: border-box;
+        }
+
+        .map-section {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 1rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-section {
+            width: 350px;
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* SVG Map Styles */
+        svg {
+            width: 100%;
+            height: 100%;
+            max-height: 80vh;
+        }
+
+        .province {
+            fill: #334155;
+            stroke: #0f172a;
+            stroke-width: 1;
+            transition: fill 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .province:hover {
+            fill: #475569;
+            stroke: var(--accent);
+            stroke-width: 1.5;
+        }
+
+        .province.highlight {
+            fill: var(--accent);
+            animation: pulseMap 1.5s infinite;
+        }
+
+        .province.success {
+            fill: var(--success) !important;
+            stroke: #fff;
+        }
+
+        .province.error {
+            fill: var(--danger) !important;
+            animation: shake 0.4s;
+        }
+        
+        .province.completed {
+            fill: #0d9488 !important; /* Muted teal for completed */
+            stroke: #134e4a;
+            pointer-events: none;
+        }
+
+        .province.completed.identical {
+            fill: #f59e0b !important; /* Amber for identical name capitals */
+            stroke: #b45309;
+        }
+
+        .province.failed {
+            fill: #ef4444 !important; /* Red for failed/wrong */
+            stroke: #7f1d1d;
+            pointer-events: none;
+        }
+
+        @keyframes pulseMap {
+            0% { fill: rgba(56, 189, 248, 0.7); }
+            50% { fill: rgba(56, 189, 248, 1); }
+            100% { fill: rgba(56, 189, 248, 0.7); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* UI Panel Styles */
+        .status-box {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .status-box h2 {
+            font-size: 1.25rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-muted);
+        }
+
+        .status-box .target-province {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .score-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-item span:first-child {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+        }
+
+        .score-value.correct { color: var(--success); }
+        .score-value.total { color: var(--accent); }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        button.start-btn {
+            background: linear-gradient(135deg, var(--accent), #2563eb);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        button.start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        button.start-btn:active {
+            transform: translateY(0);
+        }
+        
+        button.start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal styling overrides for SweetAlert2 */
+        .swal2-popup.dark-theme {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+        }
+        .swal2-title { color: var(--text-main) !important; }
+        .swal2-html-container { color: var(--text-muted) !important; }
+
+        @media (max-width: 900px) {
+            .game-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .panel-section {
+                width: 100%;
+                order: -1; /* Panel on top for mobile */
+            }
+            .map-section {
+                min-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GeoArg: Provincias y Capitales</h1>
+    </header>
+
+    <div class="game-container">
+        <!-- UI Panel -->
+        <div class="panel-section">
+            <div class="score-board">
+                <div class="score-item">
+                    <span>Aciertos</span>
+                    <span class="score-value correct" id="score-correct">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Progreso</span>
+                    <span class="score-value total" id="score-total">0 / 24</span>
+                </div>
+            </div>
+
+            <div class="status-box">
+                <h2>¿Dónde queda...?</h2>
+                <div class="target-province" id="target-province-display">---</div>
+            </div>
+
+            <p id="instruction-text" style="color: var(--text-muted); text-align: center; margin-bottom: 2rem; font-size: 0.95rem;">
+                Haz clic en el mapa para ubicar la provincia.
+            </p>
+
+            <button class="start-btn" id="start-btn" onclick="startGame()">Comenzar Juego</button>
+        </div>
+
+        <!-- Map Section -->
+        <div class="map-section">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                Cargando mapa...
+            </div>
+            <svg id="map"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Data structure for provinces and capitals
+        const provincesData = [
+            { id: "AR.BA", name: "Buenos Aires", capital: "La Plata" },
+            { id: "AR.CT", name: "Catamarca", capital: "San Fernando del Valle de Catamarca" },
+            { id: "AR.CC", name: "Chaco", capital: "Resistencia" },
+            { id: "AR.CH", name: "Chubut", capital: "Rawson" },
+            { id: "AR.CB", name: "Córdoba", capital: "Córdoba" },
+            { id: "AR.CN", name: "Corrientes", capital: "Corrientes" },
+            { id: "AR.ER", name: "Entre Ríos", capital: "Paraná" },
+            { id: "AR.FM", name: "Formosa", capital: "Formosa" },
+            { id: "AR.JY", name: "Jujuy", capital: "San Salvador de Jujuy" },
+            { id: "AR.LP", name: "La Pampa", capital: "Santa Rosa" },
+            { id: "AR.LR", name: "La Rioja", capital: "La Rioja" },
+            { id: "AR.MZ", name: "Mendoza", capital: "Mendoza" },
+            { id: "AR.MN", name: "Misiones", capital: "Posadas" },
+            { id: "AR.NQ", name: "Neuquén", capital: "Neuquén" },
+            { id: "AR.RN", name: "Río Negro", capital: "Viedma" },
+            { id: "AR.SA", name: "Salta", capital: "Salta" },
+            { id: "AR.SJ", name: "San Juan", capital: "San Juan" },
+            { id: "AR.SL", name: "San Luis", capital: "San Luis" },
+            { id: "AR.SC", name: "Santa Cruz", capital: "Río Gallegos" },
+            { id: "AR.SF", name: "Santa Fe", capital: "Santa Fe" },
+            { id: "AR.SE", name: "Santiago del Estero", capital: "Santiago del Estero" },
+            { id: "AR.TF", name: "Tierra del Fuego", capital: "Ushuaia" },
+            { id: "AR.TM", name: "Tucumán", capital: "San Miguel de Tucumán" }
+        ];
+
+        // Normalization function (removes accents, to lowercase)
+        function normalizeText(text) {
+            return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+        }
+
+        // Game State
+        let gameState = {
+            isPlaying: false,
+            remainingProvinces: [],
+            currentProvince: null,
+            score: 0,
+            step: 'map' // 'map' or 'capital'
+        };
+
+        const svg = d3.select("#map");
+        const loading = document.getElementById("loading");
+        const targetDisplay = document.getElementById("target-province-display");
+        const instructionText = document.getElementById("instruction-text");
+        const startBtn = document.getElementById("start-btn");
+        
+        let pathGenerator;
+        let mapFeatures;
+
+        // Fetch TopoJSON and render map
+        async function loadMap() {
+            try {
+                const [arRes, fkRes] = await Promise.all([
+                    fetch("/static/pastapp/maps/ar-all.topo.json"),
+                    fetch("/static/pastapp/maps/fk-all.topo.json")
+                ]);
+                
+                const arTopology = await arRes.json();
+                const fkGeojson = await fkRes.json(); // It is saved as a GeoJSON FeatureCollection now
+                
+                // Convert TopoJSON to GeoJSON only for Argentina
+                const arGeojson = topojson.feature(arTopology, arTopology.objects.default);
+                
+                // Merge Malvinas into Tierra del Fuego
+                fkGeojson.features.forEach(f => {
+                    f.id = "AR.TF"; // Make clicks count as Tierra del Fuego
+                });
+                
+                mapFeatures = arGeojson.features.concat(fkGeojson.features);
+
+                // Need a combined object to fitSize correctly
+                const combinedFeatureCollection = {
+                    type: "FeatureCollection",
+                    features: mapFeatures
+                };
+
+                // Configure projection to fit SVG
+                const projection = d3.geoMercator();
+                pathGenerator = d3.geoPath().projection(projection);
+
+                // Resize handler
+                function resize() {
+                    const width = svg.node().getBoundingClientRect().width;
+                    const height = svg.node().getBoundingClientRect().height;
+                    
+                    projection.fitSize([width, height], combinedFeatureCollection);
+                    
+                    svg.selectAll("path")
+                        .attr("d", pathGenerator);
+                }
+
+                // Draw paths
+                svg.selectAll("path")
+                    .data(mapFeatures)
+                    .enter()
+                    .append("path")
+                    .attr("class", "province")
+                    .attr("id", d => d.id)
+                    .on("click", handleProvinceClick);
+                
+                resize();
+                window.addEventListener("resize", resize);
+                
+                loading.style.display = "none";
+                startBtn.disabled = false;
+
+            } catch (error) {
+                console.error("Error loading map:", error);
+                loading.innerHTML = "Error al cargar el mapa. Verifica tu conexión.";
+            }
+        }
+
+        function startGame() {
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.remainingProvinces = [...provincesData];
+            
+            // Shuffle
+            gameState.remainingProvinces.sort(() => Math.random() - 0.5);
+            
+            // Reset UI
+            document.getElementById("score-correct").innerText = gameState.score;
+            document.getElementById("score-total").innerText = `0 / ${provincesData.length}`;
+            startBtn.style.display = 'none';
+            
+            // Reset Map
+            d3.selectAll(".province").attr("class", "province");
+            
+            nextTurn();
+        }
+
+        function nextTurn() {
+            if (gameState.remainingProvinces.length === 0) {
+                endGame();
+                return;
+            }
+            
+            gameState.currentProvince = gameState.remainingProvinces.pop();
+            gameState.step = 'map';
+            
+            targetDisplay.innerText = gameState.currentProvince.name;
+            instructionText.innerText = "Haz clic en el mapa para ubicar la provincia.";
+            
+            const progress = provincesData.length - gameState.remainingProvinces.length;
+            document.getElementById("score-total").innerText = `${progress} / ${provincesData.length}`;
+        }
+
+        function handleProvinceClick(event, d) {
+            if (!gameState.isPlaying || gameState.step !== 'map') return;
+            
+            const clickedId = d.id;
+            const targetId = gameState.currentProvince.id;
+            const element = d3.select(this);
+
+            if (clickedId === targetId) {
+                // Correct map guess
+                element.classed("success", true);
+                gameState.score++;
+                document.getElementById("score-correct").innerText = gameState.score;
+                
+                // Move to capital guess
+                gameState.step = 'capital';
+                promptForCapital();
+            } else {
+                // Incorrect map guess
+                element.classed("error", true);
+                setTimeout(() => element.classed("error", false), 400); // remove shake
+                
+                // Show right answer on map briefly
+                const correctEl = d3.selectAll(`[id="${targetId}"]`);
+                correctEl.classed("highlight", true);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Ups!',
+                    text: `Esa provincia es ${getProvinceName(clickedId)}. Buscábamos ${gameState.currentProvince.name}.`,
+                    customClass: { popup: 'dark-theme' },
+                    confirmButtonColor: '#38bdf8'
+                }).then(() => {
+                    correctEl.classed("failed", true);
+                    correctEl.classed("highlight", false);
+                    nextTurn(); // Skip capital if map is wrong (or you could ask anyway)
+                });
+            }
+        }
+
+        function getProvinceName(id) {
+            const p = provincesData.find(x => x.id === id);
+            return p ? p.name : "Desconocida";
+        }
+
+        function promptForCapital() {
+            instructionText.innerText = "¡Excelente! Ahora ingresa su capital.";
+            
+            Swal.fire({
+                title: `Capital de ${gameState.currentProvince.name}`,
+                input: 'text',
+                inputPlaceholder: 'Ingresa el nombre de la capital',
+                showCancelButton: false,
+                confirmButtonText: 'Responder',
+                confirmButtonColor: '#10b981',
+                customClass: { popup: 'dark-theme' },
+                allowOutsideClick: false,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Debes escribir algo.';
+                    }
+                }
+            }).then((result) => {
+                const userGuess = normalizeText(result.value);
+                const actualCapital = normalizeText(gameState.currentProvince.capital);
+                
+                // For 'San Fernando del Valle de Catamarca', let's accept 'Catamarca' or 'San Fernando'
+                // For 'Ciudad de Buenos Aires', accept 'caba'
+                // Let's implement a simple substring or exact match logic
+                let isCorrect = false;
+                
+                if (userGuess === actualCapital) {
+                    isCorrect = true;
+                } else if (actualCapital.includes(userGuess) && userGuess.length > 3) {
+                    // Tolerant match (e.g. "san miguel de tucuman" -> user wrote "tucuman")
+                    isCorrect = true;
+                } else if (gameState.currentProvince.name === "Catamarca" && userGuess.includes("catamarca")) {
+                    isCorrect = true; 
+                } else if (gameState.currentProvince.name === "Ciudad de Buenos Aires") {
+                    if (["caba", "buenos aires", "capital federal"].includes(userGuess)) isCorrect = true;
+                }
+
+                const pathEl = d3.selectAll(`[id="${gameState.currentProvince.id}"]`);
+
+                if (isCorrect) {
+                    gameState.score += 2; // Bonus for capital
+                    document.getElementById("score-correct").innerText = gameState.score;
+                    
+                    // Is an identical name capital?
+                    const isIdentical = (gameState.currentProvince.name === gameState.currentProvince.capital);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Correcto!',
+                        text: isIdentical ? `¡Exacto! Tienen el mismo nombre: ${gameState.currentProvince.capital}.` : `La capital es ${gameState.currentProvince.capital}.`,
+                        timer: isIdentical ? 2500 : 1500,
+                        showConfirmButton: false,
+                        customClass: { popup: 'dark-theme' }
+                    }).then(() => {
+                        pathEl.classed("completed", true);
+                        if (isIdentical) {
+                            pathEl.classed("identical", true);
+                        }
+                        nextTurn();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Incorrecto',
+                        html: `La capital de ${gameState.currentProvince.name} es <b>${gameState.currentProvince.capital}</b>.`,
+                        customClass: { popup: 'dark-theme' },
+                        confirmButtonColor: '#38bdf8'
+                    }).then(() => {
+                        pathEl.classed("failed", true);
+                        nextTurn();
+                    });
+                }
+            });
+        }
+
+        function endGame() {
+            gameState.isPlaying = false;
+            targetDisplay.innerText = "¡Juego Terminado!";
+            instructionText.innerText = `Puntaje final: ${gameState.score}`;
+            startBtn.style.display = 'block';
+            startBtn.innerText = 'Jugar de Nuevo';
+            
+            const maxScore = provincesData.length * 3; // 1 for map, 2 for capital
+            let msg = gameState.score > maxScore * 0.8 ? "¡Excelente! Eres un experto." : "¡Buen intento! Sigue practicando.";
+            
+            Swal.fire({
+                title: '¡Juego Completado!',
+                text: `${msg} Obtuviste ${gameState.score} puntos.`,
+                icon: 'info',
+                confirmButtonText: 'Genial',
+                confirmButtonColor: '#38bdf8',
+                customClass: { popup: 'dark-theme' }
+            });
+        }
+
+        // Initialize map on load
+        loadMap();
+
+    </script>
+</body>
+</html>

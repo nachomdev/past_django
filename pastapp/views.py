@@ -50,3 +50,6 @@ def save_attempt(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+def geografia(request):
+    return render(request, 'pastapp/geografia.html', {})
