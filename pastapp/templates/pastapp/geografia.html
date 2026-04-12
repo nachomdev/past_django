@@ -387,16 +387,11 @@
         let pathGenerator;
         let mapFeatures;
 
-        // Fetch TopoJSON and render map
+        // Fetch TopoJSON and render map from securely injected context
         async function loadMap() {
             try {
-                const [arRes, fkRes] = await Promise.all([
-                    fetch("/static/pastapp/maps/ar-all.topo.json"),
-                    fetch("/static/pastapp/maps/fk-all.topo.json")
-                ]);
-                
-                const arTopology = await arRes.json();
-                const fkGeojson = await fkRes.json(); // It is saved as a GeoJSON FeatureCollection now
+                const arTopology = {{ ar_json|safe }};
+                const fkGeojson = {{ fk_json|safe }};
                 
                 // Convert TopoJSON to GeoJSON only for Argentina
                 const arGeojson = topojson.feature(arTopology, arTopology.objects.default);

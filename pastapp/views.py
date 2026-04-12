@@ -52,4 +52,18 @@ def save_attempt(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 def geografia(request):
-    return render(request, 'pastapp/geografia.html', {})
+    import os
+    from django.conf import settings
+    
+    ar_path = os.path.join(settings.BASE_DIR, 'pastapp', 'static', 'pastapp', 'maps', 'ar-all.topo.json')
+    fk_path = os.path.join(settings.BASE_DIR, 'pastapp', 'static', 'pastapp', 'maps', 'fk-all.topo.json')
+    
+    with open(ar_path, 'r', encoding='utf-8') as f:
+        ar_json = f.read()
+    with open(fk_path, 'r', encoding='utf-8') as f:
+        fk_json = f.read()
+        
+    return render(request, 'pastapp/geografia.html', {
+        'ar_json': ar_json,
+        'fk_json': fk_json,
+    })
