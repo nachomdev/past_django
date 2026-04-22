@@ -5,7 +5,23 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Verb, PlayLog
 
 def get_verbs_json():
-    verbs = list(Verb.objects.values('group', 'infinitive', 'past_tense', 'spanish'))
+    try:
+        verbs = list(Verb.objects.values('group', 'infinitive', 'past_tense', 'spanish'))
+    except Exception as e:
+        print("Database error loading verbs:", e)
+        verbs = []
+
+    if not verbs:
+        # Fallback if the database is empty or unmigrated on the server
+        return json.dumps([
+            {"group": "1", "infinitivo": "BE", "pasado": "WAS", "espa": "SER"},
+            {"group": "1", "infinitivo": "DO", "pasado": "DID", "espa": "HACER"},
+            {"group": "1", "infinitivo": "HAVE", "pasado": "HAD", "espa": "TENER"},
+            {"group": "2", "infinitivo": "GO", "pasado": "WENT", "espa": "IR"},
+            {"group": "2", "infinitivo": "SEE", "pasado": "SAW", "espa": "VER"},
+            {"group": "2", "infinitivo": "MAKE", "pasado": "MADE", "espa": "HACER"}
+        ])
+
     formatted_verbs = [
         {
             "group": v["group"],
