@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Practice - {{ dictation.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="{% static 'pastapp/css/wordle.css' %}" rel="stylesheet">
+    <style>
+        .btn-audio {
+            background-color: #538d4e; /* Always green */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto 20px auto;
+        }
+        .btn-audio:hover {
+            background-color: #3a6836;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="wordle-verbo-juego">
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+            <h1>Practice</h1>
+            <a href="{% url 'dictation_list' %}" class="btn btn-outline-light btn-sm">Go Back</a>
+        </header>
+
+        <div class="container p-0 m-0" id="container_juego" style="display: flex; flex-direction: column; align-items: center; width:100%; height:100%; padding-top: 20px;">
+            
+            <button class="btn-audio" id="btn-play">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M11.536 14.01A8.473 8.473 0 0 0 14.026 8a8.473 8.473 0 0 0-2.49-6.01l-.708.707A7.476 7.476 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z"/>
+                  <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.483 5.483 0 0 1 11.025 8a5.483 5.483 0 0 1-1.61 3.89l.706.706z"/>
+                  <path d="M8.707 11.182A4.486 4.486 0 0 0 10.025 8a4.486 4.486 0 0 0-1.318-3.182L8 5.525A3.489 3.489 0 0 1 9.025 8 3.49 3.49 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z"/>
+                </svg>
+                Play Audio
+            </button>
+            
+            <input id="teclado-invisible" type="text" autocomplete="off" autocorrect="off" spellcheck="false" />
+            
+            <p id="intentos" class="mensaje-feedback" style="display: block; margin-bottom: 10px;"></p>
+            
+            <div id="contenedor-juego" class="cuadricula-wordle"></div>
+            
+            <p id="mensaje" class="mensaje-feedback"></p>
+
+            <div id="finishImgLost" style="display:none; text-align:center;">
+                <img src="{% static 'pastapp/img/lost.png' %}" alt="lost" style="width: 200px; height: 200px">
+            </div>
+            <div id="finishImg" style="display:none; text-align:center;">
+                <img src="{% static 'pastapp/img/win.png' %}" alt="win" style="width: 200px; height: 200px">
+                <br>
+                <a href="{% url 'dictation_list' %}" class="btn btn-light mt-3">Return to Menu</a>
+            </div>
+
+            <div id="keyboard" style="display: none; margin-top: 20px;">
+                <div class="keyboard-row">
+                    <div class="kbd-key" data-key="Q">q</div>
+                    <div class="kbd-key" data-key="W">w</div>
+                    <div class="kbd-key" data-key="E">e</div>
+                    <div class="kbd-key" data-key="R">r</div>
+                    <div class="kbd-key" data-key="T">t</div>
+                    <div class="kbd-key" data-key="Y">y</div>
+                    <div class="kbd-key" data-key="U">u</div>
+                    <div class="kbd-key" data-key="I">i</div>
+                    <div class="kbd-key" data-key="O">o</div>
+                    <div class="kbd-key" data-key="P">p</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="kbd-key invisible" style="flex:0.5"></div>
+                    <div class="kbd-key" data-key="A">a</div>
+                    <div class="kbd-key" data-key="S">s</div>
+                    <div class="kbd-key" data-key="D">d</div>
+                    <div class="kbd-key" data-key="F">f</div>
+                    <div class="kbd-key" data-key="G">g</div>
+                    <div class="kbd-key" data-key="H">h</div>
+                    <div class="kbd-key" data-key="J">j</div>
+                    <div class="kbd-key" data-key="K">k</div>
+                    <div class="kbd-key" data-key="L">l</div>
+                    <div class="kbd-key invisible" style="flex:0.5"></div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="kbd-key large" data-key="ENTER">ENTER</div>
+                    <div class="kbd-key" data-key="Z">z</div>
+                    <div class="kbd-key" data-key="X">x</div>
+                    <div class="kbd-key" data-key="C">c</div>
+                    <div class="kbd-key" data-key="V">v</div>
+                    <div class="kbd-key" data-key="B">b</div>
+                    <div class="kbd-key" data-key="N">n</div>
+                    <div class="kbd-key" data-key="M">m</div>
+                    <div class="kbd-key large" data-key="BACKSPACE">⌫</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{ hard_words|json_script:"hard-words-data" }}
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'pastapp/js/dictation_practice.js' %}"></script>
+</body>
+</html>

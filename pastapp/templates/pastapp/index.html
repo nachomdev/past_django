@@ -1,26 +1,277 @@
-{% load static %} 
-
+{% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basurero</title>
+    <title>Learning Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS para el fondo de pantalla completo */
-        body, html {
-            height: 100%;
-            margin: 0; /* Elimina el margen predeterminado del body */
-            font-family: Arial, sans-serif;
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+            --color-wordle: #10b981;
+            --color-dictation: #8b5cf6;
+            --color-geo: #0ea5e9;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* Abstract background blobs for modern vibe */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.4;
+            z-index: 0;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--color-wordle);
+            top: -100px;
+            left: -100px;
+        }
+
+        .blob-2 {
+            width: 350px;
+            height: 350px;
+            background: var(--color-dictation);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--color-geo);
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -2s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                transform: translateY(40px) scale(1.05);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 1000px;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .hero-img {
+            height: 140px;
+            margin-bottom: 1rem;
+            animation: bounce 3s infinite ease-in-out alternate;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: translateY(0);
+            }
+
+            100% {
+                transform: translateY(-15px);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card.wordle:hover::before {
+            background: var(--color-wordle);
+            box-shadow: 0 0 20px var(--color-wordle);
+        }
+
+        .card.wordle:hover .icon {
+            transform: scale(1.15) rotate(-5deg);
+            text-shadow: 0 0 30px var(--color-wordle);
+        }
+
+        .card.dictation:hover::before {
+            background: var(--color-dictation);
+            box-shadow: 0 0 20px var(--color-dictation);
+        }
+
+        .card.dictation:hover .icon {
+            transform: scale(1.15) rotate(5deg);
+            text-shadow: 0 0 30px var(--color-dictation);
+        }
+
+        .card.geo:hover::before {
+            background: var(--color-geo);
+            box-shadow: 0 0 20px var(--color-geo);
+        }
+
+        .card.geo:hover .icon {
+            transform: scale(1.15) rotate(-5deg);
+            text-shadow: 0 0 30px var(--color-geo);
+        }
+
+        .icon {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            line-height: 1;
+        }
+
+        .card h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0 0 0.8rem 0;
+            letter-spacing: -0.5px;
+        }
+
+        .card p {
+            color: #94a3b8;
+            font-size: 1.05rem;
+            margin: 0;
+            line-height: 1.5;
+            transition: color 0.3s ease;
+        }
+
+        .card:hover p {
+            color: #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            .grid {
+                gap: 1.5rem;
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .card {
+                padding: 2rem 1.5rem;
+            }
+        }
     </style>
 </head>
-<body>
-	<div class="containter">
-        <img src="{% static 'pastapp/img/win.png' %}" alt="image" style="height: 100%;">
-    </div>
 
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container">
+        <h1>Learning Hub</h1>
+        <div class="grid">
+            <a href="{% url 'pasto' %}" class="card wordle">
+                <div class="icon">📝</div>
+                <h2>Past Verbs</h2>
+                <p>Guess the English verbs in their past tense form</p>
+            </a>
+
+            <a href="{% url 'dictation_list' %}" class="card dictation">
+                <div class="icon">🎧</div>
+                <h2>Dictations</h2>
+                <p>Listen carefully and type the exact sentences</p>
+            </a>
+
+            <a href="{% url 'geografia' %}" class="card geo">
+                <div class="icon">🌍</div>
+                <h2>Geografia</h2>
+                <p>Provincias y capitales de Argentina</p>
+            </a>
+        </div>
+    </div>
 </body>
+
 </html>
