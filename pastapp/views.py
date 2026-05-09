@@ -87,33 +87,39 @@ def geografia(request):
 DICTATIONS = [
     {
         "id": 1,
-        "title": "Dictation 1",
+        "title": "Dictation 1 (March 19th)",
         "text": "Carolina has a new purple bag. Inside, there is a green notebook and a red pencil-case. It has a silver sharpener and a pot of glue. She also has a small snack for break. Carolina is ready for school!",
         "hard_words": ["purple", "notebook", "sharpener", "snack"]
     },
     {
         "id": 2,
-        "title": "Dictation 2",
+        "title": "Dictation 2 (March 26th)",
         "text": "Little Witch was a kind witch, but her mother wanted her to be mean. She decided to go to school to make friends because she was bored. Her new friends loved her and she was very helpful to them!",
         "hard_words": ["witch", "decided", "friends", "helpful"]
     },
     {
         "id": 3,
-        "title": "Dictation 3",
+        "title": "Dictation 3 (April 9th)",
         "text": "A woman baked the most scrumptious cakes. People travelled from far away to buy them, and even the fairies wanted them. But she never left her cakes outside, so the fairies made a plan to steal the cake-maker.",
         "hard_words": ["scrumptious", "travelled", "fairies", "outside"]
     },
     {
         "id": 4,
-        "title": "Dictation 4",
+        "title": "Dictation 4 (April 16th)",
         "text": "One warm summer night, the woman walked home through the woods. She heard many little whispers and felt fairy wings around her. She was very tired and lay down to rest. When she opened her eyes, she was in the fairies’ palace.",
         "hard_words": ["through", "whispers", "around", "palace"]
     },
     {
         "id": 5,
-        "title": "Dictation 5",
+        "title": "Dictation 5 (April 23rd)",
         "text": "Her name is Rose. She is twenty years old. She lives with her three fairy sisters. She has got wavy gray hair and round blue eyes. Her nose is straight and her mouth is small. She is wearing a white dress and pink shoes. She likes eating cakes.",
         "hard_words": ["twenty","years","lives","fairy","wavy","gray","hair","blue","eyes","straight","mouth","small","wearing","white","dress","pink","shoes","likes","eating","cakes"]
+    },
+    {
+        "id": 6,
+        "title": "Dictation 6 (May 21st)",
+        "text": "His name is Charlie. He is a young boy. He lives with his mum, dad, and four grandparents in a small, old house near the chocolate factory. He has got short blonde hair and big brown eyes. He is wearing a yellow jacket and blue trousers. He likes chocolate.",
+        "hard_words": ["young","grandparents","small","house","near","blonde","hair","brown","eyes","wearing","yellow","jacket","trousers"]
     }
 ]
 
