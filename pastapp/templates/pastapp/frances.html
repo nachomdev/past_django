@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Français — Les Verbes et les Nationalités</title>
+    <meta name="description" content="Étudiez et pratiquez les conjugaisons des verbes français et les nationalités : S'APPELER, ÊTRE, AVOIR, verbes en -ER, pays et nationalités">
+    <link rel="stylesheet" href="{% static 'pastapp/css/frances.css' %}">
+</head>
+
+<body>
+    <!-- Ambient background orbs -->
+    <div class="fr-ambient">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="fr-app">
+        <!-- Back link -->
+        <a href="{% url 'index' %}" class="fr-back">← Retour</a>
+
+        <!-- Header -->
+        <header class="fr-header">
+            <div class="flag-bar">
+                <span class="blue"></span>
+                <span class="white"></span>
+                <span class="red"></span>
+            </div>
+            <h1>Français</h1>
+            <p class="subtitle">Verbes · Nationalités · Prépositions · Négation · Articles</p>
+        </header>
+
+        <!-- Verb Tabs -->
+        <nav class="fr-tabs" role="tablist">
+            <button class="fr-tab active" data-verb="sappeler" role="tab">S'appeler</button>
+            <button class="fr-tab" data-verb="etre" role="tab">Être</button>
+            <button class="fr-tab" data-verb="avoir" role="tab">Avoir</button>
+            <button class="fr-tab" data-verb="er" role="tab">Verbes -ER</button>
+            <button class="fr-tab" data-verb="nationalites" role="tab">Nationalités</button>
+            <button class="fr-tab" data-verb="prepositions" role="tab">Prépositions</button>
+            <button class="fr-tab" data-verb="negation" role="tab">Négation</button>
+            <button class="fr-tab" data-verb="articles" role="tab">Articles</button>
+        </nav>
+
+        <!-- Mode Toggle -->
+        <div class="fr-mode-toggle">
+            <button class="fr-mode-btn active" data-mode="study">
+                <span>📖</span> Étudier
+            </button>
+            <button class="fr-mode-btn" data-mode="practice">
+                <span>✏️</span> Pratiquer
+            </button>
+        </div>
+
+        <!-- Study Panel -->
+        <div id="study-panel" class="fr-study-panel"></div>
+
+        <!-- Practice Panel -->
+        <div id="practice-panel" class="fr-practice-panel" style="display: none;"></div>
+    </div>
+
+    <script src="{% static 'pastapp/js/frances.js' %}"></script>
+</body>
+
+</html>

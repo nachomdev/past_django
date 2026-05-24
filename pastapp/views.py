@@ -84,6 +84,9 @@ def geografia(request):
         'fk_json': fk_json,
     })
 
+def frances(request):
+    return render(request, 'pastapp/frances.html', {})
+
 DICTATIONS = [
     {
         "id": 1,
