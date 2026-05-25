@@ -176,6 +176,60 @@ function isNegationTab() {
 }
 
 // ========================================
+// NOMBRES DATA
+// ========================================
+const NOMBRES = {
+    de0a20: [
+        { num: 0, fr: "zéro" }, { num: 1, fr: "un" }, { num: 2, fr: "deux" },
+        { num: 3, fr: "trois" }, { num: 4, fr: "quatre" }, { num: 5, fr: "cinq" },
+        { num: 6, fr: "six" }, { num: 7, fr: "sept" }, { num: 8, fr: "huit" },
+        { num: 9, fr: "neuf" }, { num: 10, fr: "dix" }, { num: 11, fr: "onze" },
+        { num: 12, fr: "douze" }, { num: 13, fr: "treize" }, { num: 14, fr: "quatorze" },
+        { num: 15, fr: "quinze" }, { num: 16, fr: "seize" }, { num: 17, fr: "dix-sept" },
+        { num: 18, fr: "dix-huit" }, { num: 19, fr: "dix-neuf" }, { num: 20, fr: "vingt" }
+    ],
+    dizaines: [
+        { num: 30, fr: "trente" }, { num: 40, fr: "quarante" }, { num: 50, fr: "cinquante" },
+        { num: 60, fr: "soixante" }, { num: 70, fr: "soixante-dix" }, { num: 80, fr: "quatre-vingts" },
+        { num: 90, fr: "quatre-vingt-dix" }, { num: 100, fr: "cent" }
+    ],
+    exemples: [
+        { num: 21, fr: "vingt et un" }, { num: 32, fr: "trente-deux" }, { num: 45, fr: "quarante-cinq" },
+        { num: 58, fr: "cinquante-huit" }, { num: 71, fr: "soixante et onze" }, { num: 84, fr: "quatre-vingt-quatre" },
+        { num: 99, fr: "quatre-vingt-dix-neuf" }
+    ]
+};
+
+function isNombresTab() {
+    return state.currentTab === 'nombres';
+}
+
+// ========================================
+// PRÉSENTATION DATA
+// ========================================
+const PRESENTATION = {
+    se_presenter: [
+        "Bonjour !",
+        "Je m’appelle Clara.",
+        "J’ai 11 ans.",
+        "Je suis argentine.",
+        "J’habite à Buenos Aires.",
+        "J’aime la musique et le sport."
+    ],
+    presenter_autre: [
+        "Elle s’appelle Emma.",
+        "Elle a 12 ans.",
+        "Elle est française.",
+        "Elle habite à Lyon.",
+        "Elle aime danser."
+    ]
+};
+
+function isPresentationTab() {
+    return state.currentTab === 'presentation';
+}
+
+// ========================================
 // ARTICLES DATA
 // ========================================
 const ARTICLES = {
@@ -321,6 +375,16 @@ function renderStudy() {
 
     if (isArticlesTab()) {
         renderStudyArticles(panel);
+        return;
+    }
+
+    if (isNombresTab()) {
+        renderStudyNombres(panel);
+        return;
+    }
+
+    if (isPresentationTab()) {
+        renderStudyPresentation(panel);
         return;
     }
 
@@ -882,6 +946,138 @@ function renderStudyArticles(panel) {
 }
 
 // ========================================
+// STUDY: NOMBRES
+// ========================================
+function renderStudyNombres(panel) {
+    let html = '';
+
+    // De 0 à 20
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🔢</span>
+                <span class="verb-name">De 0 à 20</span>
+            </div>
+            <div class="fr-er-verbs-grid">
+    `;
+    NOMBRES.de0a20.forEach(n => {
+        html += `
+            <div class="fr-er-verb-chip" style="display: flex; justify-content: space-between; padding: 0.5rem 1rem;">
+                <span style="color: var(--fr-text-dim); font-weight: bold;">${n.num}</span>
+                <span style="color: var(--fr-text); font-weight: 600;">${n.fr}</span>
+            </div>
+        `;
+    });
+    html += `
+            </div>
+        </div>
+    `;
+
+    // Dizaines
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🔟</span>
+                <span class="verb-name">Les dizaines</span>
+            </div>
+            <div class="fr-er-verbs-grid">
+    `;
+    NOMBRES.dizaines.forEach(n => {
+        html += `
+            <div class="fr-er-verb-chip" style="display: flex; justify-content: space-between; padding: 0.5rem 1rem;">
+                <span style="color: var(--fr-text-dim); font-weight: bold;">${n.num}</span>
+                <span style="color: var(--fr-text); font-weight: 600;">${n.fr}</span>
+            </div>
+        `;
+    });
+    html += `
+            </div>
+        </div>
+    `;
+
+    // Exemples
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>💡</span>
+                <span class="verb-name">Exemples importants</span>
+            </div>
+            <table class="fr-conj-table">
+                <tbody>
+    `;
+    NOMBRES.exemples.forEach(ex => {
+        html += `
+            <tr>
+                <td class="subject" style="width: 50px; text-align: right; font-size: 1.2rem;">${ex.num}</td>
+                <td class="conjugation">→ <span class="highlight">${ex.fr}</span></td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    panel.innerHTML = html;
+}
+
+// ========================================
+// STUDY: PRÉSENTATION
+// ========================================
+function renderStudyPresentation(panel) {
+    let html = '';
+
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>👋</span>
+                <span class="verb-name">Se présenter</span>
+            </div>
+            <div class="verb-desc">Presentarse (Ejemplo)</div>
+            <table class="fr-conj-table">
+                <tbody>
+    `;
+    PRESENTATION.se_presenter.forEach(phrase => {
+        html += `
+            <tr>
+                <td class="conjugation" style="font-size: 1.1rem;">${phrase}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🤝</span>
+                <span class="verb-name">Présenter une autre personne</span>
+            </div>
+            <div class="verb-desc">Presentar a otra persona (Ejemplo)</div>
+            <table class="fr-conj-table">
+                <tbody>
+    `;
+    PRESENTATION.presenter_autre.forEach(phrase => {
+        html += `
+            <tr>
+                <td class="conjugation" style="font-size: 1.1rem;">${phrase}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    panel.innerHTML = html;
+}
+
+// ========================================
 // PRACTICE MODE
 // ========================================
 function generateQuestions() {
@@ -901,6 +1097,14 @@ function generateQuestions() {
 
     if (isArticlesTab()) {
         return generateArticlesQuestions();
+    }
+
+    if (isNombresTab()) {
+        return generateNombresQuestions();
+    }
+
+    if (isPresentationTab()) {
+        return generatePresentationQuestions();
     }
 
     const verbData = FRENCH_VERBS[state.currentTab];
@@ -1008,7 +1212,7 @@ function generatePrepositionsQuestions() {
             questions.push({
                 questionType: 'preposition',
                 prompt: `Quelle préposition ? (ville)`,
-                displaySubject: '___ ' + ville.ville,
+                displayTemplate: '___ ' + ville.ville,
                 verbName: 'VILLE',
                 answer: 'à ' + ville.ville,
             });
@@ -1017,7 +1221,7 @@ function generatePrepositionsQuestions() {
             questions.push({
                 questionType: 'preposition',
                 prompt: `Quelle préposition ? (pays ${pays.type})`,
-                displaySubject: '___ ' + pays.pays,
+                displayTemplate: '___ ' + pays.pays,
                 verbName: pays.type.toUpperCase(),
                 answer: pays.example,
             });
@@ -1103,9 +1307,93 @@ function generateArticlesQuestions() {
         questions.push({
             questionType: 'article',
             prompt: `Quel est l'article ${isDefini ? 'défini (le/la/l’/les)' : 'indéfini (un/une/des)'} ?`,
-            displaySubject: '___ ' + wordObj.mot + ' (' + (wordObj.type === 'pluriel' ? 'pl.' : wordObj.type.substring(0,4) + '.') + ')',
+            displayTemplate: '___ ' + wordObj.mot + ' (' + (wordObj.type === 'pluriel' ? 'pl.' : wordObj.type.substring(0,4) + '.') + ')',
             verbName: isDefini ? 'DÉFINI' : 'INDÉFINI',
             answer: answer,
+        });
+    }
+
+    return questions;
+}
+
+function getNumberInFrench(num) {
+    if (num <= 20) {
+        const de0a20 = ["zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf", "vingt"];
+        return de0a20[num];
+    }
+    if (num === 100) return "cent";
+    
+    const dizainesStr = {
+        20: "vingt", 30: "trente", 40: "quarante", 50: "cinquante", 60: "soixante", 70: "soixante-dix", 80: "quatre-vingts", 90: "quatre-vingt-dix"
+    };
+    if (num % 10 === 0) return dizainesStr[num];
+    
+    if (num === 71) return "soixante et onze";
+    if (num === 81) return "quatre-vingt-un";
+    if (num === 91) return "quatre-vingt-onze";
+    
+    let d = Math.floor(num / 10) * 10;
+    let u = num % 10;
+    
+    if (d === 70) {
+        d = 60;
+        u += 10;
+    } else if (d === 90) {
+        d = 80;
+        u += 10;
+    }
+    
+    let prefix = dizainesStr[d];
+    if (d === 80) prefix = "quatre-vingt";
+    
+    if (u === 1 && d !== 80) {
+        return prefix + " et un";
+    }
+    
+    const unitsStr = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
+    return prefix + "-" + unitsStr[u];
+}
+
+function generateNombresQuestions() {
+    const questions = [];
+
+    for (let i = 0; i < state.totalQuestions; i++) {
+        const randNum = Math.floor(Math.random() * 101); // 0 to 100
+        questions.push({
+            questionType: 'nombres',
+            prompt: `Écrivez le nombre en lettres`,
+            displaySubject: randNum + ' =',
+            verbName: 'NÚMEROS',
+            answer: getNumberInFrench(randNum),
+        });
+    }
+
+    return questions;
+}
+
+function generatePresentationQuestions() {
+    const questions = [];
+    const items = [
+        { prompt: "Yo me llamo Clara.", template: "Je ___ Clara.", answer: "m'appelle" },
+        { prompt: "Yo tengo 11 años.", template: "J'___ 11 ans.", answer: "ai" },
+        { prompt: "Yo soy argentina.", template: "Je ___ argentine.", answer: "suis" },
+        { prompt: "Yo vivo en Buenos Aires.", template: "J'___ à Buenos Aires.", answer: "habite" },
+        { prompt: "Me gusta la música.", template: "J'___ la musique.", answer: "aime" },
+        { prompt: "Ella se llama Emma.", template: "Elle ___ Emma.", answer: "s'appelle" },
+        { prompt: "Ella tiene 12 años.", template: "Elle ___ 12 ans.", answer: "a" },
+        { prompt: "Ella es francesa.", template: "Elle ___ française.", answer: "est" },
+        { prompt: "Ella vive en Lyon.", template: "Elle ___ à Lyon.", answer: "habite" },
+        { prompt: "A ella le gusta bailar.", template: "Elle ___ danser.", answer: "aime" },
+    ];
+
+    for (let i = 0; i < state.totalQuestions; i++) {
+        const item = items[Math.floor(Math.random() * items.length)];
+        questions.push({
+            questionType: 'presentation',
+            prompt: item.prompt,
+            displayTemplate: item.template,
+            verbName: 'PRÉSENTATION',
+            answer: item.answer,
         });
     }
 
@@ -1168,7 +1456,7 @@ function renderPractice() {
             <div class="fr-question-count">Question ${state.currentQuestion + 1} / ${state.questions.length}</div>
             <div class="fr-prompt">${q.prompt || 'Conjuguez le verbe'}</div>
             <div class="fr-verb-display">${q.verbName}</div>
-            <div class="fr-subject-display">${q.displaySubject} ___</div>
+            <div class="fr-subject-display">${q.displayTemplate || (q.displaySubject + ' ___')}</div>
 
             <div class="fr-input-wrapper">
                 <input 
