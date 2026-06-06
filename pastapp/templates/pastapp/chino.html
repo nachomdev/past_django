@@ -349,8 +349,10 @@
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .conv-num {
@@ -417,12 +419,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.8rem;
-            margin-bottom: 2.5rem;
-            padding: 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
             justify-content: center;
-            border: 1px dashed rgba(255,255,255,0.2);
         }
 
         .pool-item {
@@ -443,6 +440,26 @@
             line-height: 1;
         }
 
+        #conversations-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .options-pool-wrapper {
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            margin-bottom: 2rem;
+        }
+
         @media (max-width: 768px) {
             .number-input-container {
                 flex-direction: column;
@@ -454,6 +471,9 @@
                 position: relative;
                 display: inline-block;
                 margin-bottom: 1rem;
+            }
+            #conversations-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -526,16 +546,32 @@
 
     <!-- CONVERSACION SECTION -->
     <div id="conversacion" class="section">
-        <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">1. Selecciona un espacio en blanco.<br>2. Toca una opción de abajo para completarlo.</h2>
-        
-        <div class="options-pool" id="options-pool">
-            <!-- Rendered via JS -->
+        <div class="sub-tabs">
+            <div class="sub-tab active" onclick="showSubSection('conv-repaso', this)">Repaso Vocabulario</div>
+            <div class="sub-tab" onclick="showSubSection('conv-ejercicio', this)">Ejercicio Diálogos</div>
         </div>
 
-        <div id="conversations-container"></div>
-        
-        <div style="text-align: center; margin-top: 2rem;">
-            <button onclick="resetConversations()" style="background: #334155; color: white;">Reiniciar</button>
+        <div id="conv-repaso" class="sub-section active">
+            <h2 style="text-align:center; color: #cbd5e1; font-weight: 400; margin-bottom: 2rem;">Toca las tarjetas para repasar el vocabulario</h2>
+            <div class="cards-grid" id="conv-cards-container">
+                <!-- Rendered via JS -->
+            </div>
+        </div>
+
+        <div id="conv-ejercicio" class="sub-section">
+            <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">1. Selecciona un espacio en blanco.<br>2. Toca una opción de abajo para completarlo.</h2>
+            
+            <div class="options-pool-wrapper">
+                <div class="options-pool" id="options-pool">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+
+            <div id="conversations-container"></div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="resetConversations()" style="background: #334155; color: white;">Reiniciar Diálogos</button>
+            </div>
         </div>
     </div>
 
@@ -549,8 +585,9 @@
         }
 
         function showSubSection(id, element) {
-            document.querySelectorAll('#fechas .sub-section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('#fechas .sub-tab').forEach(tab => tab.classList.remove('active'));
+            const section = element.closest('.section');
+            section.querySelectorAll('.sub-section').forEach(sec => sec.classList.remove('active'));
+            section.querySelectorAll('.sub-tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             element.classList.add('active');
         }
@@ -877,6 +914,23 @@
             renderConversations();
         }
 
+        function renderConvCards() {
+            const container = document.getElementById('conv-cards-container');
+            container.innerHTML = '';
+            convOptions.forEach(opt => {
+                let div = document.createElement('div');
+                div.className = 'flashcard';
+                div.onclick = function() { this.classList.toggle('flipped'); };
+                div.innerHTML = `
+                    <div class="front">${opt.es}</div>
+                    <div class="back zh">${opt.text}</div>
+                    <div class="pinyin">${opt.pinyin}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        renderConvCards();
         renderPool();
         renderConversations();
     </script>
