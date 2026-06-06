@@ -123,6 +123,12 @@ DICTATIONS = [
         "title": "Dictation 6 (May 21st)",
         "text": "His name is Charlie. He is a young boy. He lives with his mum, dad, and four grandparents in a small, old house near the chocolate factory. He has got short blonde hair and big brown eyes. He is wearing a yellow jacket and blue trousers. He likes chocolate.",
         "hard_words": ["young","grandparents","small","house","near","blonde","hair","brown","eyes","wearing","yellow","jacket","trousers"]
+    },
+    {
+        "id": 7,
+        "title": "Dictation 7 (Jun 11th)",
+        "text": "Dorothy lived on a farm in Kansas with her aunt, her uncle and her little dog, Toto. One day, a storm came and carried her house away. It landed in the country of Oz. Dorothy met the Good Witch. She thanked Dorothy for killing the Horrible Witch.",
+        "hard_words": ["Dorothy","farm","Kansas","aunt","uncle","little","Toto","storm","carried","house","away","landed","Oz", "Witch", "thanked", "killing", "Horrible"]
     }
 ]
 
