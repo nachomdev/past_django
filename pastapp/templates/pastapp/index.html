@@ -21,6 +21,7 @@
             --color-dictation: #8b5cf6;
             --color-geo: #0ea5e9;
             --color-french: #3b82f6;
+            --color-chinese: #ef4444;
         }
 
         body,
@@ -212,6 +213,16 @@
             text-shadow: 0 0 30px var(--color-french);
         }
 
+        .card.chinese:hover::before {
+            background: var(--color-chinese);
+            box-shadow: 0 0 20px var(--color-chinese);
+        }
+
+        .card.chinese:hover .icon {
+            transform: scale(1.15) rotate(-5deg);
+            text-shadow: 0 0 30px var(--color-chinese);
+        }
+
         .icon {
             font-size: 4.5rem;
             margin-bottom: 1.5rem;
@@ -287,6 +298,12 @@
                 <div class="icon">🇫🇷</div>
                 <h2>Français</h2>
                 <p>Verbes, Nationalités, Prépositions, Négation et Articles</p>
+            </a>
+
+            <a href="{% url 'chino' %}" class="card chinese">
+                <div class="icon">🇨🇳</div>
+                <h2>中文</h2>
+                <p>Números, Días y Saludos</p>
             </a>
         </div>
     </div>

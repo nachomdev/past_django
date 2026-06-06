@@ -1,0 +1,884 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repaso de Chino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --color-chinese: #ef4444;
+            --color-correct: #10b981;
+            --color-incorrect: #f43f5e;
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: #ffffff;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(to right, #ffffff, #fca5a5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active, .tab:hover {
+            background: var(--color-chinese);
+            border-color: #fca5a5;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .section {
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .zh {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* Numbers Section */
+        .number-display {
+            font-size: 6rem;
+            text-align: center;
+            margin: 2rem 0;
+            font-weight: 700;
+        }
+        
+        .number-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        input[type="number"], select {
+            padding: 0.75rem 1rem;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            font-family: inherit;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: none;
+            background: white;
+            color: #0f172a;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.2rem;
+            min-height: 2rem;
+            font-weight: 600;
+        }
+
+        .correct { color: var(--color-correct); }
+        .incorrect { color: var(--color-incorrect); }
+
+        /* Dates Matching Section */
+        .match-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 2rem;
+            max-width: 600px;
+            margin: 2rem auto 0;
+        }
+        .match-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+        .match-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .match-item.selected {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+        .match-item.matched {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--color-correct);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .match-item.error {
+            background: rgba(244, 63, 94, 0.2);
+            border-color: var(--color-incorrect);
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .sub-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .sub-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            color: #94a3b8;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .sub-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .sub-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .sub-section.active {
+            display: block;
+        }
+        
+        .conv-blank {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed #94a3b8;
+            color: #cbd5e1;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            min-width: 120px;
+            min-height: 45px;
+            transition: all 0.2s;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+        .conv-blank:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .conv-blank.active-blank {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+        .conv-blank.correct-ans {
+            border-style: solid;
+            border-color: var(--color-correct);
+            background: rgba(16, 185, 129, 0.2);
+            cursor: default;
+        }
+        .conv-blank.incorrect-ans {
+            border-style: solid;
+            border-color: var(--color-incorrect);
+            background: rgba(244, 63, 94, 0.1);
+            cursor: default;
+        }
+        .es-small {
+            font-size: 0.85rem;
+            color: #fca5a5;
+            display: block;
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        /* Dates Section */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .flashcard {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            transform-style: preserve-3d;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .flashcard .front {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .flashcard .back {
+            display: none;
+            font-size: 2.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .flashcard .pinyin {
+            display: none;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .flashcard.flipped .back, .flashcard.flipped .pinyin {
+            display: block;
+        }
+        
+        .flashcard.flipped .front {
+            color: #cbd5e1;
+            font-size: 1.1rem;
+        }
+
+        /* Conversations Section */
+        .conv-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .conv-num {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            background: #fca5a5;
+            color: #0f172a;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .conv-line {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .conv-select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #94a3b8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        .conv-select option {
+            background: #1e293b;
+            color: white;
+        }
+
+        .conv-select.correct-ans {
+            border-color: var(--color-correct);
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .conv-select.incorrect-ans {
+            border-color: var(--color-incorrect);
+            background: rgba(244, 63, 94, 0.2);
+        }
+        
+        .speaker {
+            font-weight: 800;
+            color: #fca5a5;
+            font-size: 1.5rem;
+            min-width: 30px;
+        }
+
+        .options-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            justify-content: center;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+
+        .pool-item {
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .pinyin-small {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: -2px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        @media (max-width: 768px) {
+            .number-input-container {
+                flex-direction: column;
+            }
+            .number-input-container input, .number-input-container button {
+                width: 100%;
+            }
+            .back-btn {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{% url 'index' %}" class="back-btn">← Volver</a>
+        <h1>Repaso de Chino <span class="zh" style="font-size: 3rem; vertical-align: middle;">中文</span></h1>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showSection('numeros', this)">Números (1-99)</div>
+        <div class="tab" onclick="showSection('fechas', this)">Fechas</div>
+        <div class="tab" onclick="showSection('conversacion', this)">Conversaciones</div>
+    </div>
+
+    <!-- NÚMEROS SECTION -->
+    <div id="numeros" class="section active">
+        <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">¿Qué número es? Escribe el número.</h2>
+        <div class="counter" id="num-counter" style="text-align: center; color: #94a3b8; font-size: 1.2rem; margin-bottom: 1rem; font-weight: bold;">1/20</div>
+        <div class="number-display zh" id="num-display">十二</div>
+        
+        <div class="number-input-container">
+            <input type="number" id="num-input" min="1" max="99" placeholder="Ej: 12">
+            <button id="btn-comprobar" onclick="checkNumber()">Comprobar</button>
+            <button id="btn-skip" onclick="skipNumber()">No lo sé</button>
+        </div>
+        <div style="text-align: center; margin-top: 1rem;">
+            <button onclick="restartNumbers()" style="background: #334155; color: white;">Reiniciar Ejercicio</button>
+        </div>
+        <div class="result" id="num-result"></div>
+    </div>
+
+    <!-- FECHAS SECTION -->
+    <div id="fechas" class="section">
+        <div class="sub-tabs">
+            <div class="sub-tab active" onclick="showSubSection('tarjetas', this)">Repaso Fechas</div>
+            <div class="sub-tab" onclick="showSubSection('fechas-match', this)">Ejercicio Fechas</div>
+        </div>
+
+        <div id="tarjetas" class="sub-section active">
+            <h2 style="text-align:center; color: #cbd5e1; font-weight: 400; margin-bottom: 2rem;">Toca las tarjetas para repasar</h2>
+            <div class="cards-grid">
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="front">Hoy</div>
+                    <div class="back zh">今天</div>
+                    <div class="pinyin">jīn tiān</div>
+                </div>
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="front">Ayer</div>
+                    <div class="back zh">昨天</div>
+                    <div class="pinyin">zuó tiān</div>
+                </div>
+                <div class="flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="front">Mañana</div>
+                    <div class="back zh">明天</div>
+                    <div class="pinyin">míng tiān</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="fechas-match" class="sub-section">
+            <h2 style="text-align:center; color: #cbd5e1; font-weight: 400; margin-bottom: 2rem;">Une con flechas (Toca uno de cada lado)</h2>
+            <div class="match-container">
+                <div class="match-col" id="match-col-es"></div>
+                <div class="match-col" id="match-col-zh"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONVERSACION SECTION -->
+    <div id="conversacion" class="section">
+        <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">1. Selecciona un espacio en blanco.<br>2. Toca una opción de abajo para completarlo.</h2>
+        
+        <div class="options-pool" id="options-pool">
+            <!-- Rendered via JS -->
+        </div>
+
+        <div id="conversations-container"></div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button onclick="resetConversations()" style="background: #334155; color: white;">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Tabs Logic ---
+        function showSection(id, element) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function showSubSection(id, element) {
+            document.querySelectorAll('#fechas .sub-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('#fechas .sub-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            element.classList.add('active');
+        }
+
+        function restartNumbers() {
+            numCount = 0;
+            document.getElementById('num-input').style.display = 'inline-block';
+            document.getElementById('btn-comprobar').style.display = 'inline-block';
+            document.getElementById('btn-skip').style.display = 'inline-block';
+            document.getElementById('num-counter').style.display = 'block';
+            nextNumber();
+        }
+
+        // --- Numbers Logic ---
+        const chineseDigits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+        let currentNum = 0;
+        let numCount = 0;
+        const maxNums = 20;
+
+        function getChineseNumber(num) {
+            if (num <= 10) return chineseDigits[num];
+            if (num < 20) return "十" + chineseDigits[num % 10];
+            let tens = Math.floor(num / 10);
+            let units = num % 10;
+            return chineseDigits[tens] + "十" + chineseDigits[units];
+        }
+
+        function nextNumber() {
+            if (numCount >= maxNums) {
+                document.getElementById('num-display').innerHTML = '<span style="font-size: 2rem;">¡Ejercicio terminado!</span>';
+                document.getElementById('num-input').style.display = 'none';
+                document.getElementById('btn-comprobar').style.display = 'none';
+                document.getElementById('btn-skip').style.display = 'none';
+                document.getElementById('num-counter').style.display = 'none';
+                return;
+            }
+            numCount++;
+            document.getElementById('num-counter').innerText = numCount + '/' + maxNums;
+            currentNum = Math.floor(Math.random() * 99) + 1;
+            document.getElementById('num-display').innerText = getChineseNumber(currentNum);
+            document.getElementById('num-input').value = '';
+            document.getElementById('num-result').innerText = '';
+            document.getElementById('num-input').focus();
+        }
+
+        function checkNumber() {
+            if (numCount > maxNums) return;
+            const guessStr = document.getElementById('num-input').value;
+            if (!guessStr) return;
+            const guess = parseInt(guessStr);
+            const res = document.getElementById('num-result');
+            if (guess === currentNum) {
+                res.innerText = '¡Correcto! ' + getChineseNumber(currentNum) + ' es ' + currentNum;
+                res.className = 'result correct';
+                setTimeout(nextNumber, 1500);
+            } else {
+                res.innerText = 'Incorrecto. Era ' + currentNum;
+                res.className = 'result incorrect';
+                setTimeout(nextNumber, 2000);
+            }
+        }
+        
+        function skipNumber() {
+            if (numCount > maxNums) return;
+            const res = document.getElementById('num-result');
+            res.innerText = 'Era ' + currentNum;
+            res.className = 'result incorrect';
+            setTimeout(nextNumber, 2000);
+        }
+        
+        document.getElementById('num-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkNumber();
+        });
+
+        nextNumber();
+
+        // --- Dates Matching Logic ---
+        const datePairs = [
+            { id: 'today', es: 'Hoy', zh: '今天 (jīn tiān)' },
+            { id: 'yesterday', es: 'Ayer', zh: '昨天 (zuó tiān)' },
+            { id: 'tomorrow', es: 'Mañana', zh: '明天 (míng tiān)' }
+        ];
+
+        let selectedEs = null;
+        let selectedZh = null;
+
+        function initMatch() {
+            const colEs = document.getElementById('match-col-es');
+            const colZh = document.getElementById('match-col-zh');
+            colEs.innerHTML = '';
+            colZh.innerHTML = '';
+
+            let esItems = [...datePairs].sort(() => Math.random() - 0.5);
+            let zhItems = [...datePairs].sort(() => Math.random() - 0.5);
+
+            esItems.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'match-item es-item';
+                div.innerText = item.es;
+                div.dataset.id = item.id;
+                div.onclick = () => handleMatchClick('es', div);
+                colEs.appendChild(div);
+            });
+
+            zhItems.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'match-item zh-item zh';
+                div.innerText = item.zh;
+                div.dataset.id = item.id;
+                div.onclick = () => handleMatchClick('zh', div);
+                colZh.appendChild(div);
+            });
+        }
+
+        function handleMatchClick(type, element) {
+            if (element.classList.contains('matched')) return;
+
+            document.querySelectorAll(`.match-item.${type}-item`).forEach(el => el.classList.remove('selected', 'error'));
+            element.classList.add('selected');
+
+            if (type === 'es') selectedEs = element;
+            else selectedZh = element;
+
+            if (selectedEs && selectedZh) {
+                if (selectedEs.dataset.id === selectedZh.dataset.id) {
+                    selectedEs.classList.remove('selected');
+                    selectedEs.classList.add('matched');
+                    selectedZh.classList.remove('selected');
+                    selectedZh.classList.add('matched');
+                    selectedEs = null;
+                    selectedZh = null;
+                } else {
+                    selectedEs.classList.add('error');
+                    selectedZh.classList.add('error');
+                    let tempEs = selectedEs;
+                    let tempZh = selectedZh;
+                    selectedEs = null;
+                    selectedZh = null;
+                    setTimeout(() => {
+                        tempEs.classList.remove('selected', 'error');
+                        tempZh.classList.remove('selected', 'error');
+                    }, 800);
+                }
+            }
+        }
+        initMatch();
+
+        // --- Conversations Logic ---
+        const convOptions = [
+            {val: "zaijian", text: "再见", pinyin: "zài jiàn", es: "Adiós"},
+            {val: "ninhao", text: "您好", pinyin: "nín hǎo", es: "Hola (formal)"},
+            {val: "nine", text: "你呢", pinyin: "nǐ ne", es: "¿Y tú?"},
+            {val: "woyehenhao", text: "我也很好", pinyin: "wǒ yě hěn hǎo", es: "Yo también estoy bien"},
+            {val: "nihaoma", text: "你好吗", pinyin: "nǐ hǎo ma", es: "¿Cómo estás?"},
+            {val: "nizao", text: "你早", pinyin: "nǐ zǎo", es: "Buenos días"},
+            {val: "bucuo", text: "不错", pinyin: "bú cuò", es: "Nada mal"},
+            {val: "haikeyi", text: "还可以", pinyin: "hái kě yǐ", es: "Más o menos"},
+            {val: "nihao", text: "你好", pinyin: "nǐ hǎo", es: "Hola"}
+        ];
+
+        let activeBlank = null;
+
+        function renderPool() {
+            const pool = document.getElementById('options-pool');
+            pool.innerHTML = '';
+            convOptions.forEach(opt => {
+                let div = document.createElement('div');
+                div.className = 'pool-item';
+                div.onclick = () => selectOption(opt.val, opt);
+                div.innerHTML = `<span class="zh">${opt.text}</span><br><span class="pinyin-small">${opt.pinyin}</span>`;
+                pool.appendChild(div);
+            });
+        }
+
+        function selectOption(optVal, optObj) {
+            if (!activeBlank) {
+                alert("Primero selecciona un espacio [ __________ ] para completar.");
+                return;
+            }
+            if (activeBlank.disabled) return;
+            
+            const exp = activeBlank.dataset.expected;
+            const alt = activeBlank.dataset.alt;
+            
+            if (optVal === exp || optVal === alt) {
+                activeBlank.classList.remove('incorrect-ans');
+                activeBlank.classList.add('correct-ans');
+                activeBlank.innerHTML = `<span class="zh">${optObj.text}</span><br><span class="pinyin-small">${optObj.pinyin}</span><span class="es-small">${optObj.es}</span>`;
+                activeBlank.classList.remove('active-blank');
+                activeBlank.disabled = true;
+                activeBlank = null;
+            } else {
+                activeBlank.classList.add('incorrect-ans');
+                const correctOpt = convOptions.find(o => o.val === exp);
+                activeBlank.innerHTML = `<span style="color:#fca5a5; font-size:0.85rem; font-weight:bold;">Incorrecto. Era:</span><br><span class="zh">${correctOpt.text}</span><br><span class="pinyin-small">${correctOpt.pinyin}</span><span class="es-small">${correctOpt.es}</span>`;
+                activeBlank.classList.remove('active-blank');
+                activeBlank.disabled = true;
+                activeBlank = null;
+            }
+        }
+
+        function createBlank(expectedVal, altVal = null) {
+            let btn = document.createElement('div');
+            btn.className = 'conv-blank';
+            btn.dataset.expected = expectedVal;
+            if (altVal) btn.dataset.alt = altVal;
+            btn.innerHTML = ' [ __________ ] ';
+            
+            btn.onclick = function() {
+                if(this.disabled) return;
+                document.querySelectorAll('.conv-blank').forEach(b => b.classList.remove('active-blank'));
+                this.classList.add('active-blank');
+                activeBlank = this;
+            };
+            return btn;
+        }
+
+        const conversations = [
+            {
+                id: 1,
+                lines: [
+                    { speaker: 'A', content: 'text', text: '<div style="display:inline-block; text-align:center;"><span class="zh">你早！</span><br><span class="pinyin-small">nǐ zǎo</span><span class="es-small">Buenos días</span></div>' },
+                    { speaker: 'B', content: 'input', expected: 'nizao', punct: ' !' }
+                ]
+            },
+            {
+                id: 2,
+                lines: [
+                    { speaker: 'A', content: 'input', expected: 'nihaoma', punct: ' ?' },
+                    { speaker: 'B', content: 'text', text: '<div style="display:inline-block; text-align:center;"><span class="zh">我很好，谢谢！</span><br><span class="pinyin-small">wǒ hěn hǎo, xiè xiè</span><span class="es-small">Estoy muy bien, ¡gracias!</span></div>' }
+                ]
+            },
+            {
+                id: 3,
+                lines: [
+                    { speaker: 'A', content: 'input', expected: 'nihaoma', alt: 'nine', punct: ' ?' },
+                    { speaker: 'B', content: 'text', text: '<div style="display:inline-block; text-align:center;"><span class="zh">还可以。</span><br><span class="pinyin-small">hái kě yǐ</span><span class="es-small">Más o menos</span></div>' }
+                ]
+            },
+            {
+                id: 4,
+                lines: [
+                    { speaker: 'A', content: 'text', text: '<div style="display:inline-block; text-align:center;"><span class="zh">您好！</span><br><span class="pinyin-small">nín hǎo</span><span class="es-small">Hola (formal)</span></div>' },
+                    { speaker: 'B', content: 'input', expected: 'ninhao', punct: ' !' }
+                ]
+            },
+            {
+                id: 5,
+                lines: [
+                    { speaker: 'A', content: 'input', expected: 'nihaoma', punct: ' ?' },
+                    { speaker: 'B', content: 'mixed', parts: [
+                        { type: 'text', text: '<div style="display:inline-block; text-align:center; margin-right: 10px;"><span class="zh">不错。</span><br><span class="pinyin-small">bú cuò</span><span class="es-small">Nada mal</span></div>' },
+                        { type: 'input', expected: 'nine', punct: ' ?' }
+                    ]},
+                    { speaker: 'A', content: 'input', expected: 'woyehenhao', alt: 'haikeyi', punct: ' 。' }
+                ]
+            },
+            {
+                id: 6,
+                lines: [
+                    { speaker: 'A', content: 'input', expected: 'zaijian', punct: ' !' },
+                    { speaker: 'B', content: 'text', text: '<div style="display:inline-block; text-align:center;"><span class="zh">再见！</span><br><span class="pinyin-small">zài jiàn</span><span class="es-small">Adiós</span></div>' }
+                ]
+            }
+        ];
+
+        function renderConversations() {
+            const container = document.getElementById('conversations-container');
+            container.innerHTML = '';
+            
+            conversations.forEach(conv => {
+                let box = document.createElement('div');
+                box.className = 'conv-box';
+                
+                let num = document.createElement('div');
+                num.className = 'conv-num';
+                num.innerText = conv.id;
+                box.appendChild(num);
+
+                conv.lines.forEach(line => {
+                    let divLine = document.createElement('div');
+                    divLine.className = 'conv-line';
+                    
+                    let spk = document.createElement('span');
+                    spk.className = 'speaker';
+                    spk.innerText = line.speaker + ':';
+                    divLine.appendChild(spk);
+
+                    if (line.content === 'text') {
+                        let t = document.createElement('span');
+                        t.innerHTML = line.text;
+                        divLine.appendChild(t);
+                    } else if (line.content === 'input') {
+                        let sel = createBlank(line.expected, line.alt);
+                        divLine.appendChild(sel);
+                        let punct = document.createElement('span');
+                        punct.innerText = line.punct;
+                        divLine.appendChild(punct);
+                    } else if (line.content === 'mixed') {
+                        line.parts.forEach(part => {
+                            if (part.type === 'text') {
+                                let t = document.createElement('span');
+                                t.innerHTML = part.text;
+                                divLine.appendChild(t);
+                            } else if (part.type === 'input') {
+                                let sel = createBlank(part.expected, part.alt);
+                                divLine.appendChild(sel);
+                                let punct = document.createElement('span');
+                                punct.innerText = part.punct;
+                                divLine.appendChild(punct);
+                            }
+                        });
+                    }
+                    
+                    box.appendChild(divLine);
+                });
+                
+                container.appendChild(box);
+            });
+            activeBlank = null;
+        }
+
+        function resetConversations() {
+            renderConversations();
+        }
+
+        renderPool();
+        renderConversations();
+    </script>
+</body>
+</html>

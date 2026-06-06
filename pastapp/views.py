@@ -158,3 +158,5 @@ def dictation_practice(request, dictation_id):
         'hard_words': dictation.get('hard_words', [])
     })
 
+def chino(request):
+    return render(request, 'pastapp/chino.html', {})
