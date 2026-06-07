@@ -440,6 +440,45 @@
             line-height: 1;
         }
 
+        .date-blank {
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed #94a3b8;
+            color: #cbd5e1;
+            padding: 0.2rem 1rem;
+            border-radius: 8px;
+            font-size: 2rem;
+            cursor: pointer;
+            min-width: 60px;
+            min-height: 45px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+        .date-blank.active-blank {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+        .date-blank.filled {
+            border-style: solid;
+            border-color: #94a3b8;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Difficulty handling */
+        #conversacion.diff-medium .es-small {
+            display: none !important;
+        }
+        #conversacion.diff-hard .es-small,
+        #conversacion.diff-hard .pinyin-small {
+            display: none !important;
+        }
+
         #conversations-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -512,6 +551,7 @@
         <div class="sub-tabs">
             <div class="sub-tab active" onclick="showSubSection('tarjetas', this)">Repaso Fechas</div>
             <div class="sub-tab" onclick="showSubSection('fechas-match', this)">Ejercicio Fechas</div>
+            <div class="sub-tab" onclick="showSubSection('fechas-completar', this)">Completar Fecha</div>
         </div>
 
         <div id="tarjetas" class="sub-section active">
@@ -542,10 +582,38 @@
                 <div class="match-col" id="match-col-zh"></div>
             </div>
         </div>
+
+        <div id="fechas-completar" class="sub-section">
+            <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">Completa la fecha</h2>
+            <div class="counter" id="date-counter" style="text-align: center; color: #94a3b8; font-size: 1.2rem; margin-bottom: 1rem; font-weight: bold;">1/5</div>
+            
+            <div id="date-prompt-container" style="display:flex; justify-content:center; align-items:center; margin-bottom: 1.5rem; min-height: 80px;">
+                <!-- Filled by JS -->
+            </div>
+
+            <div id="date-blanks-container" style="font-size: 2rem; text-align: center; margin-bottom: 2rem;" class="zh">
+                <!-- Filled by JS -->
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <div class="options-pool" id="date-options-pool" style="border:none; padding:0; margin-bottom:0; background: transparent;">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <div style="text-align: center; height: 3rem;">
+                <button id="btn-date-comprobar" onclick="checkDateExercise()" style="background: #3b82f6; color: white; display: none;">Comprobar</button>
+                <button id="btn-date-skip" onclick="skipDateExercise()" style="background: #475569; color: white; display: inline-block;">No lo sé</button>
+            </div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <button onclick="restartDateExercise()" style="background: #334155; color: white;">Reiniciar Ejercicio</button>
+            </div>
+            <div id="date-result" class="result" style="margin-top: 1rem;"></div>
+        </div>
     </div>
 
     <!-- CONVERSACION SECTION -->
-    <div id="conversacion" class="section">
+    <div id="conversacion" class="section diff-medium">
         <div class="sub-tabs">
             <div class="sub-tab active" onclick="showSubSection('conv-repaso', this)">Repaso Vocabulario</div>
             <div class="sub-tab" onclick="showSubSection('conv-ejercicio', this)">Ejercicio Diálogos</div>
@@ -561,6 +629,15 @@
         <div id="conv-ejercicio" class="sub-section">
             <h2 style="text-align:center; color: #cbd5e1; font-weight: 400;">1. Selecciona un espacio en blanco.<br>2. Toca una opción de abajo para completarlo.</h2>
             
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <span style="color: #cbd5e1; margin-right: 1rem; font-size: 1.1rem;">Dificultad:</span>
+                <select id="conv-difficulty" onchange="changeDifficulty()" style="padding: 0.5rem 1rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 8px; font-size: 1rem; width: auto;">
+                    <option value="easy">Fácil (Chino + Pinyin + Español)</option>
+                    <option value="medium" selected>Medio (Chino + Pinyin)</option>
+                    <option value="hard">Difícil (Solo Chino)</option>
+                </select>
+            </div>
+
             <div class="options-pool-wrapper">
                 <div class="options-pool" id="options-pool">
                     <!-- Rendered via JS -->
@@ -735,6 +812,231 @@
         }
         initMatch();
 
+        let dateExCount = 0;
+        const maxDateEx = 5;
+        let currentDateEx = null;
+        let activeDateBlank = null;
+
+        const monthsEs = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const weekdaysEs = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+        function initDateExercise() {
+            dateExCount = 0;
+            document.getElementById('date-counter').style.display = 'block';
+            document.getElementById('btn-date-comprobar').style.display = 'inline-block';
+            document.getElementById('btn-date-skip').style.display = 'inline-block';
+            nextDateExercise();
+        }
+
+        function restartDateExercise() {
+            initDateExercise();
+        }
+
+        function nextDateExercise() {
+            if (dateExCount >= maxDateEx) {
+                document.getElementById('date-prompt-container').innerHTML = '<span style="font-size: 2rem;">¡Ejercicio terminado!</span>';
+                document.getElementById('date-blanks-container').innerHTML = '';
+                document.getElementById('date-options-pool').innerHTML = '';
+                document.getElementById('btn-date-comprobar').style.display = 'none';
+                document.getElementById('btn-date-skip').style.display = 'none';
+                document.getElementById('date-counter').style.display = 'none';
+                return;
+            }
+            dateExCount++;
+            document.getElementById('date-counter').innerText = dateExCount + '/' + maxDateEx;
+            document.getElementById('date-result').innerText = '';
+            document.getElementById('date-result').className = 'result';
+            
+            const type = Math.random() > 0.5 ? 1 : 2;
+            const month = Math.floor(Math.random() * 12) + 1;
+            const day = Math.floor(Math.random() * 28) + 1;
+            const weekday = Math.floor(Math.random() * 7);
+
+            const zhMonth = getChineseNumber(month);
+            const zhDay = getChineseNumber(day);
+            const zhWeekday = weekday === 0 ? (Math.random() > 0.5 ? '天' : '日') : getChineseNumber(weekday);
+
+            currentDateEx = {
+                type: type,
+                month: zhMonth,
+                day: zhDay,
+                weekday: zhWeekday,
+                blanksFilled: 0,
+                totalBlanks: type === 1 ? 3 : 2
+            };
+
+            renderDatePrompt(type, month, day, weekday);
+            renderDateBlanks(type);
+            renderDatePool();
+            
+            document.getElementById('btn-date-comprobar').style.display = 'none'; 
+        }
+
+        function renderDatePrompt(type, month, day, weekday) {
+            const container = document.getElementById('date-prompt-container');
+            if (type === 1) {
+                container.innerHTML = `<div style="font-size: 1.5rem; text-align: center; color: #cbd5e1;">Hoy es ${weekdaysEs[weekday]}, ${day} de ${monthsEs[month]}</div>`;
+            } else {
+                container.innerHTML = `
+                    <div style="background: white; color: black; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 100px; text-align: center;">
+                        <div style="background: #334155; color: white; font-weight: bold; padding: 0.5rem; text-transform: uppercase;">${monthsEs[month].substring(0, 3)}</div>
+                        <div style="font-size: 2.5rem; font-weight: bold; padding: 1rem 0;">${day}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderDateBlanks(type) {
+            const container = document.getElementById('date-blanks-container');
+            if (type === 1) {
+                container.innerHTML = `
+                    <div style="display:inline-block; margin-right:10px; vertical-align: middle;">
+                        <span class="pinyin-small">jīn tiān shì</span><br><span>今天是</span>
+                    </div>
+                    <div class="date-blank" data-expected="month" onclick="selectDateBlank(this)"></div>
+                    <div style="display:inline-block; margin:0 10px; vertical-align: middle;">
+                        <span class="pinyin-small">yuè</span><br><span>月</span>
+                    </div>
+                    <div class="date-blank" data-expected="day" onclick="selectDateBlank(this)"></div>
+                    <div style="display:inline-block; margin:0 10px; vertical-align: middle;">
+                        <span class="pinyin-small">hào</span><br><span>号，</span>
+                    </div>
+                    <div style="display:inline-block; margin:0 10px; vertical-align: middle;">
+                        <span class="pinyin-small">xīng qī</span><br><span>星期</span>
+                    </div>
+                    <div class="date-blank" data-expected="weekday" onclick="selectDateBlank(this)"></div>
+                    <div style="display:inline-block; vertical-align: middle;">
+                        <span>。</span>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="date-blank" data-expected="month" onclick="selectDateBlank(this)"></div>
+                    <div style="display:inline-block; margin:0 10px; vertical-align: middle;">
+                        <span class="pinyin-small">yuè</span><br><span>月</span>
+                    </div>
+                    <div class="date-blank" data-expected="day" onclick="selectDateBlank(this)"></div>
+                    <div style="display:inline-block; margin:0 10px; vertical-align: middle;">
+                        <span class="pinyin-small">hào</span><br><span>号</span>
+                    </div>
+                `;
+            }
+            activeDateBlank = null;
+        }
+
+        function renderDatePool() {
+            const pool = document.getElementById('date-options-pool');
+            pool.innerHTML = '';
+            
+            let options = [currentDateEx.month, currentDateEx.day];
+            if (currentDateEx.type === 1) options.push(currentDateEx.weekday);
+
+            // Add distractors
+            while (options.length < 8) {
+                let r = getChineseNumber(Math.floor(Math.random() * 31) + 1);
+                if (!options.includes(r)) options.push(r);
+            }
+            
+            if (Math.random() > 0.5 && !options.includes('日')) options.push('日');
+            else if (!options.includes('天')) options.push('天');
+
+            options = options.sort(() => Math.random() - 0.5).slice(0, 8);
+
+            // make sure correct options are included
+            if (!options.includes(currentDateEx.month)) options[0] = currentDateEx.month;
+            if (!options.includes(currentDateEx.day)) options[1] = currentDateEx.day;
+            if (currentDateEx.type === 1 && !options.includes(currentDateEx.weekday)) options[2] = currentDateEx.weekday;
+
+            options = options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                let div = document.createElement('div');
+                div.className = 'pool-item';
+                div.style.cursor = 'pointer';
+                div.onclick = () => fillDateBlank(opt);
+                div.innerHTML = `<span class="zh" style="font-size:1.5rem;">${opt}</span>`;
+                pool.appendChild(div);
+            });
+        }
+
+        function selectDateBlank(el) {
+            document.querySelectorAll('.date-blank').forEach(b => b.classList.remove('active-blank'));
+            el.classList.add('active-blank');
+            activeDateBlank = el;
+        }
+
+        function fillDateBlank(val) {
+            if (!activeDateBlank) {
+                alert("Primero selecciona un espacio para completar.");
+                return;
+            }
+            activeDateBlank.innerText = val;
+            activeDateBlank.dataset.filled = val;
+            activeDateBlank.classList.remove('active-blank');
+            activeDateBlank.classList.add('filled');
+            activeDateBlank = null;
+            
+            checkAllDateBlanksFilled();
+        }
+
+        function checkAllDateBlanksFilled() {
+            const blanks = document.querySelectorAll('.date-blank');
+            let filled = 0;
+            blanks.forEach(b => { if (b.dataset.filled) filled++; });
+            if (filled === currentDateEx.totalBlanks) {
+                document.getElementById('btn-date-comprobar').style.display = 'inline-block';
+            } else {
+                document.getElementById('btn-date-comprobar').style.display = 'none';
+            }
+        }
+
+        function checkDateExercise() {
+            const blanks = document.querySelectorAll('.date-blank');
+            let isCorrect = true;
+            
+            blanks.forEach(b => {
+                const expKey = b.dataset.expected;
+                let expectedVal = currentDateEx[expKey];
+                
+                if (expKey === 'weekday' && (expectedVal === '日' || expectedVal === '天')) {
+                    if (b.dataset.filled !== '日' && b.dataset.filled !== '天') isCorrect = false;
+                } else if (b.dataset.filled !== expectedVal) {
+                    isCorrect = false;
+                }
+            });
+
+            const res = document.getElementById('date-result');
+            if (isCorrect) {
+                res.innerText = '¡Correcto!';
+                res.className = 'result correct';
+                setTimeout(nextDateExercise, 1500);
+            } else {
+                let correctStr = currentDateEx.type === 1 
+                    ? `今天是 ${currentDateEx.month}月 ${currentDateEx.day}号, 星期${currentDateEx.weekday}`
+                    : `${currentDateEx.month}月 ${currentDateEx.day}号`;
+                res.innerText = 'Incorrecto. Era: ' + correctStr;
+                res.className = 'result incorrect';
+                setTimeout(nextDateExercise, 2500);
+            }
+        }
+
+        function skipDateExercise() {
+            const res = document.getElementById('date-result');
+            let correctStr = currentDateEx.type === 1 
+                ? `今天是 ${currentDateEx.month}月 ${currentDateEx.day}号, 星期${currentDateEx.weekday}`
+                : `${currentDateEx.month}月 ${currentDateEx.day}号`;
+            res.innerText = 'Era: ' + correctStr;
+            res.className = 'result incorrect';
+            setTimeout(nextDateExercise, 2500);
+        }
+        
+        function changeDifficulty() {
+            const diff = document.getElementById('conv-difficulty').value;
+            const convSection = document.getElementById('conversacion');
+            convSection.classList.remove('diff-easy', 'diff-medium', 'diff-hard');
+            convSection.classList.add('diff-' + diff);
+        }
+
         // --- Conversations Logic ---
         const convOptions = [
             {val: "zaijian", text: "再见", pinyin: "zài jiàn", es: "Adiós"},
@@ -757,7 +1059,7 @@
                 let div = document.createElement('div');
                 div.className = 'pool-item';
                 div.onclick = () => selectOption(opt.val, opt);
-                div.innerHTML = `<span class="zh">${opt.text}</span><br><span class="pinyin-small">${opt.pinyin}</span>`;
+                div.innerHTML = `<span class="zh">${opt.text}</span><br><span class="pinyin-small">${opt.pinyin}</span><span class="es-small">${opt.es}</span>`;
                 pool.appendChild(div);
             });
         }
@@ -933,6 +1235,7 @@
         renderConvCards();
         renderPool();
         renderConversations();
+        initDateExercise();
     </script>
 </body>
 </html>
