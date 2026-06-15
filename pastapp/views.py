@@ -19,7 +19,11 @@ def get_verbs_json():
             {"group": "1", "infinitivo": "HAVE", "pasado": "HAD", "espa": "TENER"},
             {"group": "2", "infinitivo": "GO", "pasado": "WENT", "espa": "IR"},
             {"group": "2", "infinitivo": "SEE", "pasado": "SAW", "espa": "VER"},
-            {"group": "2", "infinitivo": "MAKE", "pasado": "MADE", "espa": "HACER"}
+            {"group": "2", "infinitivo": "MAKE", "pasado": "MADE", "espa": "HACER"},
+            {"group": "ED", "infinitivo": "PLAY", "pasado": "PLAYED", "espa": "JUGAR"},
+            {"group": "ED", "infinitivo": "WORK", "pasado": "WORKED", "espa": "TRABAJAR"},
+            {"group": "ED", "infinitivo": "WANT", "pasado": "WANTED", "espa": "QUERER"},
+            {"group": "ED", "infinitivo": "LOOK", "pasado": "LOOKED", "espa": "MIRAR"}
         ])
 
     formatted_verbs = [
