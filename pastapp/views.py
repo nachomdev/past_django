@@ -129,7 +129,14 @@ DICTATIONS = [
         "title": "Dictation 7 (Jun 11th)",
         "text": "Dorothy lived on a farm in Kansas with her aunt, her uncle and her little dog, Toto. One day, a storm came and carried her house away. It landed in the country of Oz. Dorothy met the Good Witch. She thanked Dorothy for killing the Horrible Witch.",
         "hard_words": ["Dorothy","farm","Kansas","aunt","uncle","little","Toto","storm","carried","house","away","landed","Oz", "Witch", "thanked", "killing", "Horrible"]
+    },
+    {
+        "id": 8,
+        "title": "Dictation 8 (Jun 18th)",
+        "text": "Dorothy is walking along the yellow brick road. She is talking to the scarecrow, the tin man and the lion. They all want to see the Wizard of Oz. Dorothy wants to go back home. After walking for a long time, they arrived at Emerald City. It was all green.",
+        "hard_words": ["Dorothy","walking","yellow","brick","talking","scarecrow","tin","lion","Wizard","Dorothy","arrived","Emerald","City", "green"]
     }
+
 ]
 
 def dictation_list(request):
