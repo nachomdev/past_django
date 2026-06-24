@@ -19,6 +19,12 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Outfit', sans-serif;
     background-color: var(--bg-color);
@@ -245,7 +251,7 @@ h1.title {
 
 .quick-buttons {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.5rem;
 }
 
@@ -276,6 +282,8 @@ h1.title {
 
 .custom-input {
     flex: 1;
+    min-width: 0;
+    width: 100%;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--card-border);
     border-radius: 16px;
