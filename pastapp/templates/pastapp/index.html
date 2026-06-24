@@ -307,6 +307,24 @@
             </a>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const title = document.querySelector('.container h1');
+            if (title) {
+                let clicks = 0;
+                let clickTimer;
+                title.addEventListener('click', () => {
+                    clicks++;
+                    clearTimeout(clickTimer);
+                    if (clicks === 3) {
+                        window.location.href = "{% url 'flexiones' %}";
+                    } else {
+                        clickTimer = setTimeout(() => { clicks = 0; }, 1500);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

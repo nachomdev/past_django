@@ -2,7 +2,9 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Verb, PlayLog
+from django.utils import timezone
+from datetime import datetime, timedelta
+from .models import Verb, PlayLog, PushUpLog, PushUpGoal
 
 def get_verbs_json():
     try:
@@ -171,3 +173,139 @@ def dictation_practice(request, dictation_id):
 
 def chino(request):
     return render(request, 'pastapp/chino.html', {})
+
+def flexiones(request):
+    return render(request, 'pastapp/flexiones.html', {})
+
+def flexiones_data(request):
+    local_date_str = request.GET.get('date')
+    if not local_date_str:
+        today_date = timezone.localdate()
+    else:
+        try:
+            today_date = datetime.strptime(local_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            today_date = timezone.localdate()
+
+    goal, created = PushUpGoal.objects.get_or_create(id=1)
+
+    today_logs = PushUpLog.objects.filter(date=today_date).order_by('-timestamp')
+    today_total = sum(log.amount for log in today_logs)
+
+    week_start = today_date - timedelta(days=today_date.weekday())
+    week_end = week_start + timedelta(days=6)
+    weekly_logs = PushUpLog.objects.filter(date__range=[week_start, week_end])
+    weekly_total = sum(log.amount for log in weekly_logs)
+
+    monthly_logs = PushUpLog.objects.filter(date__year=today_date.year, date__month=today_date.month)
+    monthly_total = sum(log.amount for log in monthly_logs)
+
+    recent_sets = []
+    for log in today_logs:
+        local_time = timezone.localtime(log.timestamp)
+        recent_sets.append({
+            'id': log.id,
+            'amount': log.amount,
+            'time': local_time.strftime('%H:%M')
+        })
+
+    if today_date.month == 12:
+        next_month = today_date.replace(year=today_date.year + 1, month=1, day=1)
+    else:
+        next_month = today_date.replace(month=today_date.month + 1, day=1)
+    last_day = (next_month - timedelta(days=1)).day
+
+    daily_sums = {d: 0 for d in range(1, last_day + 1)}
+    for log in monthly_logs:
+        daily_sums[log.date.day] += log.amount
+
+    chart_days_labels = [f"{d}" for d in range(1, last_day + 1)]
+    chart_days_data = [daily_sums[d] for d in range(1, last_day + 1)]
+
+    yearly_logs = PushUpLog.objects.filter(date__year=today_date.year)
+    monthly_sums = {m: 0 for m in range(1, 13)}
+    for log in yearly_logs:
+        monthly_sums[log.date.month] += log.amount
+
+    month_names_es = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    chart_months_labels = month_names_es
+    chart_months_data = [monthly_sums[m] for m in range(1, 13)]
+
+    data = {
+        'today_total': today_total,
+        'weekly_total': weekly_total,
+        'monthly_total': monthly_total,
+        'goals': {
+            'daily': goal.daily,
+            'weekly': goal.weekly,
+            'monthly': goal.monthly,
+        },
+        'recent_sets': recent_sets,
+        'chart_daily': {
+            'labels': chart_days_labels,
+            'data': chart_days_data,
+            'month_name': today_date.strftime('%B')
+        },
+        'chart_monthly': {
+            'labels': chart_months_labels,
+            'data': chart_months_data,
+            'year': today_date.year
+        }
+    }
+    return JsonResponse(data)
+
+@csrf_exempt
+def flexiones_add(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            amount = int(data.get('amount', 0))
+            if amount <= 0:
+                return JsonResponse({'error': 'La cantidad debe ser mayor a 0'}, status=400)
+            
+            local_date_str = data.get('date')
+            if local_date_str:
+                date_val = datetime.strptime(local_date_str, '%Y-%m-%d').date()
+            else:
+                date_val = timezone.localdate()
+
+            log = PushUpLog.objects.create(
+                amount=amount,
+                date=date_val
+            )
+            return JsonResponse({'status': 'ok', 'id': log.id, 'amount': log.amount})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@csrf_exempt
+def flexiones_goal(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            goal, created = PushUpGoal.objects.get_or_create(id=1)
+            if 'daily' in data:
+                goal.daily = int(data['daily'])
+            if 'weekly' in data:
+                goal.weekly = int(data['weekly'])
+            if 'monthly' in data:
+                goal.monthly = int(data['monthly'])
+            goal.save()
+            return JsonResponse({'status': 'ok'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@csrf_exempt
+def flexiones_delete(request, log_id):
+    if request.method == 'POST' or request.method == 'DELETE':
+        try:
+            log = PushUpLog.objects.get(id=log_id)
+            log.delete()
+            return JsonResponse({'status': 'ok'})
+        except PushUpLog.DoesNotExist:
+            return JsonResponse({'error': 'Log no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+

@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flexiones - Tracker Diario</title>
+    <!-- Outfit Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{% static 'pastapp/css/flexiones.css' %}">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div style="width: 24px;"></div>
+            <h1 class="title">Flexiones</h1>
+            <button id="settingsBtn" class="settings-btn" title="Configurar Objetivos">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Main Card: Current Day Circular Progress -->
+        <main class="card progress-container">
+            <div class="circle-wrapper">
+                <svg class="circle-svg" viewBox="0 0 220 220">
+                    <defs>
+                        <!-- Sleek gradient representing multiple colors like image -->
+                        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="var(--color-primary)" />
+                            <stop offset="60%" stop-color="var(--color-secondary)" />
+                            <stop offset="100%" stop-color="#f43f5e" /> <!-- Pink/Red glow -->
+                        </linearGradient>
+                    </defs>
+                    <!-- Background circle track -->
+                    <circle class="circle-bg" cx="110" cy="110" r="90"></circle>
+                    <!-- Animated progress bar -->
+                    <circle id="circleProgress" class="circle-progress" cx="110" cy="110" r="90" stroke="url(#progressGradient)"></circle>
+                </svg>
+                <!-- Central Text Overlays -->
+                <div class="circle-text">
+                    <span id="circleNumber" class="circle-number">0</span>
+                    <span class="circle-label">Flexiones</span>
+                    <span id="circleSubtext" class="circle-subtext">0% de 100</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Goals Progress Card -->
+        <section class="card goals-summary">
+            <h2 class="section-title">Objetivos Adicionales</h2>
+            
+            <!-- Weekly Goal -->
+            <div class="goal-row goal-weekly">
+                <div class="goal-info">
+                    <span class="goal-title">Objetivo Semanal</span>
+                    <span id="weeklyGoalVal" class="goal-values">0 / 500</span>
+                </div>
+                <div class="goal-bar-bg">
+                    <div id="weeklyBarFill" class="goal-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- Monthly Goal -->
+            <div class="goal-row goal-monthly">
+                <div class="goal-info">
+                    <span class="goal-title">Objetivo Mensual</span>
+                    <span id="monthlyGoalVal" class="goal-values">0 / 2000</span>
+                </div>
+                <div class="goal-bar-bg">
+                    <div id="monthlyBarFill" class="goal-bar-fill"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Log & Add Section -->
+        <section class="card adder-container">
+            <h2 class="section-title">Registrar Ejercicio</h2>
+            <!-- Quick Add buttons -->
+            <div class="quick-buttons">
+                <button class="quick-btn" data-val="5">+5</button>
+                <button class="quick-btn" data-val="10">+10</button>
+                <button class="quick-btn" data-val="20">+20</button>
+                <button class="quick-btn" data-val="30">+30</button>
+                <button class="quick-btn" data-val="50">+50</button>
+            </div>
+            <!-- Custom input row -->
+            <div class="custom-add-row">
+                <input type="number" id="customInput" class="custom-input" placeholder="Otra cantidad..." min="1" pattern="[0-9]*" inputmode="numeric">
+                <button id="customAddBtn" class="custom-btn">Sumar</button>
+            </div>
+        </section>
+
+        <!-- Today's Logs History -->
+        <section class="card history-container">
+            <h2 class="section-title">Sesiones de Hoy</h2>
+            <div id="historyList" class="history-list">
+                <div class="empty-history">Cargando sesiones...</div>
+            </div>
+        </section>
+
+        <!-- Analytics Chart -->
+        <section class="card chart-container">
+            <div class="chart-header">
+                <h2 class="section-title">Historial</h2>
+                <div class="chart-tabs">
+                    <button id="tabDaily" class="chart-tab active">Mes</button>
+                    <button id="tabMonthly" class="chart-tab">Año</button>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </section>
+    </div>
+
+    <!-- Goals Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-card">
+            <h3 class="modal-title">Configurar Objetivos</h3>
+            <form id="goalsForm" class="modal-form">
+                <div class="form-group">
+                    <label for="goalDaily">Objetivo Diario</label>
+                    <input type="number" id="goalDaily" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalWeekly">Objetivo Semanal</label>
+                    <input type="number" id="goalWeekly" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalMonthly">Objetivo Mensual</label>
+                    <input type="number" id="goalMonthly" min="1" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" id="cancelModalBtn" class="modal-btn cancel">Cancelar</button>
+                    <button type="submit" class="modal-btn save">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Local JS -->
+    <script src="{% static 'pastapp/js/flexiones.js' %}"></script>
+</body>
+
+</html>

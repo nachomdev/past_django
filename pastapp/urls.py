@@ -13,4 +13,9 @@ urlpatterns = [
     path('dictation/<int:dictation_id>/practice', views.dictation_practice, name='dictation_practice'),
     path('frances', views.frances, name='frances'),
     path('chino', views.chino, name='chino'),
+    path('flexiones', views.flexiones, name='flexiones'),
+    path('flexiones/api/data', views.flexiones_data, name='flexiones_data'),
+    path('flexiones/api/add', views.flexiones_add, name='flexiones_add'),
+    path('flexiones/api/goal', views.flexiones_goal, name='flexiones_goal'),
+    path('flexiones/api/delete/<int:log_id>', views.flexiones_delete, name='flexiones_delete'),
 ]
