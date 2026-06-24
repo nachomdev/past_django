@@ -579,3 +579,31 @@ h1.title {
 .modal-btn.save:active {
     transform: scale(0.98);
 }
+
+@media (max-width: 400px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+    .card {
+        padding: 1rem;
+    }
+    .circle-wrapper {
+        width: 180px;
+        height: 180px;
+    }
+    .circle-number {
+        font-size: 2.3rem;
+    }
+    .quick-btn {
+        padding: 0.6rem 0;
+        font-size: 0.9rem;
+    }
+    .custom-input {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.95rem;
+    }
+    .custom-btn {
+        padding: 0 1rem;
+        font-size: 0.9rem;
+    }
+}

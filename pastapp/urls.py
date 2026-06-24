@@ -18,4 +18,7 @@ urlpatterns = [
     path('flexiones/api/add', views.flexiones_add, name='flexiones_add'),
     path('flexiones/api/goal', views.flexiones_goal, name='flexiones_goal'),
     path('flexiones/api/delete/<int:log_id>', views.flexiones_delete, name='flexiones_delete'),
+    path('flexiones/login', views.flexiones_login, name='flexiones_login'),
+    path('flexiones/signup', views.flexiones_signup, name='flexiones_signup'),
+    path('flexiones/logout', views.flexiones_logout, name='flexiones_logout'),
 ]

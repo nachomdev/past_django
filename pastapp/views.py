@@ -1,10 +1,13 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Verb, PlayLog, PushUpLog, PushUpGoal
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 def get_verbs_json():
     try:
@@ -174,10 +177,14 @@ def dictation_practice(request, dictation_id):
 def chino(request):
     return render(request, 'pastapp/chino.html', {})
 
+@login_required(login_url='flexiones_login')
 def flexiones(request):
     return render(request, 'pastapp/flexiones.html', {})
 
 def flexiones_data(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+
     local_date_str = request.GET.get('date')
     if not local_date_str:
         today_date = timezone.localdate()
@@ -187,17 +194,17 @@ def flexiones_data(request):
         except ValueError:
             today_date = timezone.localdate()
 
-    goal, created = PushUpGoal.objects.get_or_create(id=1)
+    goal, created = PushUpGoal.objects.get_or_create(user=request.user)
 
-    today_logs = PushUpLog.objects.filter(date=today_date).order_by('-timestamp')
+    today_logs = PushUpLog.objects.filter(user=request.user, date=today_date).order_by('-timestamp')
     today_total = sum(log.amount for log in today_logs)
 
     week_start = today_date - timedelta(days=today_date.weekday())
     week_end = week_start + timedelta(days=6)
-    weekly_logs = PushUpLog.objects.filter(date__range=[week_start, week_end])
+    weekly_logs = PushUpLog.objects.filter(user=request.user, date__range=[week_start, week_end])
     weekly_total = sum(log.amount for log in weekly_logs)
 
-    monthly_logs = PushUpLog.objects.filter(date__year=today_date.year, date__month=today_date.month)
+    monthly_logs = PushUpLog.objects.filter(user=request.user, date__year=today_date.year, date__month=today_date.month)
     monthly_total = sum(log.amount for log in monthly_logs)
 
     recent_sets = []
@@ -222,7 +229,7 @@ def flexiones_data(request):
     chart_days_labels = [f"{d}" for d in range(1, last_day + 1)]
     chart_days_data = [daily_sums[d] for d in range(1, last_day + 1)]
 
-    yearly_logs = PushUpLog.objects.filter(date__year=today_date.year)
+    yearly_logs = PushUpLog.objects.filter(user=request.user, date__year=today_date.year)
     monthly_sums = {m: 0 for m in range(1, 13)}
     for log in yearly_logs:
         monthly_sums[log.date.month] += log.amount
@@ -256,6 +263,9 @@ def flexiones_data(request):
 
 @csrf_exempt
 def flexiones_add(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -270,6 +280,7 @@ def flexiones_add(request):
                 date_val = timezone.localdate()
 
             log = PushUpLog.objects.create(
+                user=request.user,
                 amount=amount,
                 date=date_val
             )
@@ -280,10 +291,13 @@ def flexiones_add(request):
 
 @csrf_exempt
 def flexiones_goal(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            goal, created = PushUpGoal.objects.get_or_create(id=1)
+            goal, created = PushUpGoal.objects.get_or_create(user=request.user)
             if 'daily' in data:
                 goal.daily = int(data['daily'])
             if 'weekly' in data:
@@ -298,9 +312,12 @@ def flexiones_goal(request):
 
 @csrf_exempt
 def flexiones_delete(request, log_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+
     if request.method == 'POST' or request.method == 'DELETE':
         try:
-            log = PushUpLog.objects.get(id=log_id)
+            log = PushUpLog.objects.get(id=log_id, user=request.user)
             log.delete()
             return JsonResponse({'status': 'ok'})
         except PushUpLog.DoesNotExist:
@@ -308,4 +325,58 @@ def flexiones_delete(request, log_id):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def flexiones_login(request):
+    if request.user.is_authenticated:
+        return redirect('flexiones')
+        
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+        if not username or not password:
+            error = "Por favor complete todos los campos"
+        else:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('flexiones')
+            else:
+                error = "Usuario o contraseña incorrectos"
+                
+    return render(request, 'pastapp/login.html', {'error': error})
+
+def flexiones_signup(request):
+    if request.user.is_authenticated:
+        return redirect('flexiones')
+        
+    error = None
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
+        password_confirm = request.POST.get('password_confirm', '').strip()
+        
+        if not username or not password or not password_confirm:
+            error = "Por favor complete todos los campos"
+        elif len(password) < 6:
+            error = "La contraseña debe tener al menos 6 caracteres"
+        elif password != password_confirm:
+            error = "Las contraseñas no coinciden"
+        else:
+            if User.objects.filter(username=username).exists():
+                error = "El nombre de usuario ya está registrado"
+            else:
+                try:
+                    user = User.objects.create_user(username=username, password=password)
+                    login(request, user)
+                    return redirect('flexiones')
+                except Exception as e:
+                    error = f"Error al registrar usuario: {str(e)}"
+                    
+    return render(request, 'pastapp/signup.html', {'error': error})
+
+def flexiones_logout(request):
+    logout(request)
+    return redirect('flexiones_login')
+
 

@@ -1,6 +1,17 @@
 // pastapp/static/pastapp/js/flexiones.js
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Global fetch interceptor to handle 401 Unauthorized
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+        const response = await originalFetch(...args);
+        if (response.status === 401) {
+            window.location.href = '/flexiones/login';
+            return new Promise(() => {}); // Halt execution
+        }
+        return response;
+    };
+
     // State variables
     let chartInstance = null;
     let currentChartTab = 'daily'; // 'daily' (month view) or 'monthly' (year view)
