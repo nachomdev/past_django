@@ -230,6 +230,98 @@ function isPresentationTab() {
 }
 
 // ========================================
+// LE COLLÈGE DATA
+// ========================================
+const COLLEGE = {
+    lieux: [
+        { fr: "le collège",          es: "el colegio secundario" },
+        { fr: "la salle de classe",  es: "el aula / la sala de clase" },
+        { fr: "la cour de récréation", es: "el patio de recreo" },
+        { fr: "la cantine",          es: "el comedor" },
+        { fr: "la bibliothèque",     es: "la biblioteca" },
+        { fr: "le gymnase",          es: "el gimnasio" },
+        { fr: "le laboratoire",      es: "el laboratorio" },
+        { fr: "le couloir",          es: "el pasillo" },
+        { fr: "le bureau du directeur", es: "la dirección" },
+        { fr: "la salle des professeurs", es: "la sala de profesores" },
+        { fr: "les toilettes",       es: "los baños" },
+        { fr: "le terrain de sport", es: "el campo de deportes" },
+        { fr: "la salle informatique", es: "la sala de computación" },
+        { fr: "l'entrée",           es: "la entrada" },
+    ],
+    matieres: [
+        { fr: "le français",        es: "francés" },
+        { fr: "les mathématiques",   es: "matemáticas" },
+        { fr: "l'histoire",         es: "historia" },
+        { fr: "la géographie",      es: "geografía" },
+        { fr: "les sciences",       es: "ciencias" },
+        { fr: "l'anglais",          es: "inglés" },
+        { fr: "l'espagnol",         es: "español" },
+        { fr: "l'éducation physique", es: "educación física" },
+        { fr: "la musique",         es: "música" },
+        { fr: "les arts plastiques", es: "artes plásticas" },
+        { fr: "la technologie",     es: "tecnología" },
+        { fr: "l'informatique",     es: "informática" },
+    ],
+    ilYA: {
+        rule: "IL Y A = Hay (existencia) / IL N'Y A PAS = No hay (negación)",
+        structure_affirm: "Il y a + article + nom",
+        structure_neg: "Il n'y a pas de + nom",
+        examples: [
+            { fr: "Il y a une bibliothèque dans le collège.",   es: "Hay una biblioteca en el colegio." },
+            { fr: "Il y a des élèves dans la cour.",            es: "Hay alumnos en el patio." },
+            { fr: "Il y a un gymnase.",                         es: "Hay un gimnasio." },
+            { fr: "Il y a un laboratoire de sciences.",         es: "Hay un laboratorio de ciencias." },
+            { fr: "Il n'y a pas de piscine.",                   es: "No hay pileta." },
+            { fr: "Il n'y a pas de cantine.",                   es: "No hay comedor." },
+            { fr: "Il n'y a pas d'ordinateurs.",                es: "No hay computadoras." },
+            { fr: "Il n'y a pas de terrain de sport.",          es: "No hay campo de deportes." },
+        ]
+    },
+    heure: {
+        rule: "Para preguntar la hora: Quelle heure est-il ? — Il est…",
+        heures: [
+            { display: "1:00",  fr: "Il est une heure." },
+            { display: "2:00",  fr: "Il est deux heures." },
+            { display: "3:00",  fr: "Il est trois heures." },
+            { display: "4:15",  fr: "Il est quatre heures et quart." },
+            { display: "5:30",  fr: "Il est cinq heures et demie." },
+            { display: "6:45",  fr: "Il est sept heures moins le quart." },
+            { display: "7:10",  fr: "Il est sept heures dix." },
+            { display: "8:20",  fr: "Il est huit heures vingt." },
+            { display: "9:40",  fr: "Il est dix heures moins vingt." },
+            { display: "10:50", fr: "Il est onze heures moins dix." },
+            { display: "12:00", fr: "Il est midi." },
+            { display: "0:00",  fr: "Il est minuit." },
+        ],
+        keywords: [
+            { fr: "et quart",          es: "y cuarto (+ 15 min)" },
+            { fr: "et demie",          es: "y media (+ 30 min)" },
+            { fr: "moins le quart",    es: "menos cuarto (- 15 min)" },
+            { fr: "moins + minutes",   es: "menos + minutos" },
+            { fr: "midi",              es: "mediodía (12:00)" },
+            { fr: "minuit",            es: "medianoche (0:00)" },
+        ]
+    },
+    moments: [
+        { fr: "le matin",       es: "la mañana",   horaire: "6h – 12h",  emoji: "🌅" },
+        { fr: "l'après-midi",   es: "la tarde",    horaire: "12h – 18h", emoji: "☀️" },
+        { fr: "le soir",        es: "la noche (temprano)", horaire: "18h – 22h", emoji: "🌆" },
+        { fr: "la nuit",        es: "la noche",    horaire: "22h – 6h",  emoji: "🌙" },
+    ],
+    momentsExamples: [
+        { fr: "Le matin, j'ai cours de français.",       es: "A la mañana, tengo clase de francés." },
+        { fr: "L'après-midi, on a sport.",                es: "A la tarde, tenemos deporte." },
+        { fr: "Le soir, je fais mes devoirs.",            es: "A la noche, hago mis tareas." },
+        { fr: "Je me lève le matin à sept heures.",       es: "Me levanto a la mañana a las siete." },
+    ]
+};
+
+function isCollegeTab() {
+    return state.currentTab === 'college';
+}
+
+// ========================================
 // ARTICLES DATA
 // ========================================
 const ARTICLES = {
@@ -385,6 +477,11 @@ function renderStudy() {
 
     if (isPresentationTab()) {
         renderStudyPresentation(panel);
+        return;
+    }
+
+    if (isCollegeTab()) {
+        renderStudyCollege(panel);
         return;
     }
 
@@ -1078,6 +1175,231 @@ function renderStudyPresentation(panel) {
 }
 
 // ========================================
+// STUDY: LE COLLÈGE
+// ========================================
+function renderStudyCollege(panel) {
+    let html = '';
+
+    // ── Les lieux du collège ──
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🏫</span>
+                <span class="verb-name">Les lieux du collège</span>
+            </div>
+            <div class="verb-desc">Los lugares del colegio</div>
+            <table class="fr-conj-table">
+                <thead>
+                    <tr>
+                        <th>En français</th>
+                        <th>En español</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    COLLEGE.lieux.forEach(l => {
+        html += `
+            <tr>
+                <td class="conjugation"><span class="highlight">${l.fr}</span></td>
+                <td class="conjugation" style="color: var(--fr-text-muted);">${l.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // ── Les matières ──
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>📚</span>
+                <span class="verb-name">Les matières scolaires</span>
+            </div>
+            <div class="verb-desc">Las materias del colegio</div>
+            <div class="fr-er-verbs-grid">
+    `;
+    COLLEGE.matieres.forEach(m => {
+        html += `
+            <div class="fr-er-verb-chip">
+                ${m.fr}
+                <span class="meaning">${m.es}</span>
+            </div>
+        `;
+    });
+    html += `
+            </div>
+        </div>
+    `;
+
+    // ── IL Y A / IL N'Y A PAS ──
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>✅</span>
+                <span class="verb-name">IL Y A / IL N'Y A PAS</span>
+            </div>
+            <div class="verb-desc">${COLLEGE.ilYA.rule}</div>
+            <div class="fr-prep-rule-box" style="flex-direction: column; gap: 0.5rem; align-items: flex-start;">
+                <div>
+                    <span class="fr-prep-tag ville" style="background: #22c55e30; color: #4ade80;">✓</span>
+                    <span style="color: var(--fr-text);">${COLLEGE.ilYA.structure_affirm}</span>
+                </div>
+                <div>
+                    <span class="fr-prep-tag" style="background: #ef444430; color: #f87171;">✗</span>
+                    <span style="color: var(--fr-text);">${COLLEGE.ilYA.structure_neg}</span>
+                </div>
+            </div>
+            <table class="fr-conj-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Français</th>
+                        <th>Español</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    COLLEGE.ilYA.examples.forEach(ex => {
+        const isNeg = ex.fr.includes("n'y a pas");
+        const icon = isNeg ? '🔴' : '🟢';
+        html += `
+            <tr>
+                <td class="subject">${icon}</td>
+                <td class="conjugation"><span class="highlight">${ex.fr}</span></td>
+                <td class="conjugation" style="color: var(--fr-text-muted);">${ex.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // ── L'heure ──
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🕐</span>
+                <span class="verb-name">L'heure — Quelle heure est-il ?</span>
+            </div>
+            <div class="verb-desc">${COLLEGE.heure.rule}</div>
+            <table class="fr-conj-table">
+                <thead>
+                    <tr>
+                        <th>Heure</th>
+                        <th>En français</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    COLLEGE.heure.heures.forEach(h => {
+        html += `
+            <tr>
+                <td class="subject" style="font-size: 1.2rem; font-weight: bold;">${h.display}</td>
+                <td class="conjugation"><span class="highlight">${h.fr}</span></td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Mots-clés de l'heure
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🔑</span>
+                <span class="verb-name">Mots-clés de l'heure</span>
+            </div>
+            <div class="verb-desc">Palabras clave para decir la hora</div>
+            <div class="fr-er-verbs-grid">
+    `;
+    COLLEGE.heure.keywords.forEach(k => {
+        html += `
+            <div class="fr-er-verb-chip">
+                ${k.fr}
+                <span class="meaning">${k.es}</span>
+            </div>
+        `;
+    });
+    html += `
+            </div>
+        </div>
+    `;
+
+    // ── Les moments de la journée ──
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>🌤️</span>
+                <span class="verb-name">Les moments de la journée</span>
+            </div>
+            <div class="verb-desc">Los momentos del día</div>
+            <table class="fr-conj-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Moment</th>
+                        <th>Horaire</th>
+                        <th>En español</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    COLLEGE.moments.forEach(m => {
+        html += `
+            <tr>
+                <td class="subject" style="font-size: 1.3rem;">${m.emoji}</td>
+                <td class="conjugation"><span class="highlight">${m.fr}</span></td>
+                <td class="conjugation" style="color: var(--fr-text-dim);">${m.horaire}</td>
+                <td class="conjugation" style="color: var(--fr-text-muted);">${m.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Exemples moments
+    html += `
+        <div class="fr-verb-card">
+            <div class="verb-title">
+                <span>💡</span>
+                <span class="verb-name">Exemples</span>
+            </div>
+            <table class="fr-conj-table">
+                <tbody>
+    `;
+    COLLEGE.momentsExamples.forEach(ex => {
+        html += `
+            <tr>
+                <td class="subject">🇫🇷</td>
+                <td class="conjugation">${ex.fr}</td>
+            </tr>
+            <tr>
+                <td class="subject">🇪🇸</td>
+                <td class="conjugation" style="color: var(--fr-text-muted);">${ex.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    panel.innerHTML = html;
+}
+
+// ========================================
 // PRACTICE MODE
 // ========================================
 function generateQuestions() {
@@ -1105,6 +1427,10 @@ function generateQuestions() {
 
     if (isPresentationTab()) {
         return generatePresentationQuestions();
+    }
+
+    if (isCollegeTab()) {
+        return generateCollegeQuestions();
     }
 
     const verbData = FRENCH_VERBS[state.currentTab];
@@ -1395,6 +1721,93 @@ function generatePresentationQuestions() {
             verbName: 'PRÉSENTATION',
             answer: item.answer,
         });
+    }
+
+    return questions;
+}
+
+function generateCollegeQuestions() {
+    const questions = [];
+    // 5 question types: lieux vocab, matières vocab, il y a / il n'y a pas, heure, moments
+    const types = ['lieux', 'matieres', 'ilya', 'heure', 'moments'];
+
+    for (let i = 0; i < state.totalQuestions; i++) {
+        const type = types[Math.floor(Math.random() * types.length)];
+
+        if (type === 'lieux') {
+            const lieu = COLLEGE.lieux[Math.floor(Math.random() * COLLEGE.lieux.length)];
+            // Ask: given spanish, write french
+            questions.push({
+                questionType: 'college_vocab',
+                prompt: `¿Cómo se dice en francés?`,
+                displaySubject: lieu.es + ' →',
+                verbName: 'LES LIEUX',
+                answer: lieu.fr,
+            });
+        } else if (type === 'matieres') {
+            const mat = COLLEGE.matieres[Math.floor(Math.random() * COLLEGE.matieres.length)];
+            questions.push({
+                questionType: 'college_vocab',
+                prompt: `¿Cómo se dice en francés?`,
+                displaySubject: mat.es + ' →',
+                verbName: 'LES MATIÈRES',
+                answer: mat.fr,
+            });
+        } else if (type === 'ilya') {
+            // Build a sentence the student must complete
+            const lieuxForIlya = [
+                { noun: "bibliothèque", article: "une", gender: "f" },
+                { noun: "gymnase", article: "un", gender: "m" },
+                { noun: "cantine", article: "une", gender: "f" },
+                { noun: "laboratoire", article: "un", gender: "m" },
+                { noun: "piscine", article: "une", gender: "f" },
+                { noun: "terrain de sport", article: "un", gender: "m" },
+                { noun: "salle informatique", article: "une", gender: "f" },
+                { noun: "ordinateurs", article: "des", gender: "pl" },
+            ];
+            const item = lieuxForIlya[Math.floor(Math.random() * lieuxForIlya.length)];
+            const isNeg = Math.random() < 0.5;
+
+            if (isNeg) {
+                // Use de/d' for negation
+                const startsVowel = 'aeéèêiouâîôûùëïüÿ'.includes(item.noun[0].toLowerCase());
+                const de = startsVowel ? "d'" : "de ";
+                questions.push({
+                    questionType: 'college_ilya',
+                    prompt: `Complétez avec IL N'Y A PAS`,
+                    displayTemplate: `___ ${item.noun}`,
+                    verbName: "IL N'Y A PAS",
+                    answer: `Il n'y a pas ${de}${item.noun}`,
+                });
+            } else {
+                questions.push({
+                    questionType: 'college_ilya',
+                    prompt: `Complétez avec IL Y A`,
+                    displayTemplate: `___ ${item.article} ${item.noun}`,
+                    verbName: 'IL Y A',
+                    answer: `Il y a ${item.article} ${item.noun}`,
+                });
+            }
+        } else if (type === 'heure') {
+            const h = COLLEGE.heure.heures[Math.floor(Math.random() * COLLEGE.heure.heures.length)];
+            questions.push({
+                questionType: 'college_heure',
+                prompt: `Quelle heure est-il ? Écrivez en français`,
+                displaySubject: '🕐 ' + h.display + ' →',
+                verbName: "L'HEURE",
+                answer: h.fr,
+            });
+        } else {
+            // moments
+            const m = COLLEGE.moments[Math.floor(Math.random() * COLLEGE.moments.length)];
+            questions.push({
+                questionType: 'college_moments',
+                prompt: `¿Cómo se dice en francés?`,
+                displaySubject: m.emoji + ' ' + m.es + ' →',
+                verbName: 'MOMENTS',
+                answer: m.fr,
+            });
+        }
     }
 
     return questions;

@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English — Exam Practice</title>
+    <meta name="description" content="Study and practise for your English exam: Simple Past, Present Continuous, Question Words, Vocabulary and Sequence Words">
+    <link rel="stylesheet" href="{% static 'pastapp/css/english.css' %}">
+</head>
+
+<body>
+    <!-- Ambient background orbs -->
+    <div class="en-ambient">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="en-app">
+        <!-- Back link -->
+        <a href="{% url 'english' %}" class="en-back">← Back</a>
+
+        <!-- Header -->
+        <header class="en-header">
+            <div class="flag-bar">
+                <span class="uk-red"></span>
+                <span class="uk-white"></span>
+                <span class="uk-blue"></span>
+            </div>
+            <h1>English</h1>
+            <p class="subtitle">Simple Past · Present Continuous · Question Words · Vocabulary · Sequence Words</p>
+        </header>
+
+        <!-- Tabs -->
+        <nav class="en-tabs" role="tablist">
+            <button class="en-tab active" data-tab="simple_past" role="tab">Simple Past</button>
+            <button class="en-tab" data-tab="present_continuous" role="tab">Present Continuous</button>
+            <button class="en-tab" data-tab="question_words" role="tab">Question Words</button>
+            <button class="en-tab" data-tab="vocabulary" role="tab">Vocabulary</button>
+            <button class="en-tab" data-tab="sequence_words" role="tab">Sequence Words</button>
+        </nav>
+
+        <!-- Mode Toggle -->
+        <div class="en-mode-toggle">
+            <button class="en-mode-btn active" data-mode="study">
+                <span>📖</span> Study
+            </button>
+            <button class="en-mode-btn" data-mode="practice">
+                <span>✏️</span> Practice
+            </button>
+        </div>
+
+        <!-- Study Panel -->
+        <div id="en-study-panel" class="en-study-panel"></div>
+
+        <!-- Practice Panel -->
+        <div id="en-practice-panel" class="en-practice-panel" style="display: none;"></div>
+    </div>
+
+    <script src="{% static 'pastapp/js/english.js' %}"></script>
+</body>
+
+</html>

@@ -96,6 +96,12 @@ def geografia(request):
 def frances(request):
     return render(request, 'pastapp/frances.html', {})
 
+def english(request):
+    return render(request, 'pastapp/english_index.html', {})
+
+def english_practice(request):
+    return render(request, 'pastapp/english.html', {})
+
 DICTATIONS = [
     {
         "id": 1,

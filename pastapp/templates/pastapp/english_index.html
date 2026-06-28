@@ -5,23 +5,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Hub</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇫🇷</text></svg>">
+    <title>English Hub</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🇬🇧</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --bg-gradient: linear-gradient(135deg, #0c0f1a 0%, #1a1040 100%);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 
             --color-wordle: #10b981;
             --color-dictation: #8b5cf6;
-            --color-geo: #0ea5e9;
-            --color-french: #3b82f6;
-            --color-chinese: #ef4444;
             --color-english: #e11d48;
         }
 
@@ -34,12 +31,12 @@
             background: var(--bg-gradient);
             color: #ffffff;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             overflow-x: hidden;
         }
 
-        /* Abstract background blobs for modern vibe */
+        /* Ambient background blobs for modern vibe */
         .blob {
             position: absolute;
             border-radius: 50%;
@@ -52,7 +49,7 @@
         .blob-1 {
             width: 400px;
             height: 400px;
-            background: var(--color-wordle);
+            background: var(--color-english);
             top: -100px;
             left: -100px;
         }
@@ -60,20 +57,10 @@
         .blob-2 {
             width: 350px;
             height: 350px;
-            background: var(--color-dictation);
+            background: #1d4ed8;
             bottom: -50px;
             right: -50px;
             animation-delay: -5s;
-        }
-
-        .blob-3 {
-            width: 300px;
-            height: 300px;
-            background: var(--color-geo);
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -2s;
         }
 
         @keyframes float {
@@ -86,6 +73,32 @@
             }
         }
 
+        .header-bar {
+            width: 100%;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            color: #ffffff;
+            background: rgba(255,255,255,0.1);
+        }
+
         .container {
             position: relative;
             z-index: 1;
@@ -93,30 +106,17 @@
             max-width: 1000px;
             text-align: center;
             padding: 2rem 0;
-        }
-
-        .hero-img {
-            height: 140px;
-            margin-bottom: 1rem;
-            animation: bounce 3s infinite ease-in-out alternate;
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
-        }
-
-        @keyframes bounce {
-            0% {
-                transform: translateY(0);
-            }
-
-            100% {
-                transform: translateY(-15px);
-            }
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         h1 {
             font-size: 3.5rem;
             font-weight: 800;
             margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            background: linear-gradient(to right, #ffffff, #fda4af);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -1px;
@@ -194,36 +194,6 @@
             text-shadow: 0 0 30px var(--color-dictation);
         }
 
-        .card.geo:hover::before {
-            background: var(--color-geo);
-            box-shadow: 0 0 20px var(--color-geo);
-        }
-
-        .card.geo:hover .icon {
-            transform: scale(1.15) rotate(-5deg);
-            text-shadow: 0 0 30px var(--color-geo);
-        }
-
-        .card.french:hover::before {
-            background: var(--color-french);
-            box-shadow: 0 0 20px var(--color-french);
-        }
-
-        .card.french:hover .icon {
-            transform: scale(1.15) rotate(5deg);
-            text-shadow: 0 0 30px var(--color-french);
-        }
-
-        .card.chinese:hover::before {
-            background: var(--color-chinese);
-            box-shadow: 0 0 20px var(--color-chinese);
-        }
-
-        .card.chinese:hover .icon {
-            transform: scale(1.15) rotate(-5deg);
-            text-shadow: 0 0 30px var(--color-chinese);
-        }
-
         .card.english:hover::before {
             background: var(--color-english);
             box-shadow: 0 0 20px var(--color-english);
@@ -282,54 +252,34 @@
 <body>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
+    
+    <div class="header-bar">
+        <a href="{% url 'index' %}" class="back-btn">← Back</a>
+    </div>
 
     <div class="container">
-        <h1>Learning Hub</h1>
+        <h1>English Hub</h1>
+        <p class="subtitle">Choose your practice mode</p>
         <div class="grid">
-            <a href="{% url 'geografia' %}" class="card geo">
-                <div class="icon">🌍</div>
-                <h2>Geografia</h2>
-                <p>Provincias y capitales de Argentina</p>
+            <a href="{% url 'pasto' %}" class="card wordle">
+                <div class="icon">📝</div>
+                <h2>Past Verbs</h2>
+                <p>Guess the English verbs in their past tense form</p>
             </a>
 
-            <a href="{% url 'frances' %}" class="card french">
-                <div class="icon">🇫🇷</div>
-                <h2>Français</h2>
-                <p>Verbes, Nationalités, Prépositions, Négation et Articles</p>
+            <a href="{% url 'dictation_list' %}" class="card dictation">
+                <div class="icon">🎧</div>
+                <h2>Dictations</h2>
+                <p>Listen carefully and type the exact sentences</p>
             </a>
 
-            <a href="{% url 'english' %}" class="card english">
+            <a href="{% url 'english_practice' %}" class="card english">
                 <div class="icon">🇬🇧</div>
-                <h2>English</h2>
+                <h2>Practice</h2>
                 <p>Simple Past, Present Continuous, Question Words & Vocabulary</p>
-            </a>
-
-            <a href="{% url 'chino' %}" class="card chinese">
-                <div class="icon">🇨🇳</div>
-                <h2>中文</h2>
-                <p>Números, Días y Saludos</p>
             </a>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const title = document.querySelector('.container h1');
-            if (title) {
-                let clicks = 0;
-                let clickTimer;
-                title.addEventListener('click', () => {
-                    clicks++;
-                    clearTimeout(clickTimer);
-                    if (clicks === 3) {
-                        window.location.href = "{% url 'flexiones' %}";
-                    } else {
-                        clickTimer = setTimeout(() => { clicks = 0; }, 1500);
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>
