@@ -281,18 +281,18 @@ const COLLEGE = {
     heure: {
         rule: "Para preguntar la hora: Quelle heure est-il ? — Il est…",
         heures: [
-            { display: "1:00",  fr: "Il est une heure." },
-            { display: "2:00",  fr: "Il est deux heures." },
-            { display: "3:00",  fr: "Il est trois heures." },
-            { display: "4:15",  fr: "Il est quatre heures et quart." },
-            { display: "5:30",  fr: "Il est cinq heures et demie." },
-            { display: "6:45",  fr: "Il est sept heures moins le quart." },
-            { display: "7:10",  fr: "Il est sept heures dix." },
-            { display: "8:20",  fr: "Il est huit heures vingt." },
-            { display: "9:40",  fr: "Il est dix heures moins vingt." },
+            { display: "01:00", fr: "Il est une heure." },
+            { display: "02:00", fr: "Il est deux heures." },
+            { display: "03:00", fr: "Il est trois heures." },
+            { display: "04:15", fr: "Il est quatre heures et quart." },
+            { display: "05:30", fr: "Il est cinq heures et demie." },
+            { display: "06:45", fr: "Il est sept heures moins le quart." },
+            { display: "07:10", fr: "Il est sept heures dix." },
+            { display: "08:20", fr: "Il est huit heures vingt." },
+            { display: "09:40", fr: "Il est dix heures moins vingt." },
             { display: "10:50", fr: "Il est onze heures moins dix." },
             { display: "12:00", fr: "Il est midi." },
-            { display: "0:00",  fr: "Il est minuit." },
+            { display: "00:00", fr: "Il est minuit." },
         ],
         keywords: [
             { fr: "et quart",          es: "y cuarto (+ 15 min)" },
@@ -1792,10 +1792,10 @@ function generateCollegeQuestions() {
             const h = COLLEGE.heure.heures[Math.floor(Math.random() * COLLEGE.heure.heures.length)];
             questions.push({
                 questionType: 'college_heure',
-                prompt: `Quelle heure est-il ? Écrivez en français`,
-                displaySubject: '🕐 ' + h.display + ' →',
+                prompt: `Quelle heure est-il ? Écrivez en chiffres (ex: 05:30)`,
+                displaySubject: '🕐 ' + h.fr + ' →',
                 verbName: "L'HEURE",
-                answer: h.fr,
+                answer: h.display,
             });
         } else {
             // moments
