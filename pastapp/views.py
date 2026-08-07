@@ -150,6 +150,12 @@ DICTATIONS = [
         "title": "Dictation 8 (Jun 18th)",
         "text": "Dorothy is walking along the yellow brick road. She is talking to the scarecrow, the tin man and the lion. They all want to see the Wizard of Oz. Dorothy wants to go back home. After walking for a long time, they arrived at Emerald City. It was all green.",
         "hard_words": ["Dorothy","walking","yellow","brick","talking","scarecrow","tin","lion","Wizard","Dorothy","arrived","Emerald","City", "green"]
+    },
+    {
+        "id": 9,
+        "title": "Dictation 9 (Aug 13th)",
+        "text": "My winter holidays were great! First, I went to the countryside with my family. Then, we watched a fun show at the theatre. After that, I enjoyed at the cinema and I played with my friends in the park. Finally, I rested at home. It was fantastic!",
+        "hard_words": ["holidays","countryside","watched","theatre","enjoyed","Finally","rested","fantastic"]
     }
 
 ]
