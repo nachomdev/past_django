@@ -156,6 +156,12 @@ DICTATIONS = [
         "title": "Dictation 9 (Aug 13th)",
         "text": "My winter holidays were great! First, I went to the countryside with my family. Then, we watched a fun show at the theatre. After that, I enjoyed at the cinema and I played with my friends in the park. Finally, I rested at home. It was fantastic!",
         "hard_words": ["holidays","countryside","watched","theatre","enjoyed","Finally","rested","fantastic"]
+    },
+    {
+        "id": 10,
+        "title": "Dictation 10 (Aug 20th)",
+        "text": "When hungry Brown Bear woke up after winter, he could not smell food. He met an old wolf named Wilbur, who was too weak. The two animals decided to help each other: Wilbur smelt the food and Bear caught it. By working as a team, they became friends.",
+        "hard_words": ["hungry","smell","wolf","Wilbur","dediced","smelt","caught","working"]
     }
 
 ]
