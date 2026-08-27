@@ -162,8 +162,13 @@ DICTATIONS = [
         "title": "Dictation 10 (Aug 20th)",
         "text": "When hungry Brown Bear woke up after winter, he could not smell food. He met an old wolf named Wilbur, who was too weak. The two animals decided to help each other: Wilbur smelt the food and Bear caught it. By working as a team, they became friends.",
         "hard_words": ["hungry","smell","wolf","Wilbur","dediced","smelt","caught","working"]
+    },
+    {
+        "id": 11,
+        "title": "Dictation 11 (Sep 3rd)",
+        "text": "Last week, we started reading \"Gulliver's Travels\". Gulliver was a very clever young man, who loved adventures. His ship hit a rock and broke in two. He was scared and swam for his life. He arrived on an island and was all alone. He was very tired, so he fell asleep.",
+        "hard_words": ["hungry","smell","wolf","Wilbur","dediced","smelt","caught","working"]
     }
-
 ]
 
 def dictation_list(request):
