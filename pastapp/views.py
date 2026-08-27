@@ -167,7 +167,7 @@ DICTATIONS = [
         "id": 11,
         "title": "Dictation 11 (Sep 3rd)",
         "text": "Last week, we started reading \"Gulliver's Travels\". Gulliver was a very clever young man, who loved adventures. His ship hit a rock and broke in two. He was scared and swam for his life. He arrived on an island and was all alone. He was very tired, so he fell asleep.",
-        "hard_words": ["hungry","smell","wolf","Wilbur","dediced","smelt","caught","working"]
+        "hard_words": ["started","reading","Gulliver's","Travels","clever","adventures","swam","asleep"]
     }
 ]
 
