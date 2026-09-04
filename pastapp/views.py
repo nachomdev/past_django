@@ -168,6 +168,12 @@ DICTATIONS = [
         "title": "Dictation 11 (Sep 3rd)",
         "text": "Last week, we started reading \"Gulliver's Travels\". Gulliver was a very clever young man, who loved adventures. His ship hit a rock and broke in two. He was scared and swam for his life. He arrived on an island and was all alone. He was very tired, so he fell asleep.",
         "hard_words": ["started","reading","Gulliver's","Travels","clever","adventures","swam","asleep"]
+    },
+    {
+        "id": 12,
+        "title": "Dictation 12 (Sep 10th)",
+        "text": "One morning, Gulliver woke up and felt surprised. He tried to move, but he could not. Then, he looked around and saw many tiny people. They were afraid of Gulliver. He was confused because he didn't know where he was. Gulliver wanted to talk to them and understand what happened.",
+        "hard_words": ["morning","Gulliver","surprised","tried","afraid","confused","understand","happedned"]
     }
 ]
 
