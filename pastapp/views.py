@@ -174,6 +174,12 @@ DICTATIONS = [
         "title": "Dictation 12 (Sep 10th)",
         "text": "One morning, Gulliver woke up and felt surprised. He tried to move, but he could not. Then, he looked around and saw many tiny people. They were afraid of Gulliver. He was confused because he didn't know where he was. Gulliver wanted to talk to them and understand what happened.",
         "hard_words": ["morning","Gulliver","surprised","tried","afraid","confused","understand","happedned"]
+    },
+    {
+        "id": 13,
+        "title": "Dictation 13 (Sep 17th)",
+        "text": "The tiny people attacked Gulliver with many small arrows. They hurt him, but he stayed calm. He set himself free. He wanted to speak to the little people, but he did not understand their language. Later, the Emperor met Gulliver. He ordered some food for him. Everything was tiny! The little people were happy with their new friend.",
+        "hard_words": ["attacked","Gulliver","arrows","stayed","understand","Emperor","Everything","their"]
     }
 ]
 
