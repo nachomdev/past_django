@@ -180,6 +180,12 @@ DICTATIONS = [
         "title": "Dictation 13 (Sep 17th)",
         "text": "The tiny people attacked Gulliver with many small arrows. They hurt him, but he stayed calm. He set himself free. He wanted to speak to the little people, but he did not understand their language. Later, the Emperor met Gulliver. He ordered some food for him. Everything was tiny! The little people were happy with their new friend.",
         "hard_words": ["attacked","Gulliver","arrows","stayed","understand","Emperor","Everything","their"]
+    },
+    {
+        "id": 14,
+        "title": "Dictation 14 (Sep 24th)",
+        "text": "Gulliver stayed in Lilliput for many days. The tiny people prepared beds for him to sleep. He ate their food, learnt about their lives, shared time, and helped them, too. They had many strange and funny adventures together.",
+        "hard_words": ["Lillipu","Gulliver","perpared","their","learnt","lives","shared","helped","funny","adventures"]
     }
 ]
 
