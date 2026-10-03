@@ -186,6 +186,12 @@ DICTATIONS = [
         "title": "Dictation 14 (Sep 24th)",
         "text": "Gulliver stayed in Lilliput for many days. The tiny people prepared beds for him to sleep. He ate their food, learnt about their lives, shared time, and helped them, too. They had many strange and funny adventures together.",
         "hard_words": ["Lillipu","Gulliver","perpared","their","learnt","lives","shared","helped","funny","adventures"]
+    },
+    {
+        "id": 15,
+        "title": "Dictation 15 (Oct 8th)",
+        "text": "Gulliver learnt that Lilliput was at war with the people of Blefuscu. He had a secret plan to help his friends. He took some hooks and ropes and swam to the other island. He put on his glasses to protect his eyes. Then, he used the ropes to pull the ships back to the port. The war was over! Everyone was happy!",
+        "hard_words": ["learnt","Gulliver","Lilliput","Befuscu","swan","island","glasses","ropes","ships","Everyone"]
     }
 ]
 
