@@ -192,6 +192,12 @@ DICTATIONS = [
         "title": "Dictation 15 (Oct 8th)",
         "text": "Gulliver learnt that Lilliput was at war with the people of Blefuscu. He had a secret plan to help his friends. He took some hooks and ropes and swam to the other island. He put on his glasses to protect his eyes. Then, he used the ropes to pull the ships back to the port. The war was over! Everyone was happy!",
         "hard_words": ["learnt","Gulliver","Lilliput","Befuscu","swan","island","glasses","ropes","ships","Everyone"]
+    },
+    {
+        "id": 16,
+        "title": "Dictation 16 (Oct 15th)",
+        "text": "Some people in Lilliput were not very happy with Gulliver. The Emperor gave Gulliver everything he wanted. Flimnap, the Emperor's friend, felt jealous of Gulliver. They said that Flimnap wanted to hurt him. Gulliver was afraid. He decided to go back home. He told the Emperor and the Empress how he felt. They agreed and helped him build a ship.",
+        "hard_words": ["people","Gulliver","Lilliput","Emperor","everything","Flimnap","Emperor","jealous","decided","Empress"]
     }
 ]
 
