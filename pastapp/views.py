@@ -198,8 +198,15 @@ DICTATIONS = [
         "title": "Dictation 16 (Oct 15th)",
         "text": "Some people in Lilliput were not very happy with Gulliver. The Emperor gave Gulliver everything he wanted. Flimnap, the Emperor's friend, felt jealous of Gulliver. They said that Flimnap wanted to hurt him. Gulliver was afraid. He decided to go back home. He told the Emperor and the Empress how he felt. They agreed and helped him build a ship.",
         "hard_words": ["people","Gulliver","Lilliput","Emperor","everything","Flimnap","Emperor","jealous","decided","Empress"]
+    },
+    {
+        "id": 17,
+        "title": "Dictation 16 (Oct 29th)",
+        "text": "Last Monday, our class went on an exciting campout in San Pedro. We travelled by bus with our teachers and friends. When we arrived at the campsite, we worked together in teams. In the afternoon, we played fun games. At night, we met around the campfire, ate delicious food and told stories. Sharing with my classmates was the best part of the trip!",
+        "hard_words": ["class","exciting","campout","travelled","teachers","campsite","campfire","classmates"]
     }
 ]
+
 
 def dictation_list(request):
     return render(request, 'pastapp/dictation_list.html', {
