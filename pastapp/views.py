@@ -201,9 +201,15 @@ DICTATIONS = [
     },
     {
         "id": 17,
-        "title": "Dictation 16 (Oct 29th)",
+        "title": "Dictation 17 (Oct 29th)",
         "text": "Last Monday, our class went on an exciting campout in San Pedro. We travelled by bus with our teachers and friends. When we arrived at the campsite, we worked together in teams. In the afternoon, we played fun games. At night, we met around the campfire, ate delicious food and told stories. Sharing with my classmates was the best part of the trip!",
         "hard_words": ["class","exciting","campout","travelled","teachers","campsite","campfire","classmates"]
+    },
+    {
+        "id": 18,
+        "title": "Dictation 18 (Nov 5th)",
+        "text": "It was trip day in Miss Frizzle's class and the children were really excited! Arnold's cousin, Janet, was visiting their school for the day. The children were learning about the Solar System, so they went to the planetarium to see a sky show. When they arrived, it was closed for repairs. They felt disappointed.",
+        "hard_words": ["Frizzle's","children","excited","Arnold's","cousin","visiting","learning","Solar System","planetarium","arrived","repairs","disappointed"]
     }
 ]
 
