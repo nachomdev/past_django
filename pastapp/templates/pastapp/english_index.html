@@ -20,6 +20,8 @@
             --color-wordle: #10b981;
             --color-dictation: #8b5cf6;
             --color-english: #e11d48;
+            --color-plurals: #f59e0b;
+            --color-comparatives: #0ea5e9;
         }
 
         body,
@@ -194,6 +196,26 @@
             text-shadow: 0 0 30px var(--color-dictation);
         }
 
+        .card.plurals:hover::before {
+            background: var(--color-plurals);
+            box-shadow: 0 0 20px var(--color-plurals);
+        }
+
+        .card.plurals:hover .icon {
+            transform: scale(1.15) rotate(-5deg);
+            text-shadow: 0 0 30px var(--color-plurals);
+        }
+
+        .card.comparatives:hover::before {
+            background: var(--color-comparatives);
+            box-shadow: 0 0 20px var(--color-comparatives);
+        }
+
+        .card.comparatives:hover .icon {
+            transform: scale(1.15) rotate(5deg);
+            text-shadow: 0 0 30px var(--color-comparatives);
+        }
+
         .card.english:hover::before {
             background: var(--color-english);
             box-shadow: 0 0 20px var(--color-english);
@@ -271,6 +293,18 @@
                 <div class="icon">🎧</div>
                 <h2>Dictations</h2>
                 <p>Listen carefully and type the exact sentences</p>
+            </a>
+
+            <a href="{% url 'english_plurals' %}" class="card plurals">
+                <div class="icon">👥</div>
+                <h2>Plurals</h2>
+                <p>Regular and irregular plurals: one book, two books</p>
+            </a>
+
+            <a href="{% url 'english_comparatives' %}" class="card comparatives">
+                <div class="icon">⚖️</div>
+                <h2>Comparatives</h2>
+                <p>Compare two things: taller than, more expensive than</p>
             </a>
 
             <a href="{% url 'english_practice' %}" class="card english">

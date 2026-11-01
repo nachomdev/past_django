@@ -5,12 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English — Exam Practice</title>
-    <meta name="description" content="Study and practise for your English exam: Simple Past, Present Continuous, Question Words, Vocabulary and Sequence Words">
+    <title>English — {% if topic %}{{ topic_title }}{% else %}Exam Practice{% endif %}</title>
+    <meta name="description" content="Study and practise for your English exam: {% if topic %}{{ topic_title }}{% else %}Simple Past, Present Continuous, Question Words, Vocabulary and Sequence Words{% endif %}">
     <link rel="stylesheet" href="{% static 'pastapp/css/english.css' %}">
 </head>
 
-<body>
+<body{% if topic %} data-tab="{{ topic }}"{% endif %}>
     <!-- Ambient background orbs -->
     <div class="en-ambient">
         <div class="orb orb-1"></div>
@@ -29,10 +29,16 @@
                 <span class="uk-white"></span>
                 <span class="uk-blue"></span>
             </div>
+            {% if topic %}
+            <h1>{{ topic_title }}</h1>
+            <p class="subtitle">Study the rules, then practise</p>
+            {% else %}
             <h1>English</h1>
             <p class="subtitle">Simple Past · Present Continuous · Question Words · Vocabulary · Sequence Words</p>
+            {% endif %}
         </header>
 
+        {% if not topic %}
         <!-- Tabs -->
         <nav class="en-tabs" role="tablist">
             <button class="en-tab active" data-tab="simple_past" role="tab">Simple Past</button>
@@ -41,6 +47,7 @@
             <button class="en-tab" data-tab="vocabulary" role="tab">Vocabulary</button>
             <button class="en-tab" data-tab="sequence_words" role="tab">Sequence Words</button>
         </nav>
+        {% endif %}
 
         <!-- Mode Toggle -->
         <div class="en-mode-toggle">

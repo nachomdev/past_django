@@ -340,6 +340,174 @@ const SEQUENCE_WORDS = {
         { context: "Después de mucha espera", answer: "At last" },
     ]
 };
+// ========================================
+// PLURALS DATA
+// ========================================
+const PLURALS = {
+    regularRules: [
+        { rule: "Most nouns", pattern: "+ s", example: "book → books" },
+        { rule: "Ending in SH, CH, SS, S, X, O", pattern: "+ es", example: "brush → brushes" },
+        { rule: "Ending in vowel + Y", pattern: "+ s", example: "toy → toys" },
+        { rule: "Ending in F or FE", pattern: "drop F/FE + ves", example: "knife → knives" },
+        { rule: "Ending in consonant + Y", pattern: "drop Y + ies", example: "story → stories" },
+    ],
+    // `rule` is the index in regularRules, shown as a hint after a wrong answer
+    regularNouns: [
+        { singular: "book", plural: "books", es: "libro", rule: 0 },
+        { singular: "cat", plural: "cats", es: "gato", rule: 0 },
+        { singular: "dog", plural: "dogs", es: "perro", rule: 0 },
+        { singular: "pencil", plural: "pencils", es: "lápiz", rule: 0 },
+        { singular: "apple", plural: "apples", es: "manzana", rule: 0 },
+        { singular: "teacher", plural: "teachers", es: "maestro/a", rule: 0 },
+        { singular: "house", plural: "houses", es: "casa", rule: 0 },
+        { singular: "tree", plural: "trees", es: "árbol", rule: 0 },
+        { singular: "brush", plural: "brushes", es: "cepillo", rule: 1 },
+        { singular: "dish", plural: "dishes", es: "plato", rule: 1 },
+        { singular: "watch", plural: "watches", es: "reloj", rule: 1 },
+        { singular: "church", plural: "churches", es: "iglesia", rule: 1 },
+        { singular: "sandwich", plural: "sandwiches", es: "sándwich", rule: 1 },
+        { singular: "glass", plural: "glasses", es: "vaso", rule: 1 },
+        { singular: "class", plural: "classes", es: "clase", rule: 1 },
+        { singular: "bus", plural: "buses", es: "colectivo", rule: 1 },
+        { singular: "box", plural: "boxes", es: "caja", rule: 1 },
+        { singular: "fox", plural: "foxes", es: "zorro", rule: 1 },
+        { singular: "potato", plural: "potatoes", es: "papa", rule: 1 },
+        { singular: "tomato", plural: "tomatoes", es: "tomate", rule: 1 },
+        { singular: "toy", plural: "toys", es: "juguete", rule: 2 },
+        { singular: "boy", plural: "boys", es: "chico", rule: 2 },
+        { singular: "day", plural: "days", es: "día", rule: 2 },
+        { singular: "key", plural: "keys", es: "llave", rule: 2 },
+        { singular: "monkey", plural: "monkeys", es: "mono", rule: 2 },
+        { singular: "knife", plural: "knives", es: "cuchillo", rule: 3 },
+        { singular: "life", plural: "lives", es: "vida", rule: 3 },
+        { singular: "wife", plural: "wives", es: "esposa", rule: 3 },
+        { singular: "leaf", plural: "leaves", es: "hoja", rule: 3 },
+        { singular: "wolf", plural: "wolves", es: "lobo", rule: 3 },
+        { singular: "shelf", plural: "shelves", es: "estante", rule: 3 },
+        { singular: "half", plural: "halves", es: "mitad", rule: 3 },
+        { singular: "story", plural: "stories", es: "cuento", rule: 4 },
+        { singular: "photocopy", plural: "photocopies", es: "fotocopia", rule: 4 },
+        { singular: "baby", plural: "babies", es: "bebé", rule: 4 },
+        { singular: "city", plural: "cities", es: "ciudad", rule: 4 },
+        { singular: "family", plural: "families", es: "familia", rule: 4 },
+        { singular: "party", plural: "parties", es: "fiesta", rule: 4 },
+        { singular: "lady", plural: "ladies", es: "señora", rule: 4 },
+        { singular: "cherry", plural: "cherries", es: "cereza", rule: 4 },
+    ],
+    irregular: [
+        { singular: "man", plural: "men", es: "hombre" },
+        { singular: "woman", plural: "women", es: "mujer" },
+        { singular: "foot", plural: "feet", es: "pie" },
+        { singular: "tooth", plural: "teeth", es: "diente" },
+        { singular: "goose", plural: "geese", es: "ganso" },
+        { singular: "louse", plural: "lice", es: "piojo" },
+        { singular: "mouse", plural: "mice", es: "ratón" },
+        { singular: "person", plural: "people", es: "persona" },
+        { singular: "child", plural: "children", es: "niño/a" },
+        { singular: "ox", plural: "oxen", es: "buey" },
+        { singular: "fish", plural: "fish", es: "pez" },
+        { singular: "sheep", plural: "sheep", es: "oveja" },
+        { singular: "deer", plural: "deer", es: "ciervo" },
+        { singular: "this", plural: "these", es: "este/a → estos/as" },
+        { singular: "that", plural: "those", es: "ese/a → esos/as" },
+        { singular: "am/is", plural: "are", es: "soy/es → somos/son" },
+        { singular: "was", plural: "were", es: "era → eran" },
+        { singular: "has", plural: "have", es: "tiene → tienen" },
+        { singular: "I", plural: "we", es: "yo → nosotros" },
+        { singular: "he/she/it", plural: "they", es: "él/ella → ellos" },
+        { singular: "my", plural: "our", es: "mi → nuestro" },
+        { singular: "his/her/its", plural: "their", es: "su (de él/ella) → su (de ellos)" },
+        { singular: "a/an", plural: "some", es: "un/una → unos/unas" },
+    ]
+};
+
+// ========================================
+// COMPARATIVES DATA
+// ========================================
+const COMPARATIVES = {
+    intro: "We use COMPARATIVES to compare TWO things or people using ADJECTIVES.",
+    structures: {
+        short: {
+            structure: "Adjective + ER + THAN",
+            examples: [
+                { en: "Your ruler is longer than mine.", es: "Tu regla es más larga que la mía." },
+                { en: "Tom is taller than Joe.", es: "Tom es más alto que Joe." },
+            ]
+        },
+        long: {
+            structure: "MORE + adjective + THAN",
+            examples: [
+                { en: "A car is more expensive than a bicycle.", es: "Un auto es más caro que una bicicleta." },
+                { en: "A monkey is more intelligent than Joe.", es: "Un mono es más inteligente que Joe." },
+            ]
+        }
+    },
+    rules: [
+        { rule: "Short adjectives", pattern: "+ er", example: "tall → taller" },
+        { rule: "Long adjectives", pattern: "more + adj", example: "expensive → more expensive" },
+        { rule: "Ending in consonant + Y", pattern: "drop Y + ier", example: "dirty → dirtier" },
+        { rule: "Ending in consonant + vowel + consonant", pattern: "double last + er", example: "big → bigger" },
+    ],
+    // `rule` is the index in rules, shown as a hint after a wrong answer
+    adjectives: [
+        { base: "tall", comp: "taller", es: "alto", rule: 0 },
+        { base: "long", comp: "longer", es: "largo", rule: 0 },
+        { base: "short", comp: "shorter", es: "corto/bajo", rule: 0 },
+        { base: "small", comp: "smaller", es: "pequeño", rule: 0 },
+        { base: "old", comp: "older", es: "viejo", rule: 0 },
+        { base: "young", comp: "younger", es: "joven", rule: 0 },
+        { base: "fast", comp: "faster", es: "rápido", rule: 0 },
+        { base: "slow", comp: "slower", es: "lento", rule: 0 },
+        { base: "cold", comp: "colder", es: "frío", rule: 0 },
+        { base: "strong", comp: "stronger", es: "fuerte", rule: 0 },
+        { base: "expensive", comp: "more expensive", es: "caro", rule: 1 },
+        { base: "intelligent", comp: "more intelligent", es: "inteligente", rule: 1 },
+        { base: "beautiful", comp: "more beautiful", es: "hermoso", rule: 1 },
+        { base: "interesting", comp: "more interesting", es: "interesante", rule: 1 },
+        { base: "dangerous", comp: "more dangerous", es: "peligroso", rule: 1 },
+        { base: "difficult", comp: "more difficult", es: "difícil", rule: 1 },
+        { base: "important", comp: "more important", es: "importante", rule: 1 },
+        { base: "comfortable", comp: "more comfortable", es: "cómodo", rule: 1 },
+        { base: "dirty", comp: "dirtier", es: "sucio", rule: 2 },
+        { base: "ugly", comp: "uglier", es: "feo", rule: 2 },
+        { base: "pretty", comp: "prettier", es: "bonito", rule: 2 },
+        { base: "happy", comp: "happier", es: "feliz", rule: 2 },
+        { base: "easy", comp: "easier", es: "fácil", rule: 2 },
+        { base: "funny", comp: "funnier", es: "gracioso", rule: 2 },
+        { base: "heavy", comp: "heavier", es: "pesado", rule: 2 },
+        { base: "fat", comp: "fatter", es: "gordo", rule: 3 },
+        { base: "hot", comp: "hotter", es: "caliente", rule: 3 },
+        { base: "big", comp: "bigger", es: "grande", rule: 3 },
+        { base: "thin", comp: "thinner", es: "delgado", rule: 3 },
+        { base: "sad", comp: "sadder", es: "triste", rule: 3 },
+        { base: "wet", comp: "wetter", es: "mojado", rule: 3 },
+    ],
+    exceptions: [
+        { base: "good", comp: "better", es: "bueno → mejor" },
+        { base: "bad", comp: "worse", es: "malo → peor" },
+    ],
+    // ___ is replaced by the comparative + "than"
+    sentences: [
+        { text: "Tom is ___ Joe.", adj: "tall" },
+        { text: "Your ruler is ___ mine.", adj: "long" },
+        { text: "A car is ___ a bicycle.", adj: "expensive" },
+        { text: "A monkey is ___ Joe.", adj: "intelligent" },
+        { text: "An elephant is ___ a mouse.", adj: "big" },
+        { text: "Summer is ___ winter.", adj: "hot" },
+        { text: "My shoes are ___ yours.", adj: "dirty" },
+        { text: "A lion is ___ a cat.", adj: "dangerous" },
+        { text: "Maths is ___ Art.", adj: "difficult" },
+        { text: "This book is ___ that film.", adj: "interesting" },
+        { text: "A plane is ___ a train.", adj: "fast" },
+        { text: "My grandfather is ___ my dad.", adj: "old" },
+        { text: "This joke is ___ that one.", adj: "funny" },
+        { text: "A cheetah is ___ a turtle.", adj: "fast" },
+        { text: "My pizza is ___ yours.", adj: "good" },
+        { text: "Today's weather is ___ yesterday's.", adj: "bad" },
+        { text: "Sofía is ___ her brother.", adj: "happy" },
+        { text: "My cat is ___ your dog.", adj: "fat" },
+    ]
+};
 
 
 // ========================================
@@ -362,6 +530,8 @@ let enState = {
 // INIT
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Single-topic pages (e.g. /english/plurals) set the tab on <body> and have no tab bar
+    if (document.body.dataset.tab) enState.currentTab = document.body.dataset.tab;
     enInitTabs();
     enInitModeToggle();
     enRender();
@@ -432,6 +602,12 @@ function enRenderStudy() {
             break;
         case 'sequence_words':
             enRenderStudySequenceWords(panel);
+            break;
+        case 'plurals':
+            enRenderStudyPlurals(panel);
+            break;
+        case 'comparatives':
+            enRenderStudyComparatives(panel);
             break;
     }
 }
@@ -900,6 +1076,220 @@ function enRenderStudySequenceWords(panel) {
     panel.innerHTML = html;
 }
 
+// ========================================
+// STUDY: SHARED HELPERS
+// ========================================
+function enRulesCard(icon, title, desc, rules) {
+    let html = `
+    <div class="en-card">
+        <div class="card-title">
+            <span>${icon}</span>
+            <span class="title-text">${title}</span>
+        </div>
+        <div class="card-desc">${desc}</div>
+        <table class="en-table">
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Pattern</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    rules.forEach(r => {
+        html += `
+            <tr>
+                <td class="label">${r.rule}</td>
+                <td class="value"><span class="en-tag tense">${r.pattern}</span></td>
+                <td class="value"><span class="highlight">${r.example}</span></td>
+            </tr>
+        `;
+    });
+    html += `
+            </tbody>
+        </table>
+    </div>
+    `;
+    return html;
+}
+
+// ========================================
+// STUDY: PLURALS
+// ========================================
+function enRenderStudyPlurals(panel) {
+    let html = enRulesCard('📏', 'Plurals — Spelling Rules', 'Plural = more than one. We form a plural by adding S', PLURALS.regularRules);
+
+    // Regular nouns grouped by rule
+    PLURALS.regularRules.forEach((r, idx) => {
+        html += `
+        <div class="en-card">
+            <div class="card-title">
+                <span>📝</span>
+                <span class="title-text">${r.rule} <span class="en-tag tense">${r.pattern}</span></span>
+            </div>
+            <div class="en-grid">
+        `;
+        PLURALS.regularNouns.filter(n => n.rule === idx).forEach(n => {
+            html += `
+                <div class="en-chip">
+                    ${n.singular} → ${n.plural}
+                    <span class="meaning">${n.es}</span>
+                </div>
+            `;
+        });
+        html += `
+            </div>
+        </div>
+        `;
+    });
+
+    // Irregular plurals
+    html += `
+    <div class="en-card">
+        <div class="card-title">
+            <span>⚡</span>
+            <span class="title-text">Irregular Plurals</span>
+        </div>
+        <div class="card-desc">Estos plurales no siguen reglas — hay que memorizarlos</div>
+        <table class="en-table">
+            <thead>
+                <tr>
+                    <th>Singular</th>
+                    <th>Plural</th>
+                    <th>Español</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    PLURALS.irregular.forEach(n => {
+        html += `
+            <tr>
+                <td class="label">${n.singular}</td>
+                <td class="value"><span class="highlight">${n.plural}</span></td>
+                <td class="muted">${n.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+            </tbody>
+        </table>
+    </div>
+    `;
+
+    panel.innerHTML = html;
+}
+
+// ========================================
+// STUDY: COMPARATIVES
+// ========================================
+function enRenderStudyComparatives(panel) {
+    let html = '';
+
+    const forms = [
+        { key: 'short', icon: '📐', label: 'Short Adjectives', tagClass: 'neg' },
+        { key: 'long', icon: '📏', label: 'Long Adjectives', tagClass: 'interr' },
+    ];
+
+    forms.forEach(f => {
+        const data = COMPARATIVES.structures[f.key];
+        html += `
+        <div class="en-card">
+            <div class="card-title">
+                <span>${f.icon}</span>
+                <span class="title-text">${f.label}</span>
+            </div>
+            ${f.key === 'short' ? `<div class="card-desc">${COMPARATIVES.intro}</div>` : ''}
+            <div class="en-rule-box">
+                <span class="en-tag ${f.tagClass}">${f.label}</span>
+                <span>${data.structure}</span>
+            </div>
+            <table class="en-table">
+                <thead>
+                    <tr>
+                        <th>English</th>
+                        <th>Español</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        data.examples.forEach(ex => {
+            html += `
+                <tr>
+                    <td class="value"><span class="highlight">${ex.en}</span></td>
+                    <td class="muted">${ex.es}</td>
+                </tr>
+            `;
+        });
+        html += `
+                </tbody>
+            </table>
+        </div>
+        `;
+    });
+
+    html += enRulesCard('✍️', 'Spelling Rules', 'Reglas para formar el comparativo', COMPARATIVES.rules);
+
+    // Adjectives grouped by rule
+    COMPARATIVES.rules.forEach((r, idx) => {
+        html += `
+        <div class="en-card">
+            <div class="card-title">
+                <span>📝</span>
+                <span class="title-text">${r.rule} <span class="en-tag tense">${r.pattern}</span></span>
+            </div>
+            <div class="en-grid">
+        `;
+        COMPARATIVES.adjectives.filter(a => a.rule === idx).forEach(a => {
+            html += `
+                <div class="en-chip">
+                    ${a.base} → ${a.comp}
+                    <span class="meaning">${a.es}</span>
+                </div>
+            `;
+        });
+        html += `
+            </div>
+        </div>
+        `;
+    });
+
+    // Exceptions
+    html += `
+    <div class="en-card">
+        <div class="card-title">
+            <span>⚡</span>
+            <span class="title-text">Exceptions!</span>
+        </div>
+        <div class="card-desc">Hay que memorizarlos</div>
+        <table class="en-table">
+            <thead>
+                <tr>
+                    <th>Adjective</th>
+                    <th>Comparative</th>
+                    <th>Español</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    COMPARATIVES.exceptions.forEach(e => {
+        html += `
+            <tr>
+                <td class="label">${e.base}</td>
+                <td class="value"><span class="highlight">${e.comp}</span></td>
+                <td class="muted">${e.es}</td>
+            </tr>
+        `;
+    });
+    html += `
+            </tbody>
+        </table>
+    </div>
+    `;
+
+    panel.innerHTML = html;
+}
+
 
 // ========================================
 // PRACTICE MODE
@@ -911,8 +1301,83 @@ function enGenerateQuestions() {
         case 'question_words': return enGenerateQuestionWordsQuestions();
         case 'vocabulary': return enGenerateVocabularyQuestions();
         case 'sequence_words': return enGenerateSequenceWordsQuestions();
+        case 'plurals': return enGeneratePluralsQuestions();
+        case 'comparatives': return enGenerateComparativesQuestions();
         default: return [];
     }
+}
+
+function enPick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function enGeneratePluralsQuestions() {
+    const questions = [];
+
+    for (let i = 0; i < enState.totalQuestions; i++) {
+        if (Math.random() < 0.5) {
+            const n = enPick(PLURALS.regularNouns);
+            const r = PLURALS.regularRules[n.rule];
+            questions.push({
+                prompt: `Write the plural form`,
+                display: n.singular + ' →',
+                tag: 'REGULAR PLURAL',
+                answer: n.plural,
+                hint: `${r.rule}: ${r.pattern} (${r.example})`,
+            });
+        } else {
+            const n = enPick(PLURALS.irregular);
+            questions.push({
+                prompt: `Write the plural form`,
+                display: n.singular + ' →',
+                tag: 'IRREGULAR PLURAL',
+                answer: n.plural,
+            });
+        }
+    }
+
+    return questions;
+}
+
+function enGenerateComparativesQuestions() {
+    const questions = [];
+    const types = ['form', 'form', 'exception', 'sentence', 'sentence'];
+    const allAdjectives = [...COMPARATIVES.adjectives, ...COMPARATIVES.exceptions];
+
+    for (let i = 0; i < enState.totalQuestions; i++) {
+        const type = enPick(types);
+
+        if (type === 'form') {
+            const a = enPick(COMPARATIVES.adjectives);
+            const r = COMPARATIVES.rules[a.rule];
+            questions.push({
+                prompt: `Write the comparative form`,
+                display: a.base + ' →',
+                tag: a.rule === 1 ? 'LONG ADJECTIVE' : 'SHORT ADJECTIVE',
+                answer: a.comp,
+                hint: `${r.rule}: ${r.pattern} (${r.example})`,
+            });
+        } else if (type === 'exception') {
+            const e = enPick(COMPARATIVES.exceptions);
+            questions.push({
+                prompt: `Write the comparative form`,
+                display: e.base + ' →',
+                tag: 'EXCEPTION',
+                answer: e.comp,
+            });
+        } else {
+            const s = enPick(COMPARATIVES.sentences);
+            const a = allAdjectives.find(x => x.base === s.adj);
+            questions.push({
+                prompt: `Complete with the comparative + THAN`,
+                display: `${s.text} (${s.adj})`,
+                tag: 'COMPARATIVE SENTENCE',
+                answer: `${a.comp} than`,
+            });
+        }
+    }
+
+    return questions;
 }
 
 function enGenerateSimplePastQuestions() {
@@ -1215,7 +1680,8 @@ function enHandleSubmit() {
         enState.streak = 0;
         input.classList.add('wrong');
         correction.className = 'en-correction show wrong-msg';
-        correction.innerHTML = `✗ The correct answer: <strong>${q.answer}</strong>`;
+        correction.innerHTML = `✗ The correct answer: <strong>${q.answer}</strong>`
+            + (q.hint ? `<br><small>${q.hint}</small>` : '');
     }
 
     document.getElementById('en-score-correct').textContent = enState.score;

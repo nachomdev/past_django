@@ -102,6 +102,21 @@ def english(request):
 def english_practice(request):
     return render(request, 'pastapp/english.html', {})
 
+ENGLISH_TOPICS = {
+    'plurals': 'Plurals',
+    'comparatives': 'Comparatives',
+}
+
+def english_topic(request, topic):
+    if topic not in ENGLISH_TOPICS:
+        from django.http import Http404
+        raise Http404("Topic not found")
+
+    return render(request, 'pastapp/english.html', {
+        'topic': topic,
+        'topic_title': ENGLISH_TOPICS[topic],
+    })
+
 DICTATIONS = [
     {
         "id": 1,
