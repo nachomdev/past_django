@@ -225,6 +225,12 @@ DICTATIONS = [
         "title": "Dictation 18 (Nov 5th)",
         "text": "It was trip day in Miss Frizzle's class and the children were really excited! Arnold's cousin, Janet, was visiting their school for the day. The children were learning about the Solar System, so they went to the planetarium to see a sky show. When they arrived, it was closed for repairs. They felt disappointed.",
         "hard_words": ["Frizzle's","children","excited","Arnold's","cousin","visiting","learning","Solar System","planetarium","arrived","repairs","disappointed"]
+    },
+    {
+        "id": 19,
+        "title": "Dictation 19 (Nov 12th)",
+        "text": "As we went to the planetarium, Miss Frizzle told us about the Earth. It spins while it moves in its orbit. The spinning of the Earth makes night and day. Miss Frizzle said our first stop was the Moon. We got off the bus and looked around. There was no air, no water, no life. We wanted to play, but Ms. Frizzle said it was time to go.",
+        "hard_words": ["planetarium","Frizzle","Earth","spins","orbit","spinning","night","Moon","looked around","air","water","life"]
     }
 ]
 
