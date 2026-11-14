@@ -231,6 +231,12 @@ DICTATIONS = [
         "title": "Dictation 19 (Nov 12th)",
         "text": "As we went to the planetarium, Miss Frizzle told us about the Earth. It spins while it moves in its orbit. The spinning of the Earth makes night and day. Miss Frizzle said our first stop was the Moon. We got off the bus and looked around. There was no air, no water, no life. We wanted to play, but Ms. Frizzle said it was time to go.",
         "hard_words": ["planetarium","Frizzle","Earth","spins","orbit","spinning","night","Moon","looked around","air","water","life"]
+    },
+    {
+        "id": 20,
+        "title": "Dictation 20 (Nov 19th)",
+        "text": "Her name is Miss Frizzle and she is thirty-eight years old. She has got a brother and a sister. She is tall. She has got curly ginger hair and round brown eyes. Her nose is upturned and her mouth is small. Her favourite colour is yellow and her favourite animal is the pig. She likes having adventures with her students!",
+        "hard_words": ["Frizzle","thirty-eight","brother","sister","curly","ginger","round","brown","upturned","favourite","colour","yellow","adventures","students"]
     }
 ]
 
