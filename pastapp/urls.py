@@ -25,4 +25,10 @@ urlpatterns = [
     path('flexiones/login', views.flexiones_login, name='flexiones_login'),
     path('flexiones/signup', views.flexiones_signup, name='flexiones_signup'),
     path('flexiones/logout', views.flexiones_logout, name='flexiones_logout'),
+    path('vivir', views.vivir, name='vivir'),
+    path('vivir/api/data', views.vivir_data, name='vivir_data'),
+    path('vivir/api/session', views.vivir_session, name='vivir_session'),
+    path('vivir/api/start', views.vivir_start, name='vivir_start'),
+    path('vivir/api/weight', views.vivir_weight_add, name='vivir_weight_add'),
+    path('vivir/api/weight/delete/<int:log_id>', views.vivir_weight_delete, name='vivir_weight_delete'),
 ]

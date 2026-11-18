@@ -26,6 +26,7 @@
         <!-- Form Card -->
         <form class="auth-card" method="POST" action="{% url 'flexiones_signup' %}">
             {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
             
             <h2 style="font-size: 1.3rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem;">Crear Cuenta</h2>
             
@@ -54,7 +55,7 @@
 
             <div class="auth-footer">
                 ¿Ya tienes una cuenta? 
-                <a href="{% url 'flexiones_login' %}">Inicia sesión aquí</a>
+                <a href="{% url 'flexiones_login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Inicia sesión aquí</a>
             </div>
         </form>
 

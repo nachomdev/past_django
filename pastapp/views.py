@@ -4,7 +4,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import Verb, PlayLog, PushUpLog, PushUpGoal
+from .models import Verb, PlayLog, PushUpLog, PushUpGoal, VivirPlan, VivirSession, VivirWeightLog
+from decimal import Decimal, InvalidOperation
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -419,9 +421,17 @@ def flexiones_delete(request, log_id):
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+def _auth_next(request):
+    """URL a la que volver después del login (?next=), validada; por defecto flexiones."""
+    nxt = request.POST.get('next') or request.GET.get('next') or ''
+    if nxt and url_has_allowed_host_and_scheme(nxt, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        return nxt
+    return None
+
 def flexiones_login(request):
+    next_url = _auth_next(request)
     if request.user.is_authenticated:
-        return redirect('flexiones')
+        return redirect(next_url or 'flexiones')
         
     error = None
     if request.method == 'POST':
@@ -433,15 +443,16 @@ def flexiones_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('flexiones')
+                return redirect(next_url or 'flexiones')
             else:
                 error = "Usuario o contraseña incorrectos"
                 
-    return render(request, 'pastapp/login.html', {'error': error})
+    return render(request, 'pastapp/login.html', {'error': error, 'next': next_url or ''})
 
 def flexiones_signup(request):
+    next_url = _auth_next(request)
     if request.user.is_authenticated:
-        return redirect('flexiones')
+        return redirect(next_url or 'flexiones')
         
     error = None
     if request.method == 'POST':
@@ -462,14 +473,234 @@ def flexiones_signup(request):
                 try:
                     user = User.objects.create_user(username=username, password=password)
                     login(request, user)
-                    return redirect('flexiones')
+                    return redirect(next_url or 'flexiones')
                 except Exception as e:
                     error = f"Error al registrar usuario: {str(e)}"
                     
-    return render(request, 'pastapp/signup.html', {'error': error})
+    return render(request, 'pastapp/signup.html', {'error': error, 'next': next_url or ''})
 
 def flexiones_logout(request):
     logout(request)
     return redirect('flexiones_login')
 
 
+
+
+
+# ---------------------------------------------------------------------------
+# Vivir: rutina semanal (2 días de gym + 5 en casa), seguimiento de 4 semanas
+# y registro de pesos. El contenido de la rutina está hardcodeado (como
+# DICTATIONS). "short" es el volumen de la versión corta (semanas 1-2) y
+# "weights" marca los ejercicios que tiene sentido anotar en el registro de pesos.
+# ---------------------------------------------------------------------------
+
+VIVIR_WEEKS = 4
+
+VIVIR_ROUTINE = [
+    {'day': 'Lunes', 'session': 'Gym A', 'kind': 'gym', 'exercises': [
+        {'name': 'Bici', 'volume': '30 min', 'notes': 'Ritmo en el que puedas hablar entrecortado'},
+        {'name': 'Cuádriceps (prensa o extensión)', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'notes': 'Terminar con 2-3 reps en reserva', 'weights': True},
+        {'name': 'Press de pecho', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+        {'name': 'Jalón al pecho', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+        {'name': 'Bíceps', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+    ]},
+    {'day': 'Martes', 'session': 'Cardio casa', 'kind': 'cardio', 'exercises': [
+        {'name': 'Caminata rápida', 'volume': '30 min'},
+        {'name': 'Core: plancha, plancha lateral, bicho muerto', 'volume': '10 min'},
+    ]},
+    {'day': 'Miércoles', 'session': 'Fuerza casa', 'kind': 'fuerza', 'note': 'Circuito: 3 vueltas (2 en semanas 1-2)', 'exercises': [
+        {'name': 'Sentadilla con disco al pecho', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'weights': True},
+        {'name': 'Peso muerto rumano con disco', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'notes': 'Rodillas apenas flexionadas, espalda recta', 'weights': True},
+        {'name': 'Press de hombros con disco', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'weights': True},
+        {'name': 'Remo inclinado con disco', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'weights': True},
+        {'name': 'Flexiones de brazos', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'notes': 'Con rodillas apoyadas si cuesta'},
+        {'name': 'Puente de glúteos con disco en la cadera', 'volume': '3 × 10-15', 'short': '2 × 10-15', 'weights': True},
+        {'name': 'Plancha + giros de torso con disco', 'volume': '30-45 s + 10-15', 'weights': True},
+    ]},
+    {'day': 'Jueves', 'session': 'Gym B', 'kind': 'gym', 'exercises': [
+        {'name': 'Bici', 'volume': '30 min', 'notes': 'Opcional: 6 × (1 min fuerte + 2 min suave)'},
+        {'name': 'Isquiotibiales', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+        {'name': 'Remo', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+        {'name': 'Press de pecho', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+        {'name': 'Cuádriceps (prensa o extensión)', 'volume': '3 × 8-12', 'short': '2 × 8-12', 'weights': True},
+    ]},
+    {'day': 'Viernes', 'session': 'Cardio casa', 'kind': 'cardio', 'exercises': [
+        {'name': 'Circuito: tijeras, sentadilla, escaladores, zancadas, trote en el lugar', 'volume': '3-4 vueltas', 'short': '2 vueltas', 'notes': '40 s de trabajo / 20 s de descanso'},
+    ]},
+    {'day': 'Sábado', 'session': 'Fuerza casa', 'kind': 'fuerza', 'repeat': 2, 'exercises': [
+        {'name': 'Repetir circuito del miércoles', 'volume': '3 vueltas', 'short': '2 vueltas', 'notes': 'Alternativa: caminata de 45-50 min'},
+    ]},
+    {'day': 'Domingo', 'session': 'Movilidad', 'kind': 'movilidad', 'exercises': [
+        {'name': 'Estiramientos: cadera, isquios, pecho, espalda (gato-camello, cobra, niño)', 'volume': '15-20 min', 'notes': 'O caminata tranquila'},
+    ]},
+]
+
+VIVIR_TIPS = [
+    ('Semanas 1-2', 'versión corta (2 series / 2 vueltas) para acostumbrar el cuerpo.'),
+    ('Desde la semana 3', '3 series o vueltas. Al llegar cómodo a 12-15 reps, subí el peso en el gym; en casa, hacé el movimiento más lento o sumá repeticiones.'),
+    ('Intensidad', 'cada serie termina con 2-3 repeticiones en reserva.'),
+    ('Comida', 'proteína en cada comida (carne, huevo, lácteos, legumbres) y suficiente agua.'),
+]
+
+
+def _vivir_weight_exercises():
+    names = []
+    for day in VIVIR_ROUTINE:
+        for ex in day['exercises']:
+            if ex.get('weights') and ex['name'] not in names:
+                names.append(ex['name'])
+    return names
+
+
+def _parse_date(value):
+    try:
+        return datetime.strptime(value, '%Y-%m-%d').date()
+    except (TypeError, ValueError):
+        return timezone.localdate()
+
+
+def _monday(d):
+    return d - timedelta(days=d.weekday())
+
+
+@login_required(login_url='flexiones_login')
+def vivir(request):
+    return render(request, 'pastapp/vivir.html', {
+        'routine_json': json.dumps(VIVIR_ROUTINE, ensure_ascii=False),
+        'tips': VIVIR_TIPS,
+        'weight_exercises': _vivir_weight_exercises(),
+        'weeks': VIVIR_WEEKS,
+    })
+
+
+def vivir_data(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+
+    today = _parse_date(request.GET.get('date'))
+    plan, _ = VivirPlan.objects.get_or_create(user=request.user, defaults={'start_date': _monday(today)})
+    start = plan.start_date
+    end = start + timedelta(days=7 * VIVIR_WEEKS - 1)
+
+    sessions = {s.date: s for s in VivirSession.objects.filter(user=request.user, date__range=[start, end])}
+    weeks = []
+    for w in range(VIVIR_WEEKS):
+        week_start = start + timedelta(days=7 * w)
+        days = []
+        for i in range(7):
+            d = week_start + timedelta(days=i)
+            s = sessions.get(d)
+            days.append({'date': d.isoformat(), 'done': bool(s and s.done), 'minutes': s.minutes if s else 0})
+        weeks.append({
+            'number': w + 1,
+            'start': week_start.isoformat(),
+            'end': (week_start + timedelta(days=6)).isoformat(),
+            'days': days,
+            'done_count': sum(1 for x in days if x['done']),
+            'minutes_total': sum(x['minutes'] for x in days),
+        })
+
+    today_session = sessions.get(today) or VivirSession.objects.filter(user=request.user, date=today).first()
+
+    weights = [{
+        'id': w.id,
+        'date': w.date.isoformat(),
+        'exercise': w.exercise,
+        'weight_kg': float(w.weight_kg),
+        'sets': w.sets,
+        'reps': w.reps,
+        'notes': w.notes,
+    } for w in VivirWeightLog.objects.filter(user=request.user).order_by('-date', '-timestamp')[:200]]
+
+    return JsonResponse({
+        'today': today.isoformat(),
+        'start_date': start.isoformat(),
+        'current_week': (today - start).days // 7 + 1,
+        'weeks': weeks,
+        'today_session': {
+            'done': bool(today_session and today_session.done),
+            'minutes': today_session.minutes if today_session else 0,
+        },
+        'weights': weights,
+    })
+
+
+@csrf_exempt
+def vivir_session(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    try:
+        data = json.loads(request.body)
+        session, _ = VivirSession.objects.get_or_create(user=request.user, date=_parse_date(data.get('date')))
+        if 'done' in data:
+            session.done = bool(data['done'])
+        if 'minutes' in data:
+            minutes = int(data['minutes'] or 0)
+            if not 0 <= minutes <= 1440:
+                return JsonResponse({'error': 'Minutos inválidos'}, status=400)
+            session.minutes = minutes
+        session.save()
+        return JsonResponse({'status': 'ok', 'done': session.done, 'minutes': session.minutes})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+def vivir_start(request):
+    """Arranca un ciclo nuevo de 4 semanas desde el lunes de la fecha dada."""
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    try:
+        data = json.loads(request.body)
+        start = _monday(_parse_date(data.get('date')))
+        VivirPlan.objects.update_or_create(user=request.user, defaults={'start_date': start})
+        return JsonResponse({'status': 'ok', 'start_date': start.isoformat()})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+def vivir_weight_add(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    try:
+        data = json.loads(request.body)
+        exercise = (data.get('exercise') or '').strip()[:100]
+        if not exercise:
+            return JsonResponse({'error': 'Falta el ejercicio'}, status=400)
+        try:
+            weight = Decimal(str(data.get('weight_kg', '')).replace(',', '.'))
+        except InvalidOperation:
+            return JsonResponse({'error': 'Peso inválido'}, status=400)
+        if not weight.is_finite() or not 0 <= weight <= 1000:
+            return JsonResponse({'error': 'Peso inválido'}, status=400)
+        log = VivirWeightLog.objects.create(
+            user=request.user,
+            date=_parse_date(data.get('date')),
+            exercise=exercise,
+            weight_kg=weight.quantize(Decimal('0.01')),
+            sets=max(0, int(data.get('sets') or 0)),
+            reps=max(0, int(data.get('reps') or 0)),
+            notes=(data.get('notes') or '').strip()[:255],
+        )
+        return JsonResponse({'status': 'ok', 'id': log.id})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+def vivir_weight_delete(request, log_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'No autorizado'}, status=401)
+    if request.method not in ('POST', 'DELETE'):
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    deleted, _ = VivirWeightLog.objects.filter(id=log_id, user=request.user).delete()
+    if not deleted:
+        return JsonResponse({'error': 'Registro no encontrado'}, status=404)
+    return JsonResponse({'status': 'ok'})

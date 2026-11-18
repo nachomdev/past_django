@@ -40,3 +40,38 @@ class PushUpGoal(models.Model):
     def __str__(self):
         return f"{self.user.username} Goals (D: {self.daily}, W: {self.weekly}, M: {self.monthly})"
 
+
+class VivirPlan(models.Model):
+    """Ciclo de 4 semanas de la rutina /vivir: la semana 1 arranca en start_date."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    start_date = models.DateField()
+
+    def __str__(self):
+        return f"{self.user.username} - rutina desde {self.start_date}"
+
+class VivirSession(models.Model):
+    """Una sesión diaria de la rutina: casilla de completado + minutos."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    done = models.BooleanField(default=False)
+    minutes = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date}: {'OK' if self.done else '-'} {self.minutes} min"
+
+class VivirWeightLog(models.Model):
+    """Registro de pesos: fecha, ejercicio, peso, series, reps, notas."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    exercise = models.CharField(max_length=100)
+    weight_kg = models.DecimalField(max_digits=6, decimal_places=2)
+    sets = models.PositiveIntegerField(default=0)
+    reps = models.PositiveIntegerField(default=0)
+    notes = models.CharField(max_length=255, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date} {self.exercise}: {self.weight_kg} kg {self.sets}x{self.reps}"

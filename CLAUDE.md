@@ -17,7 +17,7 @@ The virtualenv lives one level up, outside this repo (`../venv`). On Windows:
 - Apply migrations: `python manage.py migrate`
 - Create migration after model changes: `python manage.py makemigrations pastapp`
 - Load verb data: `python manage.py loaddata pastapp_data_utf8.json` (`pastapp_data_linux.json` is the same data dumped on the server)
-- Tests: `python manage.py test pastapp` (single test: `python manage.py test pastapp.tests.SomeTestCase.test_method`). `pastapp/tests.py` is currently empty.
+- Tests: `python manage.py test pastapp` (single test: `python manage.py test pastapp.tests.SomeTestCase.test_method`). `pastapp/tests.py` covers only Vivir; tests override `STORAGES` because the manifest static storage fails without `collectstatic`.
 - Production static files: `python manage.py collectstatic` (writes to `/var/www/basurero.com.ar/static/`).
 
 `STORAGES` uses `ManifestStaticFilesStorage`, so with `DEBUG = False` any `{% static %}` reference to a file not yet collected raises an error — run `collectstatic` after adding or renaming static files.
@@ -31,6 +31,7 @@ Features and where their data lives:
 - **Past-tense verb Wordle** (`/past` → `pasto.html` + `wordle.js`): verbs come from the `Verb` model, serialized by `get_verbs_json()` into the template as `verbos_json` with Spanish keys (`infinitivo`, `pasado`, `espa`) — the JS depends on those keys, not the model field names. If the DB is empty it falls back to a hardcoded list. Each guess is POSTed to `/save_attempt` and stored as `PlayLog`.
 - **Dictations** (`/dictation...`): content is the hardcoded `DICTATIONS` list in `views.py` (not the DB). Adding a dictation = appending a dict with `id`, `title`, `text`, `hard_words`.
 - **Push-up tracker "flexiones"** (`/flexiones`): the only feature using Django auth (custom login/signup views, not `django.contrib.auth.views`). The page is a shell; `flexiones.js` drives it through JSON endpoints under `/flexiones/api/` backed by `PushUpLog` / `PushUpGoal`. The client sends its local date (`YYYY-MM-DD`) so totals follow the user's day, not server UTC.
+- **Vivir** (`/vivir`): weekly workout routine (from a PDF plan), 4-week tracking grid and weight log. Reuses the flexiones login (`flexiones_login` honors `?next=` so it returns to `/vivir`). Routine content is the hardcoded `VIVIR_ROUTINE` list in `views.py` (`short` = volume for weeks 1-2, `weights` = exercise offered in the weight log). `vivir.js` drives it through `/vivir/api/` endpoints backed by `VivirPlan` (cycle start, always a Monday), `VivirSession` (done + minutes per date) and `VivirWeightLog`; same local-date convention as flexiones.
 - **Geografía** (`/geografia`): the view reads the TopoJSON files in `static/pastapp/maps/` and inlines them into the template.
 - **Francés, English, Chino**: purely client-side; all content/logic is in the JS file (or inline in `chino.html`).
 
