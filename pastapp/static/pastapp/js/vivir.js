@@ -1,9 +1,24 @@
-// Vivir: rutina semanal + seguimiento de 4 semanas + registro de pesos.
-// La rutina viene del servidor en window.VIVIR.routine (VIVIR_ROUTINE en views.py).
-// Como en flexiones, el cliente manda su fecha local (YYYY-MM-DD).
+// Vivir: sesión del día (editable), comidas, seguimiento de 4 semanas y pesos.
+// La config (catálogo de ejercicios, rutinas, plan semanal) viene del servidor
+// en window.VIVIR (ver VIVIR_* en views.py). Como en flexiones, el cliente
+// manda su fecha local (YYYY-MM-DD).
 (function () {
-    const { routine, urls, weeks: TOTAL_WEEKS } = window.VIVIR;
-    let state = null; // última respuesta de /vivir/api/data
+    const cfg = window.VIVIR;
+    const { urls } = cfg;
+    const TOTAL_WEEKS = cfg.weeks;
+    const DEFAULT_BODY_WEIGHT = 70;
+    const WATER_GOAL = 8;
+    const EFFORTS = [
+        { label: 'Suave', met: 2.5 },
+        { label: 'Moderado', met: 3.5 },
+        { label: 'Intenso', met: 5 },
+        { label: 'Muy intenso', met: 8 },
+    ];
+
+    let cycle = null;     // /vivir/api/data: ciclo, pesos, ejercicios propios, peso corporal
+    let day = null;       // /vivir/api/day: sesión y comidas del día elegido
+    let selected = null;  // fecha elegida (YYYY-MM-DD)
+    let dayReq = 0;
 
     // ---------- utilidades ----------
     const $ = (sel) => document.querySelector(sel);
@@ -11,9 +26,12 @@
     const isoDate = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     const todayIso = () => isoDate(new Date());
     const parseIso = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+    const addDays = (s, n) => { const d = parseIso(s); d.setDate(d.getDate() + n); return isoDate(d); };
     const fmtShort = (s) => { const d = parseIso(s); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`; };
+    const fmtLong = (s) => parseIso(s).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
     const weekdayIndex = (s) => (parseIso(s).getDay() + 6) % 7; // lunes = 0
-    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const WEEKDAYS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmtKg = (n) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 });
 
     function toast(msg, isError) {
@@ -38,114 +56,477 @@
         return data;
     }
 
+    // ---------- catálogo, rutinas y calorías ----------
+    const catalog = () => cfg.exercises.concat(cycle ? cycle.custom_exercises : []);
+    const findEx = (name) => catalog().find((e) => e.name === name);
+    const routineBy = (key) => cfg.routines.find((r) => r.key === key);
+    const suggestedKey = (date) => cfg.weekPlan[weekdayIndex(date)];
+    const routineKeyFor = (session, date) => (session && session.routine) || suggestedKey(date);
+    const weekOf = (date) => (cycle ? Math.floor((parseIso(date) - parseIso(cycle.start_date)) / 864e5 / 7) + 1 : 1);
     // Semanas 1-2 usan la versión corta (2 series / 2 vueltas).
     const isShortWeek = (week) => week >= 1 && week <= 2;
-    const volumeFor = (ex, week) => (ex.short && isShortWeek(week) ? ex.short : ex.volume);
 
-    function exerciseItems(day, week, withLog) {
-        return day.exercises.map((ex) => `
-            <li>
-                <div class="ex-row">
-                    <span class="ex-name">${esc(ex.name)}</span>
-                    <span class="ex-vol">${esc(volumeFor(ex, week))}</span>
-                </div>
-                ${ex.notes ? `<span class="ex-notes">${esc(ex.notes)}</span>` : ''}
-                ${withLog && ex.weights ? `<button type="button" class="ex-log" data-exercise="${esc(ex.name)}">+ anotar peso</button>` : ''}
-            </li>`).join('');
+    function resolveRoutine(key, week) {
+        const r = routineBy(key);
+        return r.items.map((it) => {
+            const ex = findEx(it.ex) || { met: 3, minutes: 10, volume: '' };
+            const short = it.short && isShortWeek(week);
+            return {
+                name: it.ex,
+                volume: short ? it.short : (it.volume || ex.volume),
+                notes: it.notes || '',
+                met: ex.met,
+                minutes: short ? Math.round(ex.minutes * 2 / 3) : ex.minutes,
+                weights: !!ex.weights,
+            };
+        });
+    }
+
+    const itemsFor = (session, date) => (session && session.items) || resolveRoutine(routineKeyFor(session, date), weekOf(date));
+    const bodyWeight = () => (cycle && cycle.body_weight_kg) || DEFAULT_BODY_WEIGHT;
+    // kcal = MET × 3.5 × kg / 200 × minutos
+    const kcalOf = (met, minutes) => (met * 3.5 * bodyWeight() / 200) * minutes;
+    const totals = (items) => items.reduce((acc, it) => ({
+        minutes: acc.minutes + (it.minutes || 0),
+        kcal: acc.kcal + kcalOf(it.met || 0, it.minutes || 0),
+    }), { minutes: 0, kcal: 0 });
+
+    function effortOf(met) {
+        const level = met < 3 ? 0 : met < 4.5 ? 1 : met < 6.5 ? 2 : 3;
+        return { label: EFFORTS[level].label, dots: '●'.repeat(level + 1) + '○'.repeat(3 - level) };
+    }
+
+    function effortChip(it) {
+        const e = effortOf(it.met || 0);
+        return `<span class="effort" title="${esc(it.met)} MET · ${esc(it.minutes)} min"><i>${e.dots}</i> ${e.label} · ≈${Math.round(kcalOf(it.met || 0, it.minutes || 0))} kcal</span>`;
     }
 
     // ---------- pestañas ----------
     function showTab(name) {
         document.querySelectorAll('.tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === name));
         document.querySelectorAll('.panel').forEach((p) => p.classList.toggle('active', p.id === `panel-${name}`));
+        $('#day-nav').classList.toggle('hidden', name !== 'hoy' && name !== 'comidas');
         try { localStorage.setItem('vivir_tab', name); } catch (e) { /* sin storage */ }
     }
     document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
-    // ---------- Hoy ----------
-    function renderToday() {
-        const idx = weekdayIndex(state.today);
-        const day = routine[idx];
-        const week = state.current_week;
-        const inCycle = week >= 1 && week <= TOTAL_WEEKS;
-        let notice = '';
-        if (week > TOTAL_WEEKS) {
-            notice = `<div class="notice">Terminaste el ciclo de ${TOTAL_WEEKS} semanas. Empezá uno nuevo desde <b>Seguimiento</b> (desde ahora: 3 series o vueltas).</div>`;
-        } else if (week < 1) {
-            notice = `<div class="notice">El ciclo empieza el ${fmtShort(state.start_date)}.</div>`;
-        }
+    // ---------- hoja inferior ----------
+    function openSheet(title, html, onMount) {
+        $('#sheet-title').textContent = title;
+        $('#sheet-body').innerHTML = html;
+        $('#sheet').classList.remove('hidden');
+        document.body.classList.add('sheet-open');
+        if (onMount) onMount($('#sheet-body'));
+    }
+    function closeSheet() {
+        $('#sheet').classList.add('hidden');
+        document.body.classList.remove('sheet-open');
+        $('#sheet-body').innerHTML = '';
+    }
+    $('#sheet-close').addEventListener('click', closeSheet);
+    $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
-        let extra = '';
-        if (day.repeat !== undefined) {
-            const base = routine[day.repeat];
-            extra = `<div class="sub-title">Circuito del ${esc(base.day.toLowerCase())}</div>
-                     <ul class="ex-list">${exerciseItems(base, week, true)}</ul>`;
-        }
-
-        const s = state.today_session;
-        $('#today-week').innerHTML = `
-                <div class="week-badge">
-                    <span class="big">${inCycle ? `Semana ${week} de ${TOTAL_WEEKS}` : 'Fuera de ciclo'}</span>
-                    <span class="muted">${isShortWeek(week) ? 'Versión corta (2 series / 2 vueltas)' : 'Versión completa (3 series / vueltas)'}</span>
-                </div>
-                ${notice}`;
-        const card = $('#today-card');
-        card.className = `card day-card kind-${day.kind}`;
-        card.innerHTML = `
-                <div class="day-head">
-                    <h3>${esc(day.day)}</h3>
-                    <span class="chip">${esc(day.session)}</span>
-                </div>
-                ${day.note ? `<span class="ex-notes">${esc(day.note)}</span>` : ''}
-                <ul class="ex-list">${exerciseItems(day, week, true)}</ul>
-                ${extra}
-                <div class="done-box">
-                    <label class="check"><input type="checkbox" id="today-done" ${s.done ? 'checked' : ''}> Sesión completada</label>
-                    <span class="min-wrap muted"><input type="number" id="today-min" class="input input-min" min="0" max="1440" inputmode="numeric" value="${s.minutes || ''}" placeholder="0"> min</span>
-                </div>`;
-
-        $('#today-done').addEventListener('change', (e) => saveSession(state.today, { done: e.target.checked }));
-        $('#today-min').addEventListener('change', (e) => saveSession(state.today, { minutes: e.target.value || 0 }));
+    // ---------- navegación de días ----------
+    function renderDayNav() {
+        const week = weekOf(selected);
+        const long = fmtLong(selected);
+        $('#day-title').textContent = selected === todayIso() ? `Hoy, ${long}` : long.charAt(0).toUpperCase() + long.slice(1);
+        $('#day-picker').value = selected;
+        $('#day-sub').textContent = week >= 1 && week <= TOTAL_WEEKS
+            ? `Semana ${week} de ${TOTAL_WEEKS} · ${isShortWeek(week) ? 'versión corta' : 'versión completa'}`
+            : 'Fuera del ciclo de 4 semanas';
+        $('#day-today').classList.toggle('hidden', selected === todayIso());
     }
 
-    // ---------- Rutina ----------
-    function renderRoutine() {
-        const week = state ? state.current_week : 3;
-        const todayIdx = state ? weekdayIndex(state.today) : -1;
-        $('#routine-list').innerHTML = routine.map((day, i) => `
-            <div class="card day-card kind-${day.kind} ${i === todayIdx ? 'is-today' : ''}">
+    async function selectDate(date) {
+        selected = date;
+        renderDayNav();
+        await loadDay();
+    }
+
+    $('#day-prev').addEventListener('click', () => selectDate(addDays(selected, -1)));
+    $('#day-next').addEventListener('click', () => selectDate(addDays(selected, 1)));
+    $('#day-today').addEventListener('click', () => selectDate(todayIso()));
+    $('#day-picker').addEventListener('change', (e) => { if (e.target.value) selectDate(e.target.value); });
+
+    // ---------- Hoy: sesión del día ----------
+    function renderSession() {
+        const s = day.session;
+        const key = routineKeyFor(s, selected);
+        const routine = routineBy(key);
+        const sugKey = suggestedKey(selected);
+        const items = itemsFor(s, selected);
+        const t = totals(items);
+        const dayNote = key === sugKey ? cfg.dayNotes[weekdayIndex(selected)] : '';
+        const card = $('#session-card');
+        card.className = `card day-card kind-${routine.kind}`;
+        card.innerHTML = `
+            <div class="day-head">
+                <h3>${esc(routine.name)}</h3>
+                <button type="button" class="btn-ghost" id="change-routine">Cambiar</button>
+            </div>
+            ${key !== sugKey ? `<span class="suggested">Sugerida para el ${WEEKDAYS[weekdayIndex(selected)]}: ${esc(routineBy(sugKey).name)}</span>` : ''}
+            ${dayNote ? `<span class="ex-notes">${esc(dayNote)}</span>` : ''}
+            ${routine.note ? `<span class="ex-notes">${esc(routine.note)}</span>` : ''}
+            <ul class="ex-list">
+                ${items.map((it, i) => `
+                <li>
+                    <div class="ex-row">
+                        <span class="ex-name">${esc(it.name)}</span>
+                        <span class="ex-vol">${esc(it.volume)}</span>
+                    </div>
+                    ${it.notes ? `<span class="ex-notes">${esc(it.notes)}</span>` : ''}
+                    <div class="ex-actions">
+                        ${effortChip(it)}
+                        ${it.weights ? `<button type="button" class="ex-log" data-exercise="${esc(it.name)}">+ anotar peso</button>` : ''}
+                        <button type="button" class="ex-remove" data-index="${i}" aria-label="Quitar ${esc(it.name)}" title="Quitar">✕</button>
+                    </div>
+                </li>`).join('') || '<li class="empty">Sin ítems. Agregá alguno.</li>'}
+            </ul>
+            <button type="button" class="add-item" id="add-item">+ Agregar ítem</button>
+            ${s.items ? `<div class="custom-row"><span>Rutina modificada para este día</span><button type="button" class="link-btn" id="reset-items">Restablecer</button></div>` : ''}
+            <div class="session-totals">
+                <span>≈ <b>${t.minutes}</b> min · ≈ <b>${Math.round(t.kcal)}</b> kcal</span>
+                <button type="button" class="link-btn" id="edit-weight">${cycle.body_weight_kg ? `con ${fmtKg(bodyWeight())} kg ✎` : 'Configurá tu peso (uso 70 kg)'}</button>
+            </div>
+            <div class="done-box">
+                <label class="check"><input type="checkbox" id="day-done" ${s.done ? 'checked' : ''}> Sesión completada</label>
+                <span class="min-wrap muted"><input type="number" id="day-min" class="input input-min" min="0" max="1440" inputmode="numeric" value="${s.minutes || ''}" placeholder="${t.minutes}"> min</span>
+            </div>`;
+    }
+
+    $('#session-card').addEventListener('click', (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+        if (target.id === 'change-routine') return openRoutinePicker();
+        if (target.id === 'add-item') return openAddItem();
+        if (target.id === 'reset-items') return saveSession(selected, { items: null }, 'Rutina restablecida');
+        if (target.id === 'edit-weight') return openBodyWeight();
+        if (target.classList.contains('ex-remove')) {
+            const items = itemsFor(day.session, selected).slice();
+            const [removed] = items.splice(Number(target.dataset.index), 1);
+            return saveSession(selected, { items }, `Quitado: ${removed.name}`);
+        }
+        if (target.classList.contains('ex-log')) return logWeightFor(target.dataset.exercise);
+    });
+
+    $('#session-card').addEventListener('change', (e) => {
+        if (e.target.id === 'day-done') {
+            const fields = { done: e.target.checked };
+            // Si no anotó minutos, al completar usa la duración estimada.
+            if (e.target.checked && !day.session.minutes) fields.minutes = totals(itemsFor(day.session, selected)).minutes;
+            saveSession(selected, fields, e.target.checked ? '¡Sesión completada!' : 'Guardado');
+        }
+        if (e.target.id === 'day-min') saveSession(selected, { minutes: e.target.value || 0 });
+    });
+
+    // Elegir rutina: muestra todas, con sus ítems y la sugerencia de días.
+    function openRoutinePicker() {
+        const week = weekOf(selected);
+        const current = routineKeyFor(day.session, selected);
+        const sugKey = suggestedKey(selected);
+        const html = cfg.routines.map((r) => {
+            const items = resolveRoutine(r.key, week);
+            const t = totals(items);
+            const days = cfg.weekPlan.map((k, i) => (k === r.key ? WEEKDAYS[i] : null)).filter(Boolean);
+            return `
+            <button type="button" class="card day-card routine-option kind-${r.kind} ${r.key === current ? 'is-selected' : ''}" data-key="${r.key}">
                 <div class="day-head">
-                    <h3>${esc(day.day)} ${i === todayIdx ? '<span class="today-tag">hoy</span>' : ''}</h3>
-                    <span class="chip">${esc(day.session)}</span>
+                    <h3>${esc(r.name)}</h3>
+                    ${r.key === current ? '<span class="chip">Elegida</span>' : r.key === sugKey ? '<span class="chip">Sugerida hoy</span>' : ''}
                 </div>
-                ${day.note ? `<span class="ex-notes">${esc(day.note)}</span>` : ''}
-                <ul class="ex-list">${exerciseItems(day, week, false)}</ul>
-            </div>`).join('');
+                <span class="routine-meta">${days.length ? `Toca: ${days.join(', ')}` : 'Alternativa'} · ≈ ${t.minutes} min · ≈ ${Math.round(t.kcal)} kcal</span>
+                <ul class="ex-list">${items.map((it) => `
+                    <li><div class="ex-row"><span class="ex-name">${esc(it.name)}</span><span class="ex-vol">${esc(it.volume)}</span></div></li>`).join('')}
+                </ul>
+            </button>`;
+        }).join('');
+        openSheet('Elegir rutina', html, (body) => {
+            body.addEventListener('click', async (e) => {
+                const opt = e.target.closest('.routine-option');
+                if (!opt) return;
+                const key = opt.dataset.key;
+                if (day.session.items && key !== current && !confirm('Este día tiene cambios en los ítems. Al cambiar de rutina se pierden. ¿Seguir?')) return;
+                closeSheet();
+                await saveSession(selected, { routine: key === sugKey ? '' : key }, `Rutina: ${routineBy(key).name}`);
+            });
+        });
+    }
+
+    // Agregar ítem: sugiere del catálogo (fijo + propios) o crea uno nuevo.
+    function openAddItem() {
+        openSheet('Agregar ítem', `
+            <input type="search" class="input" id="ai-search" placeholder="Buscar ejercicio…" autocomplete="off">
+            <div class="suggest-list" id="ai-list"></div>
+            <div id="ai-picked"></div>
+            <button type="button" class="btn-ghost" id="ai-new">+ Crear ejercicio nuevo</button>
+            <form class="picked hidden" id="ai-create" autocomplete="off">
+                <span class="picked-name">Nuevo ejercicio</span>
+                <div class="field"><label for="ai-name">Nombre</label><input type="text" id="ai-name" class="input" maxlength="100" required></div>
+                <div class="grid-2">
+                    <div class="field"><label for="ai-effort">Esfuerzo</label>
+                        <select id="ai-effort" class="input">${EFFORTS.map((e, i) => `<option value="${e.met}" ${i === 1 ? 'selected' : ''}>${e.label}</option>`).join('')}</select>
+                    </div>
+                    <div class="field"><label for="ai-min">Minutos</label><input type="number" id="ai-min" class="input" min="1" max="600" value="10" required></div>
+                </div>
+                <div class="field"><label for="ai-vol">Volumen</label><input type="text" id="ai-vol" class="input" maxlength="50" placeholder="Ej: 3 × 10-12 o 20 min"></div>
+                <label class="check"><input type="checkbox" id="ai-weights"> Se registra con peso (aparece en Pesos)</label>
+                <button type="submit" class="btn">Crear y agregar</button>
+                <div class="form-error" id="ai-error"></div>
+            </form>`, (body) => {
+            const search = body.querySelector('#ai-search');
+
+            function renderList() {
+                const q = search.value.trim().toLowerCase();
+                const list = catalog().filter((e) => !q || e.name.toLowerCase().includes(q));
+                const exact = catalog().some((e) => e.name.toLowerCase() === q);
+                const row = (e) => `
+                    <div class="suggest-item" role="button" tabindex="0" data-name="${esc(e.name)}">
+                        <span class="s-name">${esc(e.name)}</span>
+                        <span class="s-meta">${effortOf(e.met).label} · ${e.minutes} min${e.custom ? ` <span class="s-del" data-del="${e.id}" title="Borrar ejercicio">✕</span>` : ''}</span>
+                    </div>`;
+                const custom = list.filter((e) => e.custom);
+                const fixed = list.filter((e) => !e.custom);
+                body.querySelector('#ai-list').innerHTML =
+                    (custom.length ? `<span class="section-label">Tus ejercicios</span>${custom.map(row).join('')}` : '') +
+                    (fixed.length ? `<span class="section-label">De la rutina</span>${fixed.map(row).join('')}` : '') +
+                    (q && !exact ? `<div class="suggest-item" role="button" tabindex="0" data-create="${esc(search.value.trim())}"><span class="s-name">Crear «${esc(search.value.trim())}»</span><span class="s-meta">nuevo</span></div>` : '') ||
+                    '<div class="empty">Sin resultados.</div>';
+            }
+
+            function showCreate(name) {
+                body.querySelector('#ai-picked').innerHTML = '';
+                body.querySelector('#ai-create').classList.remove('hidden');
+                body.querySelector('#ai-new').classList.add('hidden');
+                body.querySelector('#ai-name').value = name || '';
+                body.querySelector(name ? '#ai-min' : '#ai-name').focus();
+            }
+
+            function pick(name) {
+                const ex = findEx(name);
+                body.querySelector('#ai-create').classList.add('hidden');
+                body.querySelector('#ai-new').classList.remove('hidden');
+                body.querySelector('#ai-picked').innerHTML = `
+                    <form class="picked" id="ai-pick-form">
+                        <span class="picked-name">${esc(ex.name)}</span>
+                        <div class="grid-2">
+                            <div class="field"><label for="ap-vol">Volumen</label><input type="text" id="ap-vol" class="input" maxlength="50" value="${esc(ex.volume)}"></div>
+                            <div class="field"><label for="ap-min">Minutos</label><input type="number" id="ap-min" class="input" min="0" max="600" value="${ex.minutes}"></div>
+                        </div>
+                        <button type="submit" class="btn">Agregar al día</button>
+                    </form>`;
+                body.querySelector('#ai-pick-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    addItem({
+                        name: ex.name, volume: body.querySelector('#ap-vol').value.trim(), notes: '',
+                        met: ex.met, minutes: Number(body.querySelector('#ap-min').value) || 0, weights: !!ex.weights,
+                    });
+                });
+                body.querySelector('#ap-vol').focus();
+            }
+
+            search.addEventListener('input', renderList);
+            body.querySelector('#ai-new').addEventListener('click', () => showCreate(search.value.trim()));
+            body.querySelector('#ai-list').addEventListener('click', async (e) => {
+                const del = e.target.closest('[data-del]');
+                if (del) {
+                    if (!confirm('¿Borrar este ejercicio de tu lista? Los días y registros ya guardados no cambian.')) return;
+                    try {
+                        await api(urls.exerciseDelete + del.dataset.del, {});
+                        cycle.custom_exercises = cycle.custom_exercises.filter((x) => String(x.id) !== del.dataset.del);
+                        renderList();
+                        renderWeightSelect();
+                    } catch (err) { toast(err.message, true); }
+                    return;
+                }
+                const item = e.target.closest('.suggest-item');
+                if (!item) return;
+                if (item.dataset.create !== undefined) showCreate(item.dataset.create);
+                else pick(item.dataset.name);
+            });
+            body.querySelector('#ai-list').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.target.classList.contains('suggest-item')) e.target.click();
+            });
+            body.querySelector('#ai-create').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const payload = {
+                    name: body.querySelector('#ai-name').value.trim(),
+                    met: Number(body.querySelector('#ai-effort').value),
+                    minutes: Number(body.querySelector('#ai-min').value),
+                    volume: body.querySelector('#ai-vol').value.trim(),
+                    weights: body.querySelector('#ai-weights').checked,
+                };
+                try {
+                    const res = await api(urls.exercise, payload);
+                    cycle.custom_exercises.push(res.exercise);
+                    renderWeightSelect();
+                    const ex = res.exercise;
+                    addItem({ name: ex.name, volume: ex.volume, notes: '', met: ex.met, minutes: ex.minutes, weights: ex.weights });
+                } catch (err) { body.querySelector('#ai-error').textContent = err.message; }
+            });
+            renderList();
+            search.focus();
+        });
+    }
+
+    async function addItem(item) {
+        const items = itemsFor(day.session, selected).concat([item]);
+        closeSheet();
+        await saveSession(selected, { items }, `Agregado: ${item.name}`);
+    }
+
+    function openBodyWeight() {
+        openSheet('Tu peso corporal', `
+            <p class="muted">Se usa para estimar las calorías: kcal ≈ esfuerzo (MET) × 3,5 × kg ÷ 200 × minutos.</p>
+            <form class="picked" id="bw-form">
+                <div class="field"><label for="bw-kg">Peso (kg)</label>
+                    <input type="number" id="bw-kg" class="input" min="25" max="400" step="0.1" inputmode="decimal" value="${cycle.body_weight_kg || ''}" required></div>
+                <button type="submit" class="btn">Guardar</button>
+                <div class="form-error" id="bw-error"></div>
+            </form>`, (body) => {
+            body.querySelector('#bw-kg').focus();
+            body.querySelector('#bw-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await api(urls.profile, { body_weight_kg: body.querySelector('#bw-kg').value });
+                    cycle.body_weight_kg = res.body_weight_kg;
+                    closeSheet();
+                    toast('Peso guardado');
+                    renderAll();
+                } catch (err) { body.querySelector('#bw-error').textContent = err.message; }
+            });
+        });
+    }
+
+    async function saveSession(date, fields, msg) {
+        try {
+            const res = await api(urls.session, { date, ...fields });
+            if (date === selected && day) { day.session = res.session; renderSession(); renderFood(); }
+            toast(msg || 'Guardado');
+            await loadCycle();
+        } catch (err) { toast(err.message, true); }
+    }
+
+    // ---------- Comidas ----------
+    function renderFood() {
+        const meals = day.meals;
+        const s = day.session;
+        const known = meals.filter((m) => m.kcal !== null);
+        const eaten = known.reduce((a, m) => a + m.kcal, 0);
+        const burned = Math.round(totals(itemsFor(s, selected)).kcal);
+        const withProtein = meals.filter((m) => m.protein).length;
+        $('#food-summary').innerHTML = `
+            <div class="food-stats">
+                <div><b>${known.length ? eaten : '—'}</b><span>kcal comidas</span></div>
+                <div><b>${meals.length ? `${withProtein}/${meals.length}` : '—'}</b><span>con proteína</span></div>
+                <div><b>≈ ${burned}</b><span>kcal ${s.done ? 'entrenando' : 'previstas'}</span></div>
+            </div>
+            <div class="water">
+                <div><b>Agua</b><div class="glasses">${'●'.repeat(Math.min(s.water, WATER_GOAL))}${'○'.repeat(Math.max(0, WATER_GOAL - s.water))}${s.water > WATER_GOAL ? ` +${s.water - WATER_GOAL}` : ''}</div></div>
+                <div class="water-ctrl">
+                    <button type="button" class="round-btn" id="water-minus" aria-label="Un vaso menos">−</button>
+                    <b>${s.water} ${s.water === 1 ? 'vaso' : 'vasos'}</b>
+                    <button type="button" class="round-btn" id="water-plus" aria-label="Un vaso más">+</button>
+                </div>
+            </div>
+            <span class="muted">Proteína en cada comida y suficiente agua (≈ ${WATER_GOAL} vasos).</span>`;
+
+        const labels = Object.fromEntries(cfg.mealTypes);
+        const groups = cfg.mealTypes.map(([key]) => [key, meals.filter((m) => m.meal_type === key)]).filter(([, list]) => list.length);
+        $('#meals-list').innerHTML = groups.length ? groups.map(([key, list]) => `
+            <div class="meal-group">
+                <h3>${esc(labels[key])}</h3>
+                ${list.map((m) => `
+                <div class="meal-item">
+                    <span class="meal-desc">${esc(m.description)}</span>
+                    <span class="meal-kcal">${m.kcal !== null ? `${m.kcal} kcal` : ''}</span>
+                    <span class="meal-meta">${m.protein ? '<span class="protein-tag">Con proteína</span>' : 'Sin proteína'}</span>
+                    <button type="button" class="w-del" data-meal="${m.id}">Borrar</button>
+                </div>`).join('')}
+            </div>`).join('') : '<div class="empty">Todavía no registraste comidas este día.</div>';
+    }
+
+    $('#food-summary').addEventListener('click', (e) => {
+        const water = day.session.water;
+        if (e.target.id === 'water-plus') saveSession(selected, { water: water + 1 }, 'Agua +1');
+        if (e.target.id === 'water-minus' && water > 0) saveSession(selected, { water: water - 1 }, 'Agua −1');
+    });
+
+    $('#meal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        $('#m-error').textContent = '';
+        try {
+            await api(urls.meal, {
+                date: selected,
+                meal_type: $('#m-type').value,
+                description: $('#m-desc').value.trim(),
+                kcal: $('#m-kcal').value,
+                protein: $('#m-protein').checked,
+            });
+            $('#m-desc').value = '';
+            $('#m-kcal').value = '';
+            $('#m-protein').checked = false;
+            toast('Comida registrada');
+            await loadDay();
+        } catch (err) { $('#m-error').textContent = err.message; }
+    });
+
+    $('#meals-list').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-meal]');
+        if (!btn || !confirm('¿Borrar esta comida?')) return;
+        try {
+            await api(urls.mealDelete + btn.dataset.meal, {});
+            toast('Comida borrada');
+            await loadDay();
+        } catch (err) { toast(err.message, true); }
+    });
+
+    // Sugerir el tipo de comida según la hora.
+    function guessMealType() {
+        const h = new Date().getHours();
+        return h < 11 ? 'desayuno' : h < 15 ? 'almuerzo' : h < 19 ? 'merienda' : 'cena';
     }
 
     // ---------- Seguimiento ----------
     function renderWeeks() {
-        $('#cycle-start').textContent = parseIso(state.start_date).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
-        $('#weeks-list').innerHTML = state.weeks.map((w) => `
-            <div class="card week-card ${w.number === state.current_week ? 'is-current' : ''}">
+        $('#cycle-start').textContent = parseIso(cycle.start_date).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
+        const today = todayIso();
+        const currentWeek = weekOf(today);
+        $('#weeks-list').innerHTML = cycle.weeks.map((w) => {
+            const kcal = w.days.filter((d) => d.done).reduce((a, d) => a + totals(itemsFor(d, d.date)).kcal, 0);
+            return `
+            <div class="card week-card ${w.number === currentWeek ? 'is-current' : ''}">
                 <div class="week-head">
                     <h3>Semana ${w.number} <span class="muted">${fmtShort(w.start)} – ${fmtShort(w.end)}</span></h3>
-                    <span class="week-total"><span class="${w.done_count === 7 ? 'ok' : ''}">${w.done_count}/7</span> · ${w.minutes_total} min</span>
+                    <span class="week-total"><span class="${w.done_count === 7 ? 'ok' : ''}">${w.done_count}/7</span> · ${w.minutes_total} min${kcal ? ` · ≈${Math.round(kcal)} kcal` : ''}</span>
                 </div>
                 <div class="progress"><div style="width:${(w.done_count / 7) * 100}%"></div></div>
-                ${w.days.map((d, i) => `
-                    <div class="track-row kind-${routine[i].kind} ${d.date === state.today ? 'is-today' : ''}">
-                        <div class="day"><span>${esc(routine[i].day)}</span><span>${esc(routine[i].session)} · ${fmtShort(d.date)}</span></div>
-                        <label class="check"><input type="checkbox" data-date="${d.date}" class="track-done" ${d.done ? 'checked' : ''} aria-label="Completada ${esc(routine[i].day)} ${fmtShort(d.date)}"></label>
+                ${w.days.map((d, i) => {
+                    const r = routineBy(routineKeyFor(d, d.date));
+                    return `
+                    <div class="track-row kind-${r.kind} ${d.date === today ? 'is-today' : ''}">
+                        <button type="button" class="day" data-open="${d.date}" title="Ver el detalle del día"><span>${esc(WEEKDAYS[i][0].toUpperCase() + WEEKDAYS[i].slice(1))}</span><span>${esc(r.name)}${d.items ? ' (modificada)' : ''} · ${fmtShort(d.date)}</span></button>
+                        <label class="check"><input type="checkbox" data-date="${d.date}" class="track-done" ${d.done ? 'checked' : ''} aria-label="Completada ${esc(WEEKDAYS[i])} ${fmtShort(d.date)}"></label>
                         <span class="min-wrap"><input type="number" data-date="${d.date}" class="input input-min track-min" min="0" max="1440" inputmode="numeric" value="${d.minutes || ''}" placeholder="0" aria-label="Minutos"> min</span>
-                    </div>`).join('')}
-            </div>`).join('');
+                    </div>`;
+                }).join('')}
+            </div>`;
+        }).join('');
     }
+
+    $('#weeks-list').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-open]');
+        if (!btn) return;
+        showTab('hoy');
+        selectDate(btn.dataset.open);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     $('#weeks-list').addEventListener('change', (e) => {
         const date = e.target.dataset.date;
         if (!date) return;
-        if (e.target.classList.contains('track-done')) saveSession(date, { done: e.target.checked });
+        if (e.target.classList.contains('track-done')) saveSession(date, { done: e.target.checked }, e.target.checked ? '¡Sesión completada!' : 'Guardado');
         if (e.target.classList.contains('track-min')) saveSession(date, { minutes: e.target.value || 0 });
     });
 
@@ -160,21 +541,25 @@
             await api(urls.start, { date });
             $('#cycle-form').classList.add('hidden');
             toast('Nuevo ciclo iniciado');
-            await load();
+            await loadCycle();
         } catch (err) { toast(err.message, true); }
     });
 
-    async function saveSession(date, fields) {
-        try {
-            await api(urls.session, { date, ...fields });
-            toast(fields.done === true ? '¡Sesión completada!' : 'Guardado');
-            await load();
-        } catch (err) { toast(err.message, true); }
+    // ---------- Pesos ----------
+    // Los ejercicios con peso salen del catálogo; se crean desde Hoy → Agregar ítem.
+    function renderWeightSelect() {
+        const sel = $('#w-exercise');
+        const current = sel.value;
+        const names = catalog().filter((e) => e.weights).map((e) => e.name);
+        const fromLogs = cycle ? [...new Set(cycle.weights.map((w) => w.exercise))].filter((n) => !names.includes(n)) : [];
+        sel.innerHTML = '<option value="">Elegí un ejercicio</option>' +
+            names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
+            (fromLogs.length ? `<optgroup label="Otros registrados">${fromLogs.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}</optgroup>` : '');
+        sel.value = current;
     }
 
-    // ---------- Pesos ----------
     function renderWeights() {
-        const all = state.weights;
+        const all = cycle.weights;
         const filterSel = $('#w-filter');
         const current = filterSel.value;
         const names = [...new Set(all.map((w) => w.exercise))].sort((a, b) => a.localeCompare(b, 'es'));
@@ -206,37 +591,50 @@
                 <span class="w-meta">${fmtShort(w.date)}${w.sets || w.reps ? ` · ${w.sets} × ${w.reps}` : ''}${w.notes ? ` · ${esc(w.notes)}` : ''}</span>
                 <button type="button" class="w-del" data-id="${w.id}">Borrar</button>
             </div>`).join('') : '<div class="empty">Todavía no hay registros.</div>';
+        renderWeightSelect();
         updateLastHint();
     }
 
     function updateLastHint() {
-        const name = $('#w-exercise').value.trim();
-        const last = state && state.weights.find((w) => w.exercise === name);
+        const name = $('#w-exercise').value;
+        const last = cycle && name && cycle.weights.find((w) => w.exercise === name);
         $('#w-last').textContent = last
             ? `Última vez (${fmtShort(last.date)}): ${fmtKg(last.weight_kg)} kg${last.sets || last.reps ? `, ${last.sets} × ${last.reps}` : ''}`
             : '';
     }
 
+    function logWeightFor(name) {
+        const week = weekOf(selected);
+        $('#w-exercise').value = name;
+        $('#w-date').value = selected;
+        $('#w-sets').value = isShortWeek(week) ? 2 : 3;
+        const last = cycle.weights.find((w) => w.exercise === name);
+        $('#w-weight').value = last ? last.weight_kg : '';
+        $('#w-reps').value = last ? (last.reps || '') : '';
+        updateLastHint();
+        showTab('pesos');
+        $('#w-weight').focus();
+    }
+
     $('#w-filter').addEventListener('change', renderWeights);
-    $('#w-exercise').addEventListener('input', updateLastHint);
+    $('#w-exercise').addEventListener('change', updateLastHint);
 
     $('#weight-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         $('#w-error').textContent = '';
-        const payload = {
-            date: $('#w-date').value,
-            exercise: $('#w-exercise').value.trim(),
-            weight_kg: $('#w-weight').value,
-            sets: $('#w-sets').value || 0,
-            reps: $('#w-reps').value || 0,
-            notes: $('#w-notes').value.trim(),
-        };
         try {
-            await api(urls.weight, payload);
+            await api(urls.weight, {
+                date: $('#w-date').value,
+                exercise: $('#w-exercise').value,
+                weight_kg: $('#w-weight').value,
+                sets: $('#w-sets').value || 0,
+                reps: $('#w-reps').value || 0,
+                notes: $('#w-notes').value.trim(),
+            });
             $('#w-weight').value = '';
             $('#w-notes').value = '';
             toast('Peso registrado');
-            await load();
+            await loadCycle();
         } catch (err) { $('#w-error').textContent = err.message; }
     });
 
@@ -246,37 +644,40 @@
         try {
             await api(urls.weightDelete + btn.dataset.id, {});
             toast('Registro borrado');
-            await load();
+            await loadCycle();
         } catch (err) { toast(err.message, true); }
     });
 
-    // "+ anotar peso" desde Hoy: precarga el formulario de pesos
-    $('#panel-hoy').addEventListener('click', (e) => {
-        const btn = e.target.closest('.ex-log');
-        if (!btn) return;
-        const name = btn.dataset.exercise;
-        const week = state.current_week;
-        $('#w-exercise').value = name;
-        $('#w-date').value = state.today;
-        $('#w-sets').value = isShortWeek(week) ? 2 : 3;
-        const last = state.weights.find((w) => w.exercise === name);
-        if (last) { $('#w-weight').value = last.weight_kg; $('#w-reps').value = last.reps || ''; }
-        updateLastHint();
-        showTab('pesos');
-        $('#w-weight').focus();
-    });
-
     // ---------- carga ----------
-    async function load() {
-        state = await api(`${urls.data}?date=${todayIso()}`);
-        renderToday();
-        renderRoutine();
+    async function loadCycle() {
+        cycle = await api(`${urls.data}?date=${todayIso()}`);
+        renderWeeks();
+        renderWeights();
+        if (day) { renderDayNav(); renderSession(); renderFood(); }
+    }
+
+    async function loadDay() {
+        const req = ++dayReq;
+        const data = await api(`${urls.day}?date=${selected}`);
+        if (req !== dayReq) return; // llegó una respuesta vieja
+        day = data;
+        renderSession();
+        renderFood();
+    }
+
+    function renderAll() {
+        renderDayNav();
+        renderSession();
+        renderFood();
         renderWeeks();
         renderWeights();
     }
 
-    $('#w-date').value = todayIso();
-    renderRoutine();
-    try { const t = localStorage.getItem('vivir_tab'); if (t && $(`#panel-${t}`)) showTab(t); } catch (e) { /* sin storage */ }
-    load().catch((err) => toast(err.message, true));
+    selected = todayIso();
+    $('#w-date').value = selected;
+    $('#m-type').value = guessMealType();
+    try { const t = localStorage.getItem('vivir_tab'); showTab(t && $(`#panel-${t}`) ? t : 'hoy'); } catch (e) { showTab('hoy'); }
+    loadCycle()
+        .then(() => { renderDayNav(); return loadDay(); })
+        .catch((err) => toast(err.message, true));
 })();

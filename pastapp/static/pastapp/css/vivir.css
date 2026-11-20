@@ -201,3 +201,115 @@ header { display: flex; align-items: center; justify-content: space-between; gap
     .tab { font-size: 0.8rem; }
     .title h1 { font-size: 1.5rem; }
 }
+
+/* ---------- v2: navegación de días ---------- */
+.day-nav { flex-direction: row; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.75rem; }
+.day-nav-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 0; text-align: center; }
+.day-nav-title { position: relative; font-size: 1.15rem; font-weight: 700; cursor: pointer; }
+.day-nav-title::after { content: ' ▾'; color: var(--muted); font-size: 0.8rem; }
+.day-picker { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; color-scheme: dark; }
+.day-nav-sub { color: var(--muted); font-size: 0.8rem; }
+.link-btn { font: inherit; font-size: 0.8rem; font-weight: 600; color: #a5b4fc; background: none; border: none; cursor: pointer; padding: 0.1rem; }
+.link-btn:hover { color: #fff; }
+.icon-btn { cursor: pointer; font: inherit; }
+
+/* ---------- v2: sesión del día ---------- */
+.day-head-actions { display: flex; align-items: center; gap: 0.5rem; }
+.suggested { color: var(--muted); font-size: 0.8rem; }
+.ex-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.2rem; }
+.effort {
+    font-size: 0.72rem; font-weight: 600; color: var(--muted);
+    background: rgba(255,255,255,.05); border-radius: 999px; padding: 0.1rem 0.5rem;
+}
+.effort i { font-style: normal; letter-spacing: -1px; }
+.ex-actions .ex-log { margin-top: 0; }
+.ex-remove {
+    margin-left: auto; font: inherit; font-size: 0.75rem; color: var(--muted);
+    background: none; border: none; cursor: pointer; padding: 0.1rem 0.25rem;
+}
+.ex-remove:hover { color: var(--danger); }
+.add-item {
+    font: inherit; font-weight: 600; font-size: 0.9rem; color: var(--accent, var(--primary));
+    background: none; border: 1px dashed color-mix(in srgb, var(--accent, var(--primary)) 50%, transparent);
+    border-radius: 12px; padding: 0.55rem; cursor: pointer;
+}
+.add-item:hover { background: color-mix(in srgb, var(--accent, var(--primary)) 10%, transparent); }
+.session-totals { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.9rem; }
+.session-totals b { font-size: 1.05rem; }
+.custom-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--muted); }
+.tips-card summary { font-weight: 700; font-size: 1.05rem; cursor: pointer; list-style: none; }
+.tips-card summary::-webkit-details-marker { display: none; }
+.tips-card summary::after { content: ' ▾'; color: var(--muted); font-size: 0.8rem; }
+.tips-card[open] summary::after { content: ' ▴'; }
+
+/* ---------- v2: hoja inferior ---------- */
+.sheet-backdrop {
+    position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.55);
+    display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+    width: 100%; max-width: 560px; max-height: 88vh; display: flex; flex-direction: column;
+    background: #111827; border: 1px solid var(--card-border); border-bottom: none;
+    border-radius: 20px 20px 0 0; animation: sheet-in .2s ease-out;
+}
+@keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.1rem 0.5rem; }
+.sheet-head h2 { font-size: 1.15rem; }
+.sheet-body { overflow-y: auto; padding: 0.5rem 1.1rem 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.sheet .card { background: rgba(255,255,255,.04); }
+body.sheet-open { overflow: hidden; }
+
+.routine-option { cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; }
+.routine-option:hover { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.routine-option.is-selected { box-shadow: 0 0 0 1px var(--accent); }
+.routine-option .ex-list li { padding: 0.35rem 0; }
+.routine-option .ex-name { font-size: 0.9rem; font-weight: 400; }
+.routine-option .ex-vol { font-size: 0.85rem; }
+.routine-meta { color: var(--muted); font-size: 0.78rem; }
+
+.suggest-list { display: flex; flex-direction: column; max-height: 40vh; overflow-y: auto; }
+.suggest-item {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;
+    font: inherit; color: inherit; text-align: left; background: none; border: none;
+    border-top: 1px solid var(--card-border); padding: 0.6rem 0.25rem; cursor: pointer;
+}
+.suggest-item:first-child { border-top: none; }
+.suggest-item:hover { background: rgba(255,255,255,.04); }
+.suggest-item .s-name { font-weight: 500; }
+.suggest-item .s-meta { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+.suggest-item .s-del { color: var(--muted); font-size: 0.75rem; padding: 0 0.25rem; }
+.suggest-item .s-del:hover { color: var(--danger); }
+.section-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 0.25rem; }
+.picked {
+    border: 1px solid var(--card-border); border-radius: 14px; padding: 0.8rem;
+    display: flex; flex-direction: column; gap: 0.6rem;
+}
+.picked-name { font-weight: 700; }
+.row-actions { display: flex; gap: 0.5rem; }
+.row-actions .btn { flex: 1; }
+
+/* ---------- v2: comidas ---------- */
+.food-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; text-align: center; }
+.food-stats div { background: rgba(255,255,255,.04); border-radius: 12px; padding: 0.55rem 0.25rem; }
+.food-stats b { display: block; font-size: 1.15rem; }
+.food-stats span { color: var(--muted); font-size: 0.75rem; }
+.water { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.water-ctrl { display: flex; align-items: center; gap: 0.6rem; }
+.water-ctrl b { min-width: 3.5rem; text-align: center; font-size: 1.05rem; }
+.round-btn {
+    width: 36px; height: 36px; border-radius: 50%; font: inherit; font-size: 1.2rem; font-weight: 700;
+    color: var(--text); background: rgba(255,255,255,.06); border: 1px solid var(--card-border); cursor: pointer;
+}
+.round-btn:hover { border-color: var(--muted); }
+.glasses { letter-spacing: 1px; font-size: 0.95rem; color: #60a5fa; min-height: 1.2em; }
+.meal-group { display: flex; flex-direction: column; }
+.meal-group h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 0.5rem; }
+.meal-item { display: grid; grid-template-columns: 1fr auto; gap: 0.15rem 0.75rem; align-items: center; padding: 0.5rem 0; border-top: 1px solid var(--card-border); }
+.meal-item .meal-desc { font-weight: 500; }
+.meal-item .meal-meta { color: var(--muted); font-size: 0.78rem; }
+.meal-item .meal-kcal { font-weight: 700; text-align: right; }
+.protein-tag { color: var(--movilidad); font-weight: 600; }
+
+/* ---------- v2: seguimiento clickeable ---------- */
+.track-row .day { cursor: pointer; background: none; border-top: none; border-right: none; border-bottom: none; font: inherit; color: inherit; text-align: left; padding: 0.1rem 0 0.1rem 0.5rem; }
+.track-row .day:hover span:first-child { color: #c7d2fe; }

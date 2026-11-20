@@ -45,16 +45,23 @@ class VivirPlan(models.Model):
     """Ciclo de 4 semanas de la rutina /vivir: la semana 1 arranca en start_date."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     start_date = models.DateField()
+    # Peso corporal, para estimar calorías (MET × kg × horas). Null = sin configurar.
+    body_weight_kg = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - rutina desde {self.start_date}"
 
 class VivirSession(models.Model):
-    """Una sesión diaria de la rutina: casilla de completado + minutos."""
+    """Una sesión diaria de la rutina: completado, minutos, rutina elegida e ítems."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
     done = models.BooleanField(default=False)
     minutes = models.PositiveIntegerField(default=0)
+    # Clave de VIVIR_ROUTINES; vacío = la sugerida para ese día de la semana.
+    routine = models.CharField(max_length=40, blank=True)
+    # Lista de ítems editada por el usuario; null = los de la rutina sin cambios.
+    items = models.JSONField(null=True, blank=True)
+    water = models.PositiveSmallIntegerField(default=0)  # vasos de agua
 
     class Meta:
         unique_together = ('user', 'date')
@@ -75,3 +82,34 @@ class VivirWeightLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.date} {self.exercise}: {self.weight_kg} kg {self.sets}x{self.reps}"
+
+class VivirExercise(models.Model):
+    """Ejercicio propio del usuario, que se suma al catálogo fijo (VIVIR_EXERCISES)."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    met = models.DecimalField(max_digits=4, decimal_places=1)  # esfuerzo (MET)
+    minutes = models.PositiveIntegerField(default=10)
+    volume = models.CharField(max_length=50, blank=True)
+    weights = models.BooleanField(default=False)  # aparece en el registro de pesos
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name} ({self.met} MET)"
+
+class VivirMeal(models.Model):
+    MEAL_TYPES = [
+        ('desayuno', 'Desayuno'),
+        ('almuerzo', 'Almuerzo'),
+        ('merienda', 'Merienda'),
+        ('cena', 'Cena'),
+        ('snack', 'Colación'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
+    meal_type = models.CharField(max_length=20, choices=MEAL_TYPES)
+    description = models.CharField(max_length=200)
+    kcal = models.PositiveIntegerField(null=True, blank=True)
+    protein = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date} {self.meal_type}: {self.description}"
