@@ -120,6 +120,8 @@ header { display: flex; align-items: center; justify-content: space-between; gap
     color-scheme: dark;
 }
 .input:focus { outline: none; border-color: var(--primary); }
+/* La lista desplegable del select la dibuja el sistema: fondo y texto explícitos para que no quede blanco sobre blanco. */
+select.input option, select.input optgroup { background-color: #1e2433; color: var(--text); }
 .input-sm { width: auto; padding: 0.35rem 0.5rem; font-size: 0.85rem; max-width: 60%; }
 .input-min { width: 5.5rem; text-align: right; }
 .field { display: flex; flex-direction: column; gap: 0.3rem; }
