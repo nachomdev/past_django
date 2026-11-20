@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=3">
 </head>
 
 <body>
@@ -121,7 +121,7 @@
         <!-- PESOS -->
         <section class="panel" id="panel-pesos">
             <form class="card" id="weight-form" autocomplete="off">
-                <h2>Registro de pesos</h2>
+                <h2>Registrar peso</h2>
                 <div class="grid-2">
                     <div class="field">
                         <label for="w-date">Fecha</label>
@@ -129,40 +129,20 @@
                     </div>
                     <div class="field">
                         <label for="w-weight">Peso (kg)</label>
-                        <input type="number" id="w-weight" class="input" step="0.25" min="0" max="1000" inputmode="decimal" required>
+                        <input type="number" id="w-weight" class="input" step="0.1" min="25" max="400" inputmode="decimal" required>
                     </div>
                 </div>
                 <div class="field">
-                    <label for="w-exercise">Ejercicio</label>
-                    <select id="w-exercise" class="input" required></select>
-                    <small class="muted" id="w-last"></small>
+                    <label for="w-notes">Notas (opcional)</label>
+                    <input type="text" id="w-notes" class="input" maxlength="255" placeholder="Ej: en ayunas, después de entrenar">
                 </div>
-                <div class="grid-2">
-                    <div class="field">
-                        <label for="w-sets">Series</label>
-                        <input type="number" id="w-sets" class="input" min="0" max="20" inputmode="numeric">
-                    </div>
-                    <div class="field">
-                        <label for="w-reps">Reps</label>
-                        <input type="number" id="w-reps" class="input" min="0" max="100" inputmode="numeric">
-                    </div>
-                </div>
-                <div class="field">
-                    <label for="w-notes">Notas</label>
-                    <input type="text" id="w-notes" class="input" maxlength="255" placeholder="Ej: quedaron 2 en reserva">
-                </div>
-                <button type="submit" class="btn">Agregar</button>
+                <button type="submit" class="btn">Guardar</button>
                 <div class="form-error" id="w-error"></div>
-                <small class="muted">¿Falta un ejercicio? Crealo desde <b>Hoy → + Agregar ítem → Crear ejercicio</b>, marcando «Se registra con peso».</small>
+                <small class="muted" id="w-hint">Un registro por día: si ya pesaste ese día, se reemplaza. El último peso se usa para estimar las calorías.</small>
             </form>
 
             <div class="card">
-                <div class="list-head">
-                    <h2>Historial</h2>
-                    <select id="w-filter" class="input input-sm">
-                        <option value="">Todos los ejercicios</option>
-                    </select>
-                </div>
+                <h2>Evolución</h2>
                 <div id="weights-summary"></div>
                 <div id="weights-list"></div>
             </div>
@@ -191,7 +171,6 @@
             day: "{% url 'vivir_day' %}",
             session: "{% url 'vivir_session' %}",
             start: "{% url 'vivir_start' %}",
-            profile: "{% url 'vivir_profile' %}",
             exercise: "{% url 'vivir_exercise_add' %}",
             exerciseDelete: "{% url 'vivir_exercise_delete' 0 %}".replace(/0$/, ''),
             meal: "{% url 'vivir_meal_add' %}",
@@ -200,7 +179,7 @@
             weightDelete: "{% url 'vivir_weight_delete' 0 %}".replace(/0$/, '')
         };
     </script>
-    <script src="{% static 'pastapp/js/vivir.js' %}?v=2"></script>
+    <script src="{% static 'pastapp/js/vivir.js' %}?v=3"></script>
 </body>
 
 </html>

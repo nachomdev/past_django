@@ -30,7 +30,6 @@ urlpatterns = [
     path('vivir/api/day', views.vivir_day, name='vivir_day'),
     path('vivir/api/session', views.vivir_session, name='vivir_session'),
     path('vivir/api/start', views.vivir_start, name='vivir_start'),
-    path('vivir/api/profile', views.vivir_profile, name='vivir_profile'),
     path('vivir/api/exercise', views.vivir_exercise_add, name='vivir_exercise_add'),
     path('vivir/api/exercise/delete/<int:ex_id>', views.vivir_exercise_delete, name='vivir_exercise_delete'),
     path('vivir/api/meal', views.vivir_meal_add, name='vivir_meal_add'),

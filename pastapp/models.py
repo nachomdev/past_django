@@ -45,8 +45,6 @@ class VivirPlan(models.Model):
     """Ciclo de 4 semanas de la rutina /vivir: la semana 1 arranca en start_date."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     start_date = models.DateField()
-    # Peso corporal, para estimar calorías (MET × kg × horas). Null = sin configurar.
-    body_weight_kg = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - rutina desde {self.start_date}"
@@ -69,19 +67,18 @@ class VivirSession(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.date}: {'OK' if self.done else '-'} {self.minutes} min"
 
-class VivirWeightLog(models.Model):
-    """Registro de pesos: fecha, ejercicio, peso, series, reps, notas."""
+class VivirBodyWeight(models.Model):
+    """Registro del peso corporal (uno por día). El último vigente se usa para las kcal."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField()
-    exercise = models.CharField(max_length=100)
-    weight_kg = models.DecimalField(max_digits=6, decimal_places=2)
-    sets = models.PositiveIntegerField(default=0)
-    reps = models.PositiveIntegerField(default=0)
+    weight_kg = models.DecimalField(max_digits=5, decimal_places=1)
     notes = models.CharField(max_length=255, blank=True)
-    timestamp = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ('user', 'date')
 
     def __str__(self):
-        return f"{self.user.username} - {self.date} {self.exercise}: {self.weight_kg} kg {self.sets}x{self.reps}"
+        return f"{self.user.username} - {self.date}: {self.weight_kg} kg"
 
 class VivirExercise(models.Model):
     """Ejercicio propio del usuario, que se suma al catálogo fijo (VIVIR_EXERCISES)."""
@@ -90,7 +87,6 @@ class VivirExercise(models.Model):
     met = models.DecimalField(max_digits=4, decimal_places=1)  # esfuerzo (MET)
     minutes = models.PositiveIntegerField(default=10)
     volume = models.CharField(max_length=50, blank=True)
-    weights = models.BooleanField(default=False)  # aparece en el registro de pesos
 
     def __str__(self):
         return f"{self.user.username} - {self.name} ({self.met} MET)"

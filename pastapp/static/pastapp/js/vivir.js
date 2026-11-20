@@ -1,4 +1,4 @@
-// Vivir: sesión del día (editable), comidas, seguimiento de 4 semanas y pesos.
+// Vivir: sesión del día (editable), comidas, seguimiento de 4 semanas y peso corporal.
 // La config (catálogo de ejercicios, rutinas, plan semanal) viene del servidor
 // en window.VIVIR (ver VIVIR_* en views.py). Como en flexiones, el cliente
 // manda su fecha local (YYYY-MM-DD).
@@ -15,7 +15,7 @@
         { label: 'Muy intenso', met: 8 },
     ];
 
-    let cycle = null;     // /vivir/api/data: ciclo, pesos, ejercicios propios, peso corporal
+    let cycle = null;     // /vivir/api/data: ciclo, registro de peso corporal, ejercicios propios
     let day = null;       // /vivir/api/day: sesión y comidas del día elegido
     let selected = null;  // fecha elegida (YYYY-MM-DD)
     let dayReq = 0;
@@ -32,7 +32,7 @@
     const weekdayIndex = (s) => (parseIso(s).getDay() + 6) % 7; // lunes = 0
     const WEEKDAYS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const fmtKg = (n) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 });
+    const fmtKg = (n) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: 1 });
 
     function toast(msg, isError) {
         const t = $('#toast');
@@ -77,18 +77,23 @@
                 notes: it.notes || '',
                 met: ex.met,
                 minutes: short ? Math.round(ex.minutes * 2 / 3) : ex.minutes,
-                weights: !!ex.weights,
             };
         });
     }
 
     const itemsFor = (session, date) => (session && session.items) || resolveRoutine(routineKeyFor(session, date), weekOf(date));
-    const bodyWeight = () => (cycle && cycle.body_weight_kg) || DEFAULT_BODY_WEIGHT;
+    // Peso vigente en una fecha: el último registrado hasta ese día (o el primero si
+    // la fecha es anterior a todos). body_weights viene del más nuevo al más viejo.
+    function weightEntryFor(date) {
+        const list = (cycle && cycle.body_weights) || [];
+        return list.find((w) => w.date <= date) || list[list.length - 1] || null;
+    }
+    const bodyWeight = (date = selected) => { const w = weightEntryFor(date); return w ? w.weight_kg : DEFAULT_BODY_WEIGHT; };
     // kcal = MET × 3.5 × kg / 200 × minutos
-    const kcalOf = (met, minutes) => (met * 3.5 * bodyWeight() / 200) * minutes;
-    const totals = (items) => items.reduce((acc, it) => ({
+    const kcalOf = (met, minutes, date = selected) => (met * 3.5 * bodyWeight(date) / 200) * minutes;
+    const totals = (items, date = selected) => items.reduce((acc, it) => ({
         minutes: acc.minutes + (it.minutes || 0),
-        kcal: acc.kcal + kcalOf(it.met || 0, it.minutes || 0),
+        kcal: acc.kcal + kcalOf(it.met || 0, it.minutes || 0, date),
     }), { minutes: 0, kcal: 0 });
 
     function effortOf(met) {
@@ -179,7 +184,6 @@
                     ${it.notes ? `<span class="ex-notes">${esc(it.notes)}</span>` : ''}
                     <div class="ex-actions">
                         ${effortChip(it)}
-                        ${it.weights ? `<button type="button" class="ex-log" data-exercise="${esc(it.name)}">+ anotar peso</button>` : ''}
                         <button type="button" class="ex-remove" data-index="${i}" aria-label="Quitar ${esc(it.name)}" title="Quitar">✕</button>
                     </div>
                 </li>`).join('') || '<li class="empty">Sin ítems. Agregá alguno.</li>'}
@@ -188,7 +192,7 @@
             ${s.items ? `<div class="custom-row"><span>Rutina modificada para este día</span><button type="button" class="link-btn" id="reset-items">Restablecer</button></div>` : ''}
             <div class="session-totals">
                 <span>≈ <b>${t.minutes}</b> min · ≈ <b>${Math.round(t.kcal)}</b> kcal</span>
-                <button type="button" class="link-btn" id="edit-weight">${cycle.body_weight_kg ? `con ${fmtKg(bodyWeight())} kg ✎` : 'Configurá tu peso (uso 70 kg)'}</button>
+                <button type="button" class="link-btn" id="edit-weight">${weightEntryFor(selected) ? `con ${fmtKg(bodyWeight())} kg ✎` : `Registrá tu peso (uso ${DEFAULT_BODY_WEIGHT} kg)`}</button>
             </div>
             <div class="done-box">
                 <label class="check"><input type="checkbox" id="day-done" ${s.done ? 'checked' : ''}> Sesión completada</label>
@@ -208,7 +212,6 @@
             const [removed] = items.splice(Number(target.dataset.index), 1);
             return saveSession(selected, { items }, `Quitado: ${removed.name}`);
         }
-        if (target.classList.contains('ex-log')) return logWeightFor(target.dataset.exercise);
     });
 
     $('#session-card').addEventListener('change', (e) => {
@@ -271,7 +274,6 @@
                     <div class="field"><label for="ai-min">Minutos</label><input type="number" id="ai-min" class="input" min="1" max="600" value="10" required></div>
                 </div>
                 <div class="field"><label for="ai-vol">Volumen</label><input type="text" id="ai-vol" class="input" maxlength="50" placeholder="Ej: 3 × 10-12 o 20 min"></div>
-                <label class="check"><input type="checkbox" id="ai-weights"> Se registra con peso (aparece en Pesos)</label>
                 <button type="submit" class="btn">Crear y agregar</button>
                 <div class="form-error" id="ai-error"></div>
             </form>`, (body) => {
@@ -320,7 +322,7 @@
                     e.preventDefault();
                     addItem({
                         name: ex.name, volume: body.querySelector('#ap-vol').value.trim(), notes: '',
-                        met: ex.met, minutes: Number(body.querySelector('#ap-min').value) || 0, weights: !!ex.weights,
+                        met: ex.met, minutes: Number(body.querySelector('#ap-min').value) || 0,
                     });
                 });
                 body.querySelector('#ap-vol').focus();
@@ -331,12 +333,11 @@
             body.querySelector('#ai-list').addEventListener('click', async (e) => {
                 const del = e.target.closest('[data-del]');
                 if (del) {
-                    if (!confirm('¿Borrar este ejercicio de tu lista? Los días y registros ya guardados no cambian.')) return;
+                    if (!confirm('¿Borrar este ejercicio de tu lista? Los días ya guardados no cambian.')) return;
                     try {
                         await api(urls.exerciseDelete + del.dataset.del, {});
                         cycle.custom_exercises = cycle.custom_exercises.filter((x) => String(x.id) !== del.dataset.del);
                         renderList();
-                        renderWeightSelect();
                     } catch (err) { toast(err.message, true); }
                     return;
                 }
@@ -355,14 +356,12 @@
                     met: Number(body.querySelector('#ai-effort').value),
                     minutes: Number(body.querySelector('#ai-min').value),
                     volume: body.querySelector('#ai-vol').value.trim(),
-                    weights: body.querySelector('#ai-weights').checked,
                 };
                 try {
                     const res = await api(urls.exercise, payload);
                     cycle.custom_exercises.push(res.exercise);
-                    renderWeightSelect();
                     const ex = res.exercise;
-                    addItem({ name: ex.name, volume: ex.volume, notes: '', met: ex.met, minutes: ex.minutes, weights: ex.weights });
+                    addItem({ name: ex.name, volume: ex.volume, notes: '', met: ex.met, minutes: ex.minutes });
                 } catch (err) { body.querySelector('#ai-error').textContent = err.message; }
             });
             renderList();
@@ -376,12 +375,14 @@
         await saveSession(selected, { items }, `Agregado: ${item.name}`);
     }
 
+    // Registra el peso del día elegido (el mismo registro que la pestaña Pesos).
     function openBodyWeight() {
+        const own = cycle.body_weights.find((w) => w.date === selected);
         openSheet('Tu peso corporal', `
-            <p class="muted">Se usa para estimar las calorías: kcal ≈ esfuerzo (MET) × 3,5 × kg ÷ 200 × minutos.</p>
+            <p class="muted">Se usa para estimar las calorías: kcal ≈ esfuerzo (MET) × 3,5 × kg ÷ 200 × minutos. Queda en tu historial de Pesos.</p>
             <form class="picked" id="bw-form">
-                <div class="field"><label for="bw-kg">Peso (kg)</label>
-                    <input type="number" id="bw-kg" class="input" min="25" max="400" step="0.1" inputmode="decimal" value="${cycle.body_weight_kg || ''}" required></div>
+                <div class="field"><label for="bw-kg">Peso del ${esc(fmtShort(selected))} (kg)</label>
+                    <input type="number" id="bw-kg" class="input" min="25" max="400" step="0.1" inputmode="decimal" value="${weightEntryFor(selected) ? bodyWeight() : ''}" required></div>
                 <button type="submit" class="btn">Guardar</button>
                 <div class="form-error" id="bw-error"></div>
             </form>`, (body) => {
@@ -389,11 +390,10 @@
             body.querySelector('#bw-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 try {
-                    const res = await api(urls.profile, { body_weight_kg: body.querySelector('#bw-kg').value });
-                    cycle.body_weight_kg = res.body_weight_kg;
+                    await api(urls.weight, { date: selected, weight_kg: body.querySelector('#bw-kg').value, notes: own ? own.notes : '' });
                     closeSheet();
                     toast('Peso guardado');
-                    renderAll();
+                    await loadCycle();
                 } catch (err) { body.querySelector('#bw-error').textContent = err.message; }
             });
         });
@@ -494,7 +494,7 @@
         const today = todayIso();
         const currentWeek = weekOf(today);
         $('#weeks-list').innerHTML = cycle.weeks.map((w) => {
-            const kcal = w.days.filter((d) => d.done).reduce((a, d) => a + totals(itemsFor(d, d.date)).kcal, 0);
+            const kcal = w.days.filter((d) => d.done).reduce((a, d) => a + totals(itemsFor(d, d.date), d.date).kcal, 0);
             return `
             <div class="card week-card ${w.number === currentWeek ? 'is-current' : ''}">
                 <div class="week-head">
@@ -545,95 +545,85 @@
         } catch (err) { toast(err.message, true); }
     });
 
-    // ---------- Pesos ----------
-    // Los ejercicios con peso salen del catálogo; se crean desde Hoy → Agregar ítem.
-    function renderWeightSelect() {
-        const sel = $('#w-exercise');
-        const current = sel.value;
-        const names = catalog().filter((e) => e.weights).map((e) => e.name);
-        const fromLogs = cycle ? [...new Set(cycle.weights.map((w) => w.exercise))].filter((n) => !names.includes(n)) : [];
-        sel.innerHTML = '<option value="">Elegí un ejercicio</option>' +
-            names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('') +
-            (fromLogs.length ? `<optgroup label="Otros registrados">${fromLogs.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}</optgroup>` : '');
-        sel.value = current;
+    // ---------- Pesos (peso corporal) ----------
+    const fmtDiff = (n) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${fmtKg(Math.abs(n))}`;
+
+    // Línea de evolución en SVG (registros en orden cronológico).
+    function weightChart(asc) {
+        if (asc.length < 2) return '';
+        const W = 320, H = 110, P = 8;
+        const kg = asc.map((w) => w.weight_kg);
+        const min = Math.min(...kg), max = Math.max(...kg);
+        const span = max - min || 1;
+        const t0 = parseIso(asc[0].date);
+        const tspan = (parseIso(asc[asc.length - 1].date) - t0) || 1;
+        const pts = asc.map((w) => [
+            P + ((parseIso(w.date) - t0) / tspan) * (W - 2 * P),
+            P + (1 - (w.weight_kg - min) / span) * (H - 2 * P),
+        ]);
+        const line = pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+        return `
+            <div class="w-chart">
+                <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolución del peso">
+                    <polyline points="${line}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                    ${pts.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`).join('')}
+                </svg>
+                <div class="w-chart-axis"><span>${fmtShort(asc[0].date)}</span><span>${fmtKg(min)} – ${fmtKg(max)} kg</span><span>${fmtShort(asc[asc.length - 1].date)}</span></div>
+            </div>`;
     }
 
     function renderWeights() {
-        const all = cycle.weights;
-        const filterSel = $('#w-filter');
-        const current = filterSel.value;
-        const names = [...new Set(all.map((w) => w.exercise))].sort((a, b) => a.localeCompare(b, 'es'));
-        filterSel.innerHTML = '<option value="">Todos los ejercicios</option>' +
-            names.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
-        filterSel.value = names.includes(current) ? current : '';
-
-        const list = filterSel.value ? all.filter((w) => w.exercise === filterSel.value) : all;
-
-        if (filterSel.value && list.length) {
-            const first = list[list.length - 1];
+        const list = cycle.body_weights; // del más nuevo al más viejo
+        if (list.length) {
             const last = list[0];
-            const max = Math.max(...list.map((w) => w.weight_kg));
-            const diff = last.weight_kg - first.weight_kg;
+            const first = list[list.length - 1];
+            const ref = list.find((w) => w.date <= addDays(last.date, -30));
             $('#weights-summary').innerHTML = `
                 <div class="summary">
-                    <div><b>${fmtKg(last.weight_kg)} kg</b><span>Último</span></div>
-                    <div><b>${fmtKg(max)} kg</b><span>Máximo</span></div>
-                    <div><b>${diff >= 0 ? '+' : ''}${fmtKg(diff)} kg</b><span>Desde el inicio</span></div>
-                </div>`;
+                    <div><b>${fmtKg(last.weight_kg)} kg</b><span>Actual</span></div>
+                    <div><b>${ref ? `${fmtDiff(last.weight_kg - ref.weight_kg)} kg` : '—'}</b><span>Últimos 30 días</span></div>
+                    <div><b>${list.length > 1 ? `${fmtDiff(last.weight_kg - first.weight_kg)} kg` : '—'}</b><span>Desde el ${fmtShort(first.date)}</span></div>
+                </div>
+                ${weightChart(list.slice(0, 60).reverse())}`;
         } else {
             $('#weights-summary').innerHTML = '';
         }
 
-        $('#weights-list').innerHTML = list.length ? list.map((w) => `
+        $('#weights-list').innerHTML = list.length ? list.map((w, i) => {
+            const prev = list[i + 1];
+            const long = fmtLong(w.date);
+            return `
             <div class="w-item">
-                <span class="w-main">${esc(w.exercise)}</span>
+                <span class="w-main">${esc(long.charAt(0).toUpperCase() + long.slice(1))}</span>
                 <span class="w-kg">${fmtKg(w.weight_kg)} kg</span>
-                <span class="w-meta">${fmtShort(w.date)}${w.sets || w.reps ? ` · ${w.sets} × ${w.reps}` : ''}${w.notes ? ` · ${esc(w.notes)}` : ''}</span>
+                <span class="w-meta">${prev ? `${fmtDiff(w.weight_kg - prev.weight_kg)} kg vs. ${fmtShort(prev.date)}` : 'Primer registro'}${w.notes ? ` · ${esc(w.notes)}` : ''}</span>
                 <button type="button" class="w-del" data-id="${w.id}">Borrar</button>
-            </div>`).join('') : '<div class="empty">Todavía no hay registros.</div>';
-        renderWeightSelect();
-        updateLastHint();
+            </div>`;
+        }).join('') : '<div class="empty">Todavía no registraste tu peso.</div>';
+        updateWeightHint();
     }
 
-    function updateLastHint() {
-        const name = $('#w-exercise').value;
-        const last = cycle && name && cycle.weights.find((w) => w.exercise === name);
-        $('#w-last').textContent = last
-            ? `Última vez (${fmtShort(last.date)}): ${fmtKg(last.weight_kg)} kg${last.sets || last.reps ? `, ${last.sets} × ${last.reps}` : ''}`
-            : '';
+    // Avisa si la fecha elegida ya tiene un registro (se va a reemplazar).
+    function updateWeightHint() {
+        const existing = cycle && cycle.body_weights.find((w) => w.date === $('#w-date').value);
+        $('#w-hint').textContent = existing
+            ? `Ese día ya registraste ${fmtKg(existing.weight_kg)} kg: al guardar se reemplaza.`
+            : 'Un registro por día. El último peso se usa para estimar las calorías.';
     }
-
-    function logWeightFor(name) {
-        const week = weekOf(selected);
-        $('#w-exercise').value = name;
-        $('#w-date').value = selected;
-        $('#w-sets').value = isShortWeek(week) ? 2 : 3;
-        const last = cycle.weights.find((w) => w.exercise === name);
-        $('#w-weight').value = last ? last.weight_kg : '';
-        $('#w-reps').value = last ? (last.reps || '') : '';
-        updateLastHint();
-        showTab('pesos');
-        $('#w-weight').focus();
-    }
-
-    $('#w-filter').addEventListener('change', renderWeights);
-    $('#w-exercise').addEventListener('change', updateLastHint);
+    $('#w-date').addEventListener('change', updateWeightHint);
 
     $('#weight-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         $('#w-error').textContent = '';
         try {
-            await api(urls.weight, {
+            const res = await api(urls.weight, {
                 date: $('#w-date').value,
-                exercise: $('#w-exercise').value,
                 weight_kg: $('#w-weight').value,
-                sets: $('#w-sets').value || 0,
-                reps: $('#w-reps').value || 0,
                 notes: $('#w-notes').value.trim(),
             });
             $('#w-weight').value = '';
             $('#w-notes').value = '';
-            toast('Peso registrado');
+            toast(res.created ? 'Peso registrado' : 'Peso actualizado');
             await loadCycle();
         } catch (err) { $('#w-error').textContent = err.message; }
     });

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import VivirPlan, VivirSession, VivirWeightLog, VivirExercise, VivirMeal
+from .models import VivirPlan, VivirSession, VivirBodyWeight, VivirExercise, VivirMeal
 
 
 @override_settings(STORAGES={
@@ -52,19 +52,25 @@ class VivirTests(TestCase):
         self.assertEqual(res.json()['start_date'], '2026-11-30')
         self.assertEqual(str(VivirPlan.objects.get(user=self.user).start_date), '2026-11-30')
 
-    def test_weight_add_validate_and_delete(self):
-        res = self.post('vivir_weight_add', {'date': '2026-11-16', 'exercise': 'Remo', 'weight_kg': '22,5', 'sets': 3, 'reps': 10})
+    def test_body_weight_add_upsert_validate_and_delete(self):
+        res = self.post('vivir_weight_add', {'date': '2026-11-16', 'weight_kg': '82,5', 'notes': 'en ayunas'})
         self.assertEqual(res.status_code, 200)
-        log = VivirWeightLog.objects.get()
-        self.assertEqual(float(log.weight_kg), 22.5)
-        self.assertEqual(self.post('vivir_weight_add', {'exercise': '', 'weight_kg': 10}).status_code, 400)
-        self.assertEqual(self.post('vivir_weight_add', {'exercise': 'Remo', 'weight_kg': 'abc'}).status_code, 400)
+        self.assertTrue(res.json()['created'])
+        # Mismo día: reemplaza en vez de duplicar.
+        res = self.post('vivir_weight_add', {'date': '2026-11-16', 'weight_kg': 82})
+        self.assertFalse(res.json()['created'])
+        log = VivirBodyWeight.objects.get()
+        self.assertEqual((float(log.weight_kg), log.notes), (82.0, ''))
+        self.assertEqual(self.post('vivir_weight_add', {'weight_kg': 'abc'}).status_code, 400)
+        self.assertEqual(self.post('vivir_weight_add', {'weight_kg': 5}).status_code, 400)
+        data = self.client.get(reverse('vivir_data')).json()
+        self.assertEqual(data['body_weights'], [{'id': log.id, 'date': '2026-11-16', 'weight_kg': 82.0, 'notes': ''}])
 
         other = User.objects.create_user(username='otro')
-        foreign = VivirWeightLog.objects.create(user=other, date='2026-11-16', exercise='Remo', weight_kg=10)
+        foreign = VivirBodyWeight.objects.create(user=other, date='2026-11-16', weight_kg=70)
         self.assertEqual(self.post('vivir_weight_delete', {}, foreign.id).status_code, 404)
         self.assertEqual(self.post('vivir_weight_delete', {}, log.id).status_code, 200)
-        self.assertEqual(VivirWeightLog.objects.filter(user=self.user).count(), 0)
+        self.assertEqual(VivirBodyWeight.objects.filter(user=self.user).count(), 0)
 
     def test_api_requires_auth(self):
         self.client.logout()
@@ -93,7 +99,7 @@ class VivirTests(TestCase):
         self.assertEqual(res['session']['water'], 30)
 
     def test_custom_exercise_add_duplicate_and_delete(self):
-        res = self.post('vivir_exercise_add', {'name': 'Soga', 'met': 8, 'minutes': 10, 'weights': False})
+        res = self.post('vivir_exercise_add', {'name': 'Soga', 'met': 8, 'minutes': 10})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(self.post('vivir_exercise_add', {'name': 'soga', 'met': 8, 'minutes': 10}).status_code, 400)
         self.assertEqual(self.post('vivir_exercise_add', {'name': 'Bici', 'met': 5, 'minutes': 10}).status_code, 400)
@@ -113,8 +119,3 @@ class VivirTests(TestCase):
         self.assertEqual((meals[0]['kcal'], meals[0]['protein']), (450, True))
         self.assertEqual(self.post('vivir_meal_delete', {}, res.json()['id']).status_code, 200)
         self.assertFalse(VivirMeal.objects.exists())
-
-    def test_body_weight(self):
-        self.assertEqual(self.post('vivir_profile', {'body_weight_kg': '82,5'}).json()['body_weight_kg'], 82.5)
-        self.assertEqual(self.post('vivir_profile', {'body_weight_kg': 5}).status_code, 400)
-        self.assertEqual(self.client.get(reverse('vivir_data')).json()['body_weight_kg'], 82.5)

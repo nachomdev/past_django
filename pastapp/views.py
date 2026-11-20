@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import Verb, PlayLog, PushUpLog, PushUpGoal, VivirPlan, VivirSession, VivirWeightLog, VivirExercise, VivirMeal
+from .models import Verb, PlayLog, PushUpLog, PushUpGoal, VivirPlan, VivirSession, VivirBodyWeight, VivirExercise, VivirMeal
 from decimal import Decimal, InvalidOperation
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib.auth import authenticate, login, logout
@@ -486,11 +486,11 @@ def flexiones_logout(request):
 
 # ---------------------------------------------------------------------------
 # Vivir: rutina semanal (2 días de gym + 5 en casa), seguimiento de 4 semanas,
-# comidas y registro de pesos.
+# comidas y registro del peso corporal.
 #
 # - VIVIR_EXERCISES: catálogo fijo. "met" es el esfuerzo (MET) y "minutes" la
 #   duración estimada; con el peso corporal dan las kcal:
-#   kcal = MET × 3.5 × kg / 200 × minutos. "weights" = se anota en Pesos.
+#   kcal = MET × 3.5 × kg / 200 × minutos (kg = último peso registrado).
 #   El usuario suma ejercicios propios (VivirExercise).
 # - VIVIR_ROUTINES: rutinas elegibles. Cada ítem referencia un ejercicio del
 #   catálogo; "short" es el volumen de la versión corta (semanas 1-2).
@@ -502,21 +502,21 @@ VIVIR_WEEKS = 4
 
 VIVIR_EXERCISES = [
     {'name': 'Bici', 'met': 6.0, 'minutes': 30, 'volume': '30 min'},
-    {'name': 'Cuádriceps (prensa o extensión)', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12', 'weights': True},
-    {'name': 'Press de pecho', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12', 'weights': True},
-    {'name': 'Jalón al pecho', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12', 'weights': True},
-    {'name': 'Bíceps', 'met': 3.5, 'minutes': 6, 'volume': '3 × 8-12', 'weights': True},
-    {'name': 'Isquiotibiales', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12', 'weights': True},
-    {'name': 'Remo', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12', 'weights': True},
+    {'name': 'Cuádriceps (prensa o extensión)', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12'},
+    {'name': 'Press de pecho', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12'},
+    {'name': 'Jalón al pecho', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12'},
+    {'name': 'Bíceps', 'met': 3.5, 'minutes': 6, 'volume': '3 × 8-12'},
+    {'name': 'Isquiotibiales', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12'},
+    {'name': 'Remo', 'met': 3.5, 'minutes': 8, 'volume': '3 × 8-12'},
     {'name': 'Caminata rápida', 'met': 4.3, 'minutes': 30, 'volume': '30 min'},
     {'name': 'Core: plancha, plancha lateral, bicho muerto', 'met': 3.8, 'minutes': 10, 'volume': '10 min'},
-    {'name': 'Sentadilla con disco al pecho', 'met': 5.0, 'minutes': 4, 'volume': '3 × 10-15', 'weights': True},
-    {'name': 'Peso muerto rumano con disco', 'met': 5.0, 'minutes': 4, 'volume': '3 × 10-15', 'weights': True},
-    {'name': 'Press de hombros con disco', 'met': 3.8, 'minutes': 4, 'volume': '3 × 10-15', 'weights': True},
-    {'name': 'Remo inclinado con disco', 'met': 3.8, 'minutes': 4, 'volume': '3 × 10-15', 'weights': True},
+    {'name': 'Sentadilla con disco al pecho', 'met': 5.0, 'minutes': 4, 'volume': '3 × 10-15'},
+    {'name': 'Peso muerto rumano con disco', 'met': 5.0, 'minutes': 4, 'volume': '3 × 10-15'},
+    {'name': 'Press de hombros con disco', 'met': 3.8, 'minutes': 4, 'volume': '3 × 10-15'},
+    {'name': 'Remo inclinado con disco', 'met': 3.8, 'minutes': 4, 'volume': '3 × 10-15'},
     {'name': 'Flexiones de brazos', 'met': 3.8, 'minutes': 3, 'volume': '3 × 10-15'},
-    {'name': 'Puente de glúteos con disco en la cadera', 'met': 3.5, 'minutes': 3, 'volume': '3 × 10-15', 'weights': True},
-    {'name': 'Plancha + giros de torso con disco', 'met': 3.8, 'minutes': 3, 'volume': '30-45 s + 10-15', 'weights': True},
+    {'name': 'Puente de glúteos con disco en la cadera', 'met': 3.5, 'minutes': 3, 'volume': '3 × 10-15'},
+    {'name': 'Plancha + giros de torso con disco', 'met': 3.8, 'minutes': 3, 'volume': '30-45 s + 10-15'},
     {'name': 'Circuito: tijeras, sentadilla, escaladores, zancadas, trote en el lugar', 'met': 8.0, 'minutes': 16, 'volume': '3-4 vueltas'},
     {'name': 'Estiramientos: cadera, isquios, pecho, espalda (gato-camello, cobra, niño)', 'met': 2.3, 'minutes': 18, 'volume': '15-20 min'},
     {'name': 'Caminata larga', 'met': 3.5, 'minutes': 48, 'volume': '45-50 min'},
@@ -619,7 +619,7 @@ def _vivir_api(methods=('POST',)):
 
 def _custom_exercise_dict(e):
     return {'id': e.id, 'name': e.name, 'met': float(e.met), 'minutes': e.minutes,
-            'volume': e.volume, 'weights': e.weights, 'custom': True}
+            'volume': e.volume, 'custom': True}
 
 
 def _session_dict(s):
@@ -655,7 +655,6 @@ def _clean_items(raw):
             'notes': str(it.get('notes') or '').strip()[:255],
             'met': round(met, 1),
             'minutes': minutes,
-            'weights': bool(it.get('weights')),
         })
     return items
 
@@ -679,7 +678,7 @@ def vivir(request):
 
 @_vivir_api(methods=('GET',))
 def vivir_data(request):
-    """Ciclo de 4 semanas, pesos, ejercicios propios y peso corporal."""
+    """Ciclo de 4 semanas, registro de peso corporal y ejercicios propios."""
     today = _parse_date(request.GET.get('date'))
     plan, _ = VivirPlan.objects.get_or_create(user=request.user, defaults={'start_date': _monday(today)})
     start = plan.start_date
@@ -702,22 +701,18 @@ def vivir_data(request):
             'minutes_total': sum(x['minutes'] for x in days),
         })
 
-    weights = [{
+    body_weights = [{
         'id': w.id,
         'date': w.date.isoformat(),
-        'exercise': w.exercise,
         'weight_kg': float(w.weight_kg),
-        'sets': w.sets,
-        'reps': w.reps,
         'notes': w.notes,
-    } for w in VivirWeightLog.objects.filter(user=request.user).order_by('-date', '-timestamp')[:200]]
+    } for w in VivirBodyWeight.objects.filter(user=request.user).order_by('-date')[:1000]]
 
     return JsonResponse({
         'today': today.isoformat(),
         'start_date': start.isoformat(),
-        'body_weight_kg': float(plan.body_weight_kg) if plan.body_weight_kg else None,
         'weeks': weeks,
-        'weights': weights,
+        'body_weights': body_weights,
         'custom_exercises': [_custom_exercise_dict(e) for e in VivirExercise.objects.filter(user=request.user).order_by('name')],
     })
 
@@ -780,23 +775,6 @@ def vivir_start(request):
 
 
 @_vivir_api()
-def vivir_profile(request):
-    data = _json_body(request)
-    if data is None:
-        return JsonResponse({'error': 'JSON inválido'}, status=400)
-    try:
-        kg = Decimal(str(data.get('body_weight_kg', '')).replace(',', '.'))
-    except InvalidOperation:
-        return JsonResponse({'error': 'Peso inválido'}, status=400)
-    if not kg.is_finite() or not 25 <= kg <= 400:
-        return JsonResponse({'error': 'Peso inválido (25 a 400 kg)'}, status=400)
-    plan, _ = VivirPlan.objects.get_or_create(user=request.user, defaults={'start_date': _monday(timezone.localdate())})
-    plan.body_weight_kg = kg.quantize(Decimal('0.1'))
-    plan.save()
-    return JsonResponse({'status': 'ok', 'body_weight_kg': float(plan.body_weight_kg)})
-
-
-@_vivir_api()
 def vivir_exercise_add(request):
     data = _json_body(request)
     if data is None:
@@ -817,7 +795,7 @@ def vivir_exercise_add(request):
         return JsonResponse({'error': 'Esfuerzo o minutos inválidos'}, status=400)
     ex = VivirExercise.objects.create(
         user=request.user, name=name, met=met.quantize(Decimal('0.1')), minutes=minutes,
-        volume=str(data.get('volume') or '').strip()[:50], weights=bool(data.get('weights')),
+        volume=str(data.get('volume') or '').strip()[:50],
     )
     return JsonResponse({'status': 'ok', 'exercise': _custom_exercise_dict(ex)})
 
@@ -865,36 +843,26 @@ def vivir_meal_delete(request, meal_id):
 
 @_vivir_api()
 def vivir_weight_add(request):
+    """Registra el peso corporal de una fecha (si ya había uno ese día, lo reemplaza)."""
     data = _json_body(request)
     if data is None:
         return JsonResponse({'error': 'JSON inválido'}, status=400)
     try:
-        exercise = str(data.get('exercise') or '').strip()[:100]
-        if not exercise:
-            return JsonResponse({'error': 'Elegí un ejercicio'}, status=400)
-        try:
-            weight = Decimal(str(data.get('weight_kg', '')).replace(',', '.'))
-        except InvalidOperation:
-            return JsonResponse({'error': 'Peso inválido'}, status=400)
-        if not weight.is_finite() or not 0 <= weight <= 1000:
-            return JsonResponse({'error': 'Peso inválido'}, status=400)
-        log = VivirWeightLog.objects.create(
-            user=request.user,
-            date=_parse_date(data.get('date')),
-            exercise=exercise,
-            weight_kg=weight.quantize(Decimal('0.01')),
-            sets=max(0, int(data.get('sets') or 0)),
-            reps=max(0, int(data.get('reps') or 0)),
-            notes=str(data.get('notes') or '').strip()[:255],
-        )
-        return JsonResponse({'status': 'ok', 'id': log.id})
-    except (TypeError, ValueError) as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        kg = Decimal(str(data.get('weight_kg', '')).replace(',', '.'))
+    except InvalidOperation:
+        return JsonResponse({'error': 'Peso inválido'}, status=400)
+    if not kg.is_finite() or not 25 <= kg <= 400:
+        return JsonResponse({'error': 'Peso inválido (25 a 400 kg)'}, status=400)
+    log, created = VivirBodyWeight.objects.update_or_create(
+        user=request.user, date=_parse_date(data.get('date')),
+        defaults={'weight_kg': kg.quantize(Decimal('0.1')), 'notes': str(data.get('notes') or '').strip()[:255]},
+    )
+    return JsonResponse({'status': 'ok', 'id': log.id, 'created': created, 'weight_kg': float(log.weight_kg)})
 
 
 @_vivir_api(methods=('POST', 'DELETE'))
 def vivir_weight_delete(request, log_id):
-    deleted, _ = VivirWeightLog.objects.filter(id=log_id, user=request.user).delete()
+    deleted, _ = VivirBodyWeight.objects.filter(id=log_id, user=request.user).delete()
     if not deleted:
         return JsonResponse({'error': 'Registro no encontrado'}, status=404)
     return JsonResponse({'status': 'ok'})
