@@ -732,6 +732,22 @@ def _clean_items(raw):
             'rpm': _num(it.get('rpm'), int, 0, 300),
         }
         item.update({k: (round(v, 3) if isinstance(v, float) else v) for k, v in extra.items() if v is not None})
+        # Series con reps y kg distintos: [{'reps': 12, 'kg': 20}, ...]
+        raw_sets = it.get('set_list')
+        if raw_sets is not None:
+            if not isinstance(raw_sets, list) or len(raw_sets) > 50:
+                raise ValueError('Series inválidas')
+            set_list = []
+            for st in raw_sets:
+                if not isinstance(st, dict):
+                    raise ValueError('Series inválidas')
+                reps = _num(st.get('reps'), int, 0, 500)
+                kg = _num(st.get('kg'), float, 0, 1000)
+                if reps is None and kg is None:
+                    continue
+                set_list.append({k: v for k, v in (('reps', reps), ('kg', round(kg, 2) if kg is not None else None)) if v is not None})
+            if set_list:
+                item['set_list'] = set_list
         items.append(item)
     return items
 
@@ -773,13 +789,14 @@ def vivir_data(request):
     for sess in sessions:
         for it in sess.items or []:
             name = it.get('name')
-            if name and name not in last and any(k in it for k in ('kg', 'sets', 'reps', 'km', 'rpm')):
+            if name and name not in last and any(k in it for k in ('set_list', 'kg', 'sets', 'reps', 'km', 'rpm')):
                 last[name] = {'date': sess.date.isoformat(),
-                              **{k: it[k] for k in ('sets', 'reps', 'kg', 'km', 'rpm', 'minutes') if k in it}}
+                              **{k: it[k] for k in ('set_list', 'sets', 'reps', 'kg', 'km', 'rpm', 'minutes') if k in it}}
 
     return JsonResponse({
         'today': today.isoformat(),
         'start_date': plan.start_date.isoformat(),
+        'profile': {'sex': plan.sex, 'birth_year': plan.birth_year, 'height_cm': plan.height_cm},
         'body_weights': body_weights,
         'custom_exercises': [_custom_exercise_dict(e) for e in VivirExercise.objects.filter(user=request.user).order_by('name')],
         'custom_foods': [_custom_food_dict(f) for f in VivirFood.objects.filter(user=request.user).order_by('name')],
@@ -865,6 +882,27 @@ def vivir_start(request):
     start = _monday(_parse_date(data.get('date')))
     VivirPlan.objects.update_or_create(user=request.user, defaults={'start_date': start})
     return JsonResponse({'status': 'ok', 'start_date': start.isoformat()})
+
+
+@_vivir_api()
+def vivir_profile(request):
+    """Sexo, año de nacimiento y altura, para calcular el gasto base diario."""
+    data = _json_body(request)
+    if data is None:
+        return JsonResponse({'error': 'JSON inválido'}, status=400)
+    sex = data.get('sex') or ''
+    if sex not in ('', 'M', 'F'):
+        return JsonResponse({'error': 'Sexo inválido'}, status=400)
+    try:
+        this_year = timezone.localdate().year
+        birth_year = _num(data.get('birth_year'), int, this_year - 110, this_year - 10)
+        height_cm = _num(data.get('height_cm'), int, 100, 250)
+    except (TypeError, ValueError):
+        return JsonResponse({'error': 'Año de nacimiento o altura inválidos'}, status=400)
+    plan, _ = VivirPlan.objects.get_or_create(user=request.user, defaults={'start_date': _monday(timezone.localdate())})
+    plan.sex, plan.birth_year, plan.height_cm = sex, birth_year, height_cm
+    plan.save()
+    return JsonResponse({'status': 'ok', 'profile': {'sex': plan.sex, 'birth_year': plan.birth_year, 'height_cm': plan.height_cm}})
 
 
 @_vivir_api()

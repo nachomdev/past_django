@@ -157,3 +157,22 @@ class VivirTests(TestCase):
         self.assertEqual(self.post('vivir_session', {'date': '2026-11-18', 'items': bad}).status_code, 400)
         last = self.client.get(reverse('vivir_data')).json()['last']
         self.assertEqual((last['Remo']['kg'], last['Bici']['km']), (22.5, 12.4))
+
+    def test_items_keep_individual_sets(self):
+        items = [{'name': 'Bíceps', 'met': 3.5, 'minutes': 8, 'mode': 'reps', 'per_rep': 0.25,
+                  'set_list': [{'reps': 12, 'kg': 20}, {'reps': 10, 'kg': 22.5}, {'reps': 8, 'kg': 25}, {'reps': '', 'kg': ''}]}]
+        saved = self.post('vivir_session', {'date': '2026-11-18', 'items': items}).json()['session']['items']
+        self.assertEqual(saved[0]['set_list'], [{'reps': 12, 'kg': 20.0}, {'reps': 10, 'kg': 22.5}, {'reps': 8, 'kg': 25.0}])
+        bad = [{'name': 'Bíceps', 'met': 3.5, 'minutes': 8, 'set_list': [{'reps': 9999}]}]
+        self.assertEqual(self.post('vivir_session', {'date': '2026-11-18', 'items': bad}).status_code, 400)
+        last = self.client.get(reverse('vivir_data')).json()['last']
+        self.assertEqual(len(last['Bíceps']['set_list']), 3)
+
+    def test_profile_for_base_burn(self):
+        res = self.post('vivir_profile', {'sex': 'M', 'birth_year': 1985, 'height_cm': 178})
+        self.assertEqual(res.json()['profile'], {'sex': 'M', 'birth_year': 1985, 'height_cm': 178})
+        self.assertEqual(self.client.get(reverse('vivir_data')).json()['profile']['height_cm'], 178)
+        self.assertEqual(self.post('vivir_profile', {'sex': 'X'}).status_code, 400)
+        self.assertEqual(self.post('vivir_profile', {'height_cm': 20}).status_code, 400)
+        # Se puede dejar vacío (vuelve a la estimación por kg).
+        self.assertEqual(self.post('vivir_profile', {}).json()['profile'], {'sex': '', 'birth_year': None, 'height_cm': None})

@@ -45,6 +45,11 @@ class VivirPlan(models.Model):
     """Ciclo de 4 semanas de la rutina /vivir: la semana 1 arranca en start_date."""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     start_date = models.DateField()
+    # Perfil para el gasto base diario (Mifflin-St Jeor). Vacío = estimación por kg.
+    SEXES = [('M', 'Hombre'), ('F', 'Mujer')]
+    sex = models.CharField(max_length=1, choices=SEXES, blank=True)
+    birth_year = models.PositiveSmallIntegerField(null=True, blank=True)
+    height_cm = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - rutina desde {self.start_date}"

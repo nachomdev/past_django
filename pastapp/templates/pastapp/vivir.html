@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=5">
+    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=6">
 </head>
 
 <body>
@@ -193,6 +193,7 @@
             week: "{% url 'vivir_week' %}",
             session: "{% url 'vivir_session' %}",
             start: "{% url 'vivir_start' %}",
+            profile: "{% url 'vivir_profile' %}",
             exercise: "{% url 'vivir_exercise_add' %}",
             exerciseDelete: "{% url 'vivir_exercise_delete' 0 %}".replace(/0$/, ''),
             meal: "{% url 'vivir_meal_add' %}",
@@ -202,7 +203,7 @@
             weightDelete: "{% url 'vivir_weight_delete' 0 %}".replace(/0$/, '')
         };
     </script>
-    <script src="{% static 'pastapp/js/vivir.js' %}?v=5"></script>
+    <script src="{% static 'pastapp/js/vivir.js' %}?v=6"></script>
 </body>
 
 </html>

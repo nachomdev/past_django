@@ -10,6 +10,8 @@
     const WATER_GOAL = 8;
     // Gasto base aproximado (sin entrenar) para el balance: kcal por kg por día.
     const BASE_KCAL_PER_KG = 26;
+    // Metabolismo basal × 1,2 = gasto de un día sin entrenar (vida diaria sedentaria).
+    const ACTIVITY_FACTOR = 1.2;
     const DEFAULT_MIN_PER_REP = 0.25;
     const MIN_MEALS_FOR_BALANCE = 3;
     const EFFORTS = [
@@ -48,6 +50,7 @@
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const fmtNum = (n, dec = 1) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: dec });
     const fmtKg = (n) => fmtNum(n, 1);
+    const fmtSigned = (n) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${fmtNum(Math.abs(Math.round(n)), 0)}`;
     const fmtDiff = (n) => `${n > 0 ? '+' : n < 0 ? '−' : '±'}${fmtKg(Math.abs(n))}`;
     const numOrNull = (v) => (v === '' || v === null || v === undefined || Number.isNaN(Number(v)) ? null : Number(v));
 
@@ -125,6 +128,19 @@
         kcal: acc.kcal + kcalOf(it.met || 0, it.minutes || 0, date),
     }), { minutes: 0, kcal: 0 });
 
+    // Gasto base diario ("por vivir", sin entrenar): Mifflin-St Jeor × 1,2 si hay perfil;
+    // si no, una estimación por kg.
+    function baseBurn(date = selected) {
+        const kg = bodyWeight(date);
+        const p = (cycle && cycle.profile) || {};
+        if (p.sex && p.birth_year && p.height_cm) {
+            const age = parseIso(date).getFullYear() - p.birth_year;
+            const bmr = 10 * kg + 6.25 * p.height_cm - 5 * age + (p.sex === 'M' ? 5 : -161);
+            return { kcal: bmr * ACTIVITY_FACTOR, exact: true };
+        }
+        return { kcal: kg * BASE_KCAL_PER_KG, exact: false };
+    }
+
     // Esfuerzo (MET) según la velocidad, para bici y caminata/carrera con km anotados.
     function metForSpeed(name, kmh) {
         if (/bici/i.test(name)) return kmh < 16 ? 4 : kmh < 19 ? 6.8 : kmh < 22 ? 8 : kmh < 26 ? 10 : 12;
@@ -142,9 +158,22 @@
         return `<span class="effort" title="${esc(it.met)} MET · ${esc(it.minutes)} min"><i>${e.dots}</i> ${e.label} · ≈${Math.round(kcalOf(it.met || 0, it.minutes || 0))} kcal</span>`;
     }
 
+    // Series registradas de un ítem: set_list, o el formato viejo (sets × reps con un solo kg).
+    function setsOf(it) {
+        if (it.set_list && it.set_list.length) return it.set_list.map((x) => ({ reps: x.reps ?? null, kg: x.kg ?? null }));
+        if (it.sets && it.reps) return Array.from({ length: it.sets }, () => ({ reps: it.reps, kg: it.kg ?? null }));
+        return [];
+    }
+
     // Lo registrado de un ítem ("3 × 10 · 20 kg", "35 min · 12,4 km · 80 rpm") o '' si no hay nada.
     function loggedText(it) {
-        if (it.mode === 'reps' && it.sets && it.reps) return `${it.sets} × ${it.reps}${it.kg ? ` · ${fmtNum(it.kg)} kg` : ''}`;
+        const sl = setsOf(it);
+        if (it.mode === 'reps' && sl.length) {
+            const same = sl.every((x) => x.reps === sl[0].reps && x.kg === sl[0].kg);
+            if (same) return `${sl.length} × ${sl[0].reps ?? '?'}${sl[0].kg ? ` · ${fmtNum(sl[0].kg)} kg` : ''}`;
+            const hasKg = sl.some((x) => x.kg);
+            return `${sl.map((x) => `${x.reps ?? '?'}${hasKg ? `×${x.kg ? fmtNum(x.kg) : '–'}` : ''}`).join(' · ')}${hasKg ? ' kg' : ' reps'}`;
+        }
         if (it.mode === 'cardio' && (it.km || it.rpm)) {
             return [`${it.minutes} min`, it.km ? `${fmtNum(it.km, 2)} km` : '', it.rpm ? `${it.rpm} rpm` : ''].filter(Boolean).join(' · ');
         }
@@ -217,7 +246,7 @@
             mealsN += d.meals.count;
             protein += d.meals.protein;
             // Solo días con al menos 3 comidas con kcal: con menos, el balance engaña.
-            if (d.meals.kcal_known >= MIN_MEALS_FOR_BALANCE) balances.push(d.meals.kcal - (bodyWeight(d.date) * BASE_KCAL_PER_KG + dayBurned));
+            if (d.meals.kcal_known >= MIN_MEALS_FOR_BALANCE) balances.push(d.meals.kcal - (baseBurn(d.date).kcal + dayBurned));
             const future = d.date > today;
             return `
             <div class="wd-row kind-${r.kind} ${d.date === today ? 'is-today' : ''} ${future ? 'is-future' : ''}">
@@ -246,10 +275,11 @@
             </div>
             <div class="balance ${avgBalance === null ? '' : avgBalance < 0 ? 'neg' : 'pos'}">
                 <span>Balance estimado</span>
-                <b>${avgBalance === null ? '—' : `${avgBalance > 0 ? '+' : '−'}${fmtNum(Math.abs(Math.round(avgBalance)), 0)} kcal/día`}</b>
+                <b>${avgBalance === null ? '—' : `${fmtSigned(avgBalance)} kcal/día`}</b>
                 <small>${avgBalance === null
                     ? `Aparece en los días con al menos ${MIN_MEALS_FOR_BALANCE} comidas con kcal anotadas.`
-                    : `Comido − (gasto base ≈ ${BASE_KCAL_PER_KG} kcal × kg + entrenamiento), promedio de ${balances.length} ${balances.length === 1 ? 'día' : 'días'} con las comidas anotadas.`}</small>
+                    : `Comido − (gasto base + entrenamiento), promedio de ${balances.length} ${balances.length === 1 ? 'día' : 'días'} con las comidas anotadas.`}
+                    Gasto base ≈ ${fmtNum(Math.round(baseBurn(weekStart).kcal), 0)} kcal/día${baseBurn(weekStart).exact ? '' : ' (estimado)'}. <button type="button" class="link-btn" data-profile>Ajustar</button></small>
             </div>`;
         $('#week-days').innerHTML = rows;
     }
@@ -402,13 +432,27 @@
         const val = (v) => (v === null || v === undefined ? '' : v);
 
         let fields;
+        // Series iniciales: las del día, o las de la última vez, o las del objetivo.
+        let initialSets = setsOf(it);
+        if (!initialSets.length && last) initialSets = setsOf({ mode, ...last });
+        if (!initialSets.length) {
+            initialSets = Array.from({ length: target ? target.sets : 3 }, () => ({ reps: target ? target.reps : null, kg: null }));
+        }
+        const setRow = (st, n) => `
+            <div class="set-row">
+                <span class="set-n">${n}</span>
+                <input type="number" class="input set-reps" min="0" max="500" inputmode="numeric" value="${val(st.reps)}" placeholder="reps" aria-label="Reps de la serie ${n}">
+                <span class="set-x">×</span>
+                <input type="number" class="input set-kg" min="0" max="1000" step="0.5" inputmode="decimal" value="${val(st.kg)}" placeholder="kg" aria-label="Kg de la serie ${n}">
+                <span class="set-unit">kg</span>
+                <button type="button" class="set-del" aria-label="Quitar serie ${n}" title="Quitar serie">✕</button>
+            </div>`;
+
         if (mode === 'reps') {
             fields = `
-                <div class="grid-3">
-                    <div class="field"><label for="ie-sets">Series</label><input type="number" id="ie-sets" class="input" min="0" max="50" inputmode="numeric" value="${val(it.sets ?? (target && target.sets))}"></div>
-                    <div class="field"><label for="ie-reps">Reps</label><input type="number" id="ie-reps" class="input" min="0" max="500" inputmode="numeric" value="${val(it.reps ?? (last && last.reps) ?? (target && target.reps))}"></div>
-                    <div class="field"><label for="ie-kg">Kg</label><input type="number" id="ie-kg" class="input" min="0" max="1000" step="0.5" inputmode="decimal" value="${val(it.kg ?? (last && last.kg))}" placeholder="—"></div>
-                </div>`;
+                <div class="set-head"><span>Serie</span><span>Reps</span><span></span><span>Peso</span></div>
+                <div class="set-rows" id="ie-sets">${initialSets.map((st, i) => setRow(st, i + 1)).join('')}</div>
+                <button type="button" class="btn-ghost add-set" id="ie-add-set">+ Agregar serie</button>`;
         } else if (mode === 'cardio') {
             fields = `
                 <div class="grid-3">
@@ -435,12 +479,18 @@
             function build() {
                 const next = { ...it, mode };
                 if (mode === 'reps') {
-                    next.sets = numOrNull(q('#ie-sets').value);
-                    next.reps = numOrNull(q('#ie-reps').value);
-                    next.kg = numOrNull(q('#ie-kg').value);
+                    // Cada serie con sus reps y kg; las kcal salen del total de repeticiones.
+                    const setList = [...body.querySelectorAll('.set-row')].map((row) => ({
+                        reps: numOrNull(row.querySelector('.set-reps').value),
+                        kg: numOrNull(row.querySelector('.set-kg').value),
+                    })).filter((x) => x.reps !== null || x.kg !== null)
+                        .map((x) => Object.fromEntries(Object.entries(x).filter(([, v]) => v !== null)));
+                    delete next.sets; delete next.reps; delete next.kg; // formato viejo
+                    next.set_list = setList.length ? setList : null;
                     const perRep = it.per_rep || (target ? it.minutes / (target.sets * target.reps) : DEFAULT_MIN_PER_REP);
                     next.per_rep = Math.round(perRep * 1000) / 1000;
-                    if (next.sets && next.reps) next.minutes = Math.max(1, Math.round(next.sets * next.reps * perRep));
+                    const totalReps = setList.reduce((a, x) => a + (x.reps || 0), 0);
+                    if (totalReps) next.minutes = Math.max(1, Math.round(totalReps * perRep));
                 } else {
                     next.minutes = numOrNull(q('#ie-min').value) || 0;
                     if (mode === 'cardio') {
@@ -462,6 +512,26 @@
             }
 
             body.addEventListener('input', preview);
+            if (mode === 'reps') {
+                const renumber = () => body.querySelectorAll('.set-row').forEach((row, i) => { row.querySelector('.set-n').textContent = i + 1; });
+                q('#ie-add-set').addEventListener('click', () => {
+                    const rows = body.querySelectorAll('.set-row');
+                    const prevRow = rows[rows.length - 1];
+                    const copy = prevRow
+                        ? { reps: numOrNull(prevRow.querySelector('.set-reps').value), kg: numOrNull(prevRow.querySelector('.set-kg').value) }
+                        : { reps: target ? target.reps : null, kg: null };
+                    q('#ie-sets').insertAdjacentHTML('beforeend', setRow(copy, rows.length + 1));
+                    q('#ie-sets .set-row:last-child .set-reps').focus();
+                    preview();
+                });
+                q('#ie-sets').addEventListener('click', (e) => {
+                    const del = e.target.closest('.set-del');
+                    if (!del) return;
+                    del.closest('.set-row').remove();
+                    renumber();
+                    preview();
+                });
+            }
             preview();
             const first = q('input');
             if (first) first.focus();
@@ -627,6 +697,53 @@
         await saveSession(selected, { items }, `Agregado: ${item.name}`);
     }
 
+    // Perfil para el gasto base: sexo, año de nacimiento y altura (el peso sale de Pesos).
+    function openProfile() {
+        const p = cycle.profile || {};
+        const year = new Date().getFullYear();
+        openSheet('Gasto base diario', `
+            <p class="muted">Son las calorías que gastás en un día sin entrenar: metabolismo basal (fórmula de Mifflin-St Jeor) × ${fmtNum(ACTIVITY_FACTOR)} por la vida diaria. Usa tu último peso registrado (${fmtKg(bodyWeight())} kg). Sin estos datos se estima en ${BASE_KCAL_PER_KG} kcal por kg.</p>
+            <form class="picked" id="pf-form" autocomplete="off">
+                <div class="field"><label for="pf-sex">Sexo</label>
+                    <select id="pf-sex" class="input">
+                        <option value="">Sin indicar</option>
+                        <option value="M" ${p.sex === 'M' ? 'selected' : ''}>Hombre</option>
+                        <option value="F" ${p.sex === 'F' ? 'selected' : ''}>Mujer</option>
+                    </select></div>
+                <div class="grid-2">
+                    <div class="field"><label for="pf-year">Año de nacimiento</label><input type="number" id="pf-year" class="input" min="${year - 110}" max="${year - 10}" inputmode="numeric" value="${p.birth_year ?? ''}"></div>
+                    <div class="field"><label for="pf-height">Altura (cm)</label><input type="number" id="pf-height" class="input" min="100" max="250" inputmode="numeric" value="${p.height_cm ?? ''}"></div>
+                </div>
+                <div class="ie-preview" id="pf-preview"></div>
+                <button type="submit" class="btn">Guardar</button>
+                <div class="form-error" id="pf-error"></div>
+            </form>`, (body) => {
+            const q = (sel) => body.querySelector(sel);
+            const read = () => ({ sex: q('#pf-sex').value, birth_year: numOrNull(q('#pf-year').value), height_cm: numOrNull(q('#pf-height').value) });
+            const preview = () => {
+                const saved = cycle.profile;
+                cycle.profile = read();
+                const b = baseBurn();
+                cycle.profile = saved;
+                q('#pf-preview').innerHTML = `Gasto base ≈ <b>${fmtNum(Math.round(b.kcal), 0)}</b> kcal/día${b.exact ? '' : ' (estimado: completá los tres datos)'}`;
+            };
+            body.addEventListener('input', preview);
+            preview();
+            q('#pf-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await api(urls.profile, read());
+                    cycle.profile = res.profile;
+                    closeSheet();
+                    toast('Perfil guardado');
+                    renderWeek();
+                    if (day) renderFood();
+                } catch (err) { q('#pf-error').textContent = err.message; }
+            });
+        });
+    }
+    document.addEventListener('click', (e) => { if (e.target.closest('[data-profile]')) openProfile(); });
+
     // Registra el peso del día elegido (el mismo registro que la pestaña Pesos).
     function openBodyWeight() {
         const own = cycle.body_weights.find((w) => w.date === selected);
@@ -669,6 +786,10 @@
         const known = meals.filter((m) => m.kcal !== null);
         const eaten = known.reduce((a, m) => a + m.kcal, 0);
         const burned = Math.round(totals(itemsFor(s, selected)).kcal);
+        const base = baseBurn(selected);
+        const training = s.done ? burned : 0;
+        const spent = Math.round(base.kcal + training);
+        const diff = eaten - spent;
         const withProtein = meals.filter((m) => m.protein).length;
         $('#food-summary').innerHTML = `
             <div class="food-stats">
@@ -683,6 +804,13 @@
                     <b>${s.water} ${s.water === 1 ? 'vaso' : 'vasos'}</b>
                     <button type="button" class="round-btn" id="water-plus" aria-label="Un vaso más">+</button>
                 </div>
+            </div>
+            <div class="day-balance">
+                <div class="db-row"><span>Comido</span><b>${known.length ? eaten : 0} kcal</b></div>
+                <div class="db-row"><span>Gasto base (por vivir)${base.exact ? '' : ' · estimado'} <button type="button" class="link-btn" data-profile>Ajustar</button></span><b>− ${fmtNum(Math.round(base.kcal), 0)} kcal</b></div>
+                <div class="db-row"><span>Entrenamiento${s.done ? '' : ' (sin completar)'}</span><b>− ${training} kcal</b></div>
+                <div class="db-row db-total ${known.length ? (diff < 0 ? 'neg' : 'pos') : ''}"><span>Diferencia del día</span><b>${known.length ? `${fmtSigned(diff)} kcal` : '—'}</b></div>
+                ${known.length && known.length < MIN_MEALS_FOR_BALANCE ? '<small class="muted">Faltan comidas con kcal: la diferencia todavía no es real.</small>' : ''}
             </div>
             <span class="muted">Proteína en cada comida y suficiente agua (≈ ${WATER_GOAL} vasos).</span>`;
 
