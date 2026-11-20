@@ -176,3 +176,11 @@ class VivirTests(TestCase):
         self.assertEqual(self.post('vivir_profile', {'height_cm': 20}).status_code, 400)
         # Se puede dejar vacío (vuelve a la estimación por kg).
         self.assertEqual(self.post('vivir_profile', {}).json()['profile'], {'sex': '', 'birth_year': None, 'height_cm': None})
+
+    def test_month_span(self):
+        self.post('vivir_session', {'date': '2026-02-27', 'done': True, 'minutes': 30})
+        res = self.client.get(reverse('vivir_week'), {'date': '2026-02-10', 'span': 'month'}).json()
+        self.assertEqual((res['start'], res['end'], len(res['days'])), ('2026-02-01', '2026-02-28', 28))
+        self.assertTrue(res['days'][26]['done'])
+        dec = self.client.get(reverse('vivir_week'), {'date': '2026-12-31', 'span': 'month'}).json()
+        self.assertEqual((dec['start'], dec['end']), ('2026-12-01', '2026-12-31'))

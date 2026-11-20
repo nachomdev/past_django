@@ -28,9 +28,10 @@
 
     let cycle = null;     // /vivir/api/data: ciclo, peso corporal, ejercicios y comidas propias, últimas cargas
     let day = null;       // /vivir/api/day: sesión y comidas del día elegido
-    let week = null;      // /vivir/api/week: resumen de la semana elegida en Inicio
+    let week = null;      // /vivir/api/week: días del período que muestra Inicio (semana o mes)
     let selected = null;  // día elegido en Entrenamiento / Comidas (YYYY-MM-DD)
-    let weekStart = null; // lunes de la semana elegida en Inicio
+    let view = 'week';    // vista de Inicio: day | week | month
+    let anchor = null;    // fecha que define el período de Inicio
     let dayReq = 0;
     let weekReq = 0;
 
@@ -211,7 +212,12 @@
     $('#sheet').addEventListener('click', (e) => { if (e.target.id === 'sheet') closeSheet(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
 
-    // ---------- Inicio: resumen semanal ----------
+    // ---------- Inicio: resumen por día, semana o mes ----------
+    const VIEWS = ['day', 'week', 'month'];
+    const MONTH_NAMES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    const firstOfMonth = (s) => `${s.slice(0, 8)}01`;
+    const addMonths = (s, n) => { const d = parseIso(firstOfMonth(s)); d.setMonth(d.getMonth() + n); return isoDate(d); };
+
     function cycleText(date) {
         const wk = weekOf(date);
         return wk >= 1 && wk <= TOTAL_WEEKS
@@ -219,96 +225,255 @@
             : 'Fuera del ciclo de 4 semanas';
     }
 
+    // Clave del período que contiene una fecha, para saber si estamos en el actual.
+    const periodKey = (date) => (view === 'day' ? date : view === 'week' ? mondayOf(date) : firstOfMonth(date));
+
     function renderWeekNav() {
-        const end = addDays(weekStart, 6);
-        const s = parseIso(weekStart), e = parseIso(end);
-        const month = (d) => d.toLocaleDateString('es-AR', { month: 'short' }).replace('.', '');
-        $('#week-title').textContent = s.getMonth() === e.getMonth()
-            ? `${s.getDate()} al ${e.getDate()} de ${month(e)}`
-            : `${s.getDate()} ${month(s)} al ${e.getDate()} ${month(e)}`;
-        $('#week-sub').textContent = cycleText(weekStart);
-        $('#week-today').classList.toggle('hidden', weekStart === mondayOf(todayIso()));
+        document.querySelectorAll('.seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+        const today = todayIso();
+        if (view === 'day') {
+            const long = fmtLong(anchor);
+            $('#week-title').textContent = anchor === today ? `Hoy, ${long}` : cap(long);
+            $('#week-sub').textContent = cycleText(anchor);
+        } else if (view === 'week') {
+            const start = mondayOf(anchor);
+            const s = parseIso(start), e = parseIso(addDays(start, 6));
+            const month = (d) => d.toLocaleDateString('es-AR', { month: 'short' }).replace('.', '');
+            $('#week-title').textContent = s.getMonth() === e.getMonth()
+                ? `${s.getDate()} al ${e.getDate()} de ${month(e)}`
+                : `${s.getDate()} ${month(s)} al ${e.getDate()} ${month(e)}`;
+            $('#week-sub').textContent = cycleText(start);
+        } else {
+            const d = parseIso(anchor);
+            $('#week-title').textContent = `${cap(MONTH_NAMES[d.getMonth()])} ${d.getFullYear()}`;
+            $('#week-sub').textContent = '';
+        }
+        const back = $('#week-today');
+        back.textContent = view === 'day' ? 'Volver a hoy' : view === 'week' ? 'Volver a esta semana' : 'Volver a este mes';
+        back.classList.toggle('hidden', periodKey(anchor) === periodKey(today));
     }
 
-    function renderWeek() {
-        if (!week || !cycle) return;
-        const today = todayIso();
+    // Lo que sale de un día: kcal de entrenamiento, comidas, balance.
+    function dayStats(d) {
+        const t = totals(itemsFor(d, d.date), d.date);
+        return { t, burned: d.done ? t.kcal : 0 };
+    }
+
+    // Desglose "comido − gasto base − entrenamiento" de un día (Comidas e Inicio diario).
+    function dayBalanceHtml(date, eaten, knownCount, done, trainingKcal) {
+        const base = baseBurn(date);
+        const training = done ? Math.round(trainingKcal) : 0;
+        const diff = eaten - Math.round(base.kcal + training);
+        return `
+            <div class="day-balance">
+                <div class="db-row"><span>Comido</span><b>${knownCount ? eaten : 0} kcal</b></div>
+                <div class="db-row"><span>Gasto base (por vivir)${base.exact ? '' : ' · estimado'} <button type="button" class="link-btn" data-profile>Ajustar</button></span><b>− ${fmtNum(Math.round(base.kcal), 0)} kcal</b></div>
+                <div class="db-row"><span>Entrenamiento${done ? '' : ' (sin completar)'}</span><b>− ${training} kcal</b></div>
+                <div class="db-row db-total ${knownCount ? (diff < 0 ? 'neg' : 'pos') : ''}"><span>Diferencia del día</span><b>${knownCount ? `${fmtSigned(diff)} kcal` : '—'}</b></div>
+                ${knownCount && knownCount < MIN_MEALS_FOR_BALANCE ? '<small class="muted">Faltan comidas con kcal: la diferencia todavía no es real.</small>' : ''}
+            </div>`;
+    }
+
+    function summaryHtml(days) {
         let done = 0, minutes = 0, burned = 0, eaten = 0, water = 0, mealsN = 0, protein = 0;
         const balances = [];
-        const rows = week.days.map((d, i) => {
-            const r = routineBy(routineKeyFor(d, d.date));
-            const t = totals(itemsFor(d, d.date), d.date);
-            const dayBurned = d.done ? t.kcal : 0;
-            if (d.done) { done += 1; burned += dayBurned; }
+        days.forEach((d) => {
+            const st = dayStats(d);
+            if (d.done) { done += 1; burned += st.burned; }
             minutes += d.minutes || 0;
             eaten += d.meals.kcal;
             water += d.water;
             mealsN += d.meals.count;
             protein += d.meals.protein;
             // Solo días con al menos 3 comidas con kcal: con menos, el balance engaña.
-            if (d.meals.kcal_known >= MIN_MEALS_FOR_BALANCE) balances.push(d.meals.kcal - (baseBurn(d.date).kcal + dayBurned));
-            const future = d.date > today;
-            return `
-            <div class="wd-row kind-${r.kind} ${d.date === today ? 'is-today' : ''} ${future ? 'is-future' : ''}">
-                <button type="button" class="wd-main" data-open="${d.date}" title="Ver el día">
-                    <span class="wd-day">${cap(WEEKDAYS[i])} <small>${fmtShort(d.date)}</small></span>
-                    <span class="wd-routine">${esc(r.name)}${d.done ? ` · ${d.minutes || Math.round(t.minutes)} min` : ''}</span>
-                    <span class="wd-icons">
-                        <span title="Comidas registradas" class="${d.meals.count ? '' : 'off'}">🍽 ${d.meals.count}${d.meals.kcal_known ? ` · ${d.meals.kcal}` : ''}</span>
-                        <span title="Vasos de agua" class="${d.water ? '' : 'off'}">💧 ${d.water}</span>
-                    </span>
-                </button>
-                <label class="check wd-check"><input type="checkbox" data-date="${d.date}" class="track-done" ${d.done ? 'checked' : ''} aria-label="Completada ${esc(WEEKDAYS[i])} ${fmtShort(d.date)}"></label>
-            </div>`;
-        }).join('');
-
+            if (d.meals.kcal_known >= MIN_MEALS_FOR_BALANCE) balances.push(d.meals.kcal - (baseBurn(d.date).kcal + st.burned));
+        });
+        const n = days.length;
+        const single = n === 1;
         const avgBalance = balances.length ? balances.reduce((a, b) => a + b, 0) / balances.length : null;
-        $('#week-summary').innerHTML = `
-            <div class="progress"><div style="width:${(done / 7) * 100}%"></div></div>
+        const grid = `
+            ${single ? '' : `<div class="progress"><div style="width:${(done / n) * 100}%"></div></div>`}
             <div class="stats-grid">
-                <div><b class="${done === 7 ? 'ok' : ''}">${done}/7</b><span>entrenamientos</span></div>
+                <div><b class="${done === n ? 'ok' : ''}">${single ? (done ? '✓' : '—') : `${done}/${n}`}</b><span>${single ? 'entrenamiento' : 'entrenamientos'}</span></div>
                 <div><b>${minutes}</b><span>minutos</span></div>
                 <div><b>≈ ${Math.round(burned)}</b><span>kcal entrenando</span></div>
                 <div><b>${eaten || '—'}</b><span>kcal comidas</span></div>
                 <div><b>${mealsN ? `${protein}/${mealsN}` : '—'}</b><span>comidas con proteína</span></div>
                 <div><b>${water}</b><span>vasos de agua</span></div>
-            </div>
+            </div>`;
+        if (single) {
+            const d = days[0];
+            return grid + dayBalanceHtml(d.date, d.meals.kcal, d.meals.kcal_known, d.done, dayStats(d).t.kcal);
+        }
+        return `${grid}
             <div class="balance ${avgBalance === null ? '' : avgBalance < 0 ? 'neg' : 'pos'}">
                 <span>Balance estimado</span>
                 <b>${avgBalance === null ? '—' : `${fmtSigned(avgBalance)} kcal/día`}</b>
                 <small>${avgBalance === null
                     ? `Aparece en los días con al menos ${MIN_MEALS_FOR_BALANCE} comidas con kcal anotadas.`
                     : `Comido − (gasto base + entrenamiento), promedio de ${balances.length} ${balances.length === 1 ? 'día' : 'días'} con las comidas anotadas.`}
-                    Gasto base ≈ ${fmtNum(Math.round(baseBurn(weekStart).kcal), 0)} kcal/día${baseBurn(weekStart).exact ? '' : ' (estimado)'}. <button type="button" class="link-btn" data-profile>Ajustar</button></small>
+                    Gasto base ≈ ${fmtNum(Math.round(baseBurn(days[0].date).kcal), 0)} kcal/día${baseBurn(days[0].date).exact ? '' : ' (estimado)'}. <button type="button" class="link-btn" data-profile>Ajustar</button></small>
             </div>`;
-        $('#week-days').innerHTML = rows;
     }
 
-    async function selectWeek(date) {
-        weekStart = mondayOf(date);
+    function weekRowsHtml(days, today) {
+        return days.map((d) => {
+            const r = routineBy(routineKeyFor(d, d.date));
+            const { t } = dayStats(d);
+            const wd = WEEKDAYS[weekdayIndex(d.date)];
+            return `
+            <div class="wd-row kind-${r.kind} ${d.date === today ? 'is-today' : ''} ${d.date > today ? 'is-future' : ''}">
+                <button type="button" class="wd-main" data-open="${d.date}" title="Ver el día">
+                    <span class="wd-day">${cap(wd)} <small>${fmtShort(d.date)}</small></span>
+                    <span class="wd-routine">${esc(r.name)}${d.done ? ` · ${d.minutes || Math.round(t.minutes)} min` : ''}</span>
+                    <span class="wd-icons">
+                        <span title="Comidas registradas" class="${d.meals.count ? '' : 'off'}">🍽 ${d.meals.count}${d.meals.kcal_known ? ` · ${d.meals.kcal}` : ''}</span>
+                        <span title="Vasos de agua" class="${d.water ? '' : 'off'}">💧 ${d.water}</span>
+                    </span>
+                </button>
+                <label class="check wd-check"><input type="checkbox" data-date="${d.date}" class="track-done" ${d.done ? 'checked' : ''} aria-label="Completada ${esc(wd)} ${fmtShort(d.date)}"></label>
+            </div>`;
+        }).join('');
+    }
+
+    function monthGridHtml(days, today) {
+        const lead = weekdayIndex(days[0].date);
+        const cells = Array.from({ length: lead }, () => '<span class="mc-cell mc-empty"></span>').concat(days.map((d) => {
+            const r = routineBy(routineKeyFor(d, d.date));
+            const label = `${cap(fmtLong(d.date))}: ${r.name}${d.done ? ', completada' : ''}`;
+            return `
+                <button type="button" class="mc-cell kind-${r.kind} ${d.done ? 'is-done' : ''} ${d.date === today ? 'is-today' : ''} ${d.date > today ? 'is-future' : ''}" data-open-day="${d.date}" title="${esc(label)}" aria-label="${esc(label)}">
+                    <span class="mc-num">${parseIso(d.date).getDate()}</span>
+                    <span class="mc-dots"><i class="${d.meals.count ? 'on' : ''}" title="Comidas"></i><i class="water ${d.water >= WATER_GOAL ? 'on' : d.water ? 'half' : ''}" title="Agua"></i></span>
+                </button>`;
+        }));
+        return `
+            <div class="mc-head">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((x) => `<span>${x}</span>`).join('')}</div>
+            <div class="mc-grid">${cells.join('')}</div>
+            <div class="mc-legend"><span><i class="sw done"></i> entrenado</span><span><i class="sw meal"></i> comidas</span><span><i class="sw water"></i> agua (8+)</span></div>`;
+    }
+
+    function dayDetailHtml(d) {
+        const r = routineBy(routineKeyFor(d, d.date));
+        const items = itemsFor(d, d.date);
+        const logged = items.map((it) => [it, loggedText(it)]).filter(([, txt]) => txt);
+        return `
+            <div class="dd-head kind-${r.kind}">
+                <div><b>${esc(r.name)}</b><span class="muted">${d.done ? `Completada · ${d.minutes || Math.round(dayStats(d).t.minutes)} min` : 'Sin completar'}</span></div>
+                <label class="check"><input type="checkbox" data-date="${d.date}" class="track-done" ${d.done ? 'checked' : ''} aria-label="Sesión completada"></label>
+            </div>
+            ${logged.length ? `<ul class="dd-logged">${logged.map(([it, txt]) => `<li><span>${esc(it.name)}</span><b>${esc(txt)}</b></li>`).join('')}</ul>` : ''}
+            <div class="dd-actions">
+                <button type="button" class="btn-ghost" data-open="${d.date}">Ver entrenamiento</button>
+                <button type="button" class="btn-ghost" data-open-food="${d.date}">Ver comidas</button>
+            </div>`;
+    }
+
+    function renderWeek() {
+        if (!week || !cycle) return;
+        if ((view === 'month') !== (week.span === 'month')) return; // falta la respuesta del período nuevo
+        const today = todayIso();
+        let days = week.days;
+        if (view === 'day') days = days.filter((d) => d.date === anchor);
+        if (!days.length) return; // todavía llegando la respuesta del período nuevo
+        $('#week-summary').innerHTML = summaryHtml(days);
+        $('#week-days').className = `card week-days view-${view}`;
+        $('#week-days').innerHTML = view === 'week' ? weekRowsHtml(days, today)
+            : view === 'month' ? monthGridHtml(days, today)
+                : dayDetailHtml(days[0]);
+    }
+
+    async function selectAnchor(date) {
+        anchor = date;
         renderWeekNav();
         await loadWeek();
     }
 
-    $('#week-prev').addEventListener('click', () => selectWeek(addDays(weekStart, -7)));
-    $('#week-next').addEventListener('click', () => selectWeek(addDays(weekStart, 7)));
-    $('#week-today').addEventListener('click', () => selectWeek(todayIso()));
+    function setView(v) {
+        view = v;
+        try { localStorage.setItem('vivir_view', v); } catch (e) { /* sin storage */ }
+        selectAnchor(anchor);
+    }
+
+    const step = (dir) => (view === 'day' ? addDays(anchor, dir) : view === 'week' ? addDays(mondayOf(anchor), 7 * dir) : addMonths(anchor, dir));
+    $('#week-prev').addEventListener('click', () => selectAnchor(step(-1)));
+    $('#week-next').addEventListener('click', () => selectAnchor(step(1)));
+    $('#week-today').addEventListener('click', () => selectAnchor(todayIso()));
+    document.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+
+    function openDay(date, tab) {
+        showTab(tab);
+        selectDate(date);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     $('#week-days').addEventListener('click', (e) => {
+        const dayCell = e.target.closest('[data-open-day]');
+        if (dayCell) { view = 'day'; anchor = dayCell.dataset.openDay; setView('day'); return; }
+        const food = e.target.closest('[data-open-food]');
+        if (food) return openDay(food.dataset.openFood, 'comidas');
         const btn = e.target.closest('[data-open]');
-        if (!btn) return;
-        showTab('entrenamiento');
-        selectDate(btn.dataset.open);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (btn) openDay(btn.dataset.open, 'entrenamiento');
     });
     $('#week-days').addEventListener('change', (e) => {
         if (!e.target.classList.contains('track-done')) return;
         const date = e.target.dataset.date;
         const fields = { done: e.target.checked };
         const d = week.days.find((x) => x.date === date);
-        if (e.target.checked && d && !d.minutes) fields.minutes = Math.round(totals(itemsFor(d, date), date).minutes);
+        if (e.target.checked && d && !d.minutes) fields.minutes = Math.round(dayStats(d).t.minutes);
         saveSession(date, fields, e.target.checked ? '¡Sesión completada!' : 'Guardado');
     });
+
+    // Botón "+": agregar entrenamiento, comida o agua al día que se está viendo (o a hoy).
+    function openAddMenu() {
+        const date = view === 'day' ? anchor : todayIso();
+        const d = week && week.days.find((x) => x.date === date);
+        const r = routineBy(routineKeyFor(d, date));
+        let water = d ? d.water : 0;
+        const when = date === todayIso() ? 'hoy' : fmtLong(date);
+        openSheet(`Agregar · ${when}`, `
+            <button type="button" class="add-option" data-add="training">
+                <span class="add-icon">🏋️</span>
+                <span><b>Entrenamiento</b><small>${esc(r.name)} · anotar series, minutos o km</small></span>
+            </button>
+            <button type="button" class="add-option" data-add="meal">
+                <span class="add-icon">🍽</span>
+                <span><b>Comida</b><small>Elegí de tu lista o agregá una nueva</small></span>
+            </button>
+            <div class="add-option add-water">
+                <span class="add-icon">💧</span>
+                <span><b>Agua</b><small id="aw-text"></small></span>
+                <span class="water-ctrl">
+                    <button type="button" class="round-btn" data-water="-1" aria-label="Un vaso menos">−</button>
+                    <b id="aw-count"></b>
+                    <button type="button" class="round-btn" data-water="1" aria-label="Un vaso más">+</button>
+                </span>
+            </div>`, (body) => {
+            const paint = () => {
+                body.querySelector('#aw-count').textContent = water;
+                body.querySelector('#aw-text').textContent = `${water} de ${WATER_GOAL} vasos`;
+            };
+            paint();
+            body.addEventListener('click', async (e) => {
+                const opt = e.target.closest('[data-add]');
+                if (opt) {
+                    closeSheet();
+                    if (opt.dataset.add === 'training') return openDay(date, 'entrenamiento');
+                    openDay(date, 'comidas');
+                    setTimeout(() => $('#m-desc').focus(), 300);
+                    return;
+                }
+                const w = e.target.closest('[data-water]');
+                if (!w) return;
+                const next = Math.max(0, water + Number(w.dataset.water));
+                if (next === water) return;
+                water = next;
+                paint();
+                await saveSession(date, { water }, `Agua: ${water} ${water === 1 ? 'vaso' : 'vasos'}`);
+            });
+        });
+    }
+    $('#add-fab').addEventListener('click', openAddMenu);
 
     $('#cycle-save').addEventListener('click', async () => {
         const date = $('#cycle-date').value;
@@ -774,7 +939,8 @@
             if (date === selected && day) { day.session = res.session; renderSession(); renderFood(); }
             toast(msg || 'Guardado');
             await refresh();
-        } catch (err) { toast(err.message, true); }
+            return res.session;
+        } catch (err) { toast(err.message, true); return null; }
     }
 
     // ---------- Comidas ----------
@@ -786,10 +952,6 @@
         const known = meals.filter((m) => m.kcal !== null);
         const eaten = known.reduce((a, m) => a + m.kcal, 0);
         const burned = Math.round(totals(itemsFor(s, selected)).kcal);
-        const base = baseBurn(selected);
-        const training = s.done ? burned : 0;
-        const spent = Math.round(base.kcal + training);
-        const diff = eaten - spent;
         const withProtein = meals.filter((m) => m.protein).length;
         $('#food-summary').innerHTML = `
             <div class="food-stats">
@@ -805,13 +967,7 @@
                     <button type="button" class="round-btn" id="water-plus" aria-label="Un vaso más">+</button>
                 </div>
             </div>
-            <div class="day-balance">
-                <div class="db-row"><span>Comido</span><b>${known.length ? eaten : 0} kcal</b></div>
-                <div class="db-row"><span>Gasto base (por vivir)${base.exact ? '' : ' · estimado'} <button type="button" class="link-btn" data-profile>Ajustar</button></span><b>− ${fmtNum(Math.round(base.kcal), 0)} kcal</b></div>
-                <div class="db-row"><span>Entrenamiento${s.done ? '' : ' (sin completar)'}</span><b>− ${training} kcal</b></div>
-                <div class="db-row db-total ${known.length ? (diff < 0 ? 'neg' : 'pos') : ''}"><span>Diferencia del día</span><b>${known.length ? `${fmtSigned(diff)} kcal` : '—'}</b></div>
-                ${known.length && known.length < MIN_MEALS_FOR_BALANCE ? '<small class="muted">Faltan comidas con kcal: la diferencia todavía no es real.</small>' : ''}
-            </div>
+            ${dayBalanceHtml(selected, eaten, known.length, s.done, burned)}
             <span class="muted">Proteína en cada comida y suficiente agua (≈ ${WATER_GOAL} vasos).</span>`;
 
         const labels = Object.fromEntries(cfg.mealTypes);
@@ -1058,16 +1214,18 @@
 
     async function loadWeek() {
         const req = ++weekReq;
-        const data = await api(`${urls.week}?date=${weekStart}`);
+        const span = view === 'month' ? 'month' : 'week'; // el día sale de su semana
+        const data = await api(`${urls.week}?date=${anchor}&span=${span}`);
         if (req !== weekReq) return;
-        week = data;
+        week = { ...data, span };
         renderWeek();
     }
 
     const refresh = () => Promise.all([loadCycle(), loadWeek()]);
 
     selected = todayIso();
-    weekStart = mondayOf(selected);
+    anchor = selected;
+    try { const v = localStorage.getItem('vivir_view'); if (VIEWS.includes(v)) view = v; } catch (e) { /* sin storage */ }
     $('#w-date').value = selected;
     $('#m-type').value = guessMealType();
     try { const t = localStorage.getItem('vivir_tab'); showTab(TABS.includes(t) ? t : 'inicio'); } catch (e) { showTab('inicio'); }

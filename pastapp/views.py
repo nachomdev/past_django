@@ -806,9 +806,15 @@ def vivir_data(request):
 
 @_vivir_api(methods=('GET',))
 def vivir_week(request):
-    """Resumen de la semana (lunes a domingo) que contiene la fecha: sesiones y comidas."""
-    start = _monday(_parse_date(request.GET.get('date')))
-    end = start + timedelta(days=6)
+    """Resumen por día de la semana (lunes a domingo) o del mes (?span=month) que
+    contiene la fecha: sesiones y comidas agregadas."""
+    date_val = _parse_date(request.GET.get('date'))
+    if request.GET.get('span') == 'month':
+        start = date_val.replace(day=1)
+        end = (start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    else:
+        start = _monday(date_val)
+        end = start + timedelta(days=6)
     sessions = {x.date: x for x in VivirSession.objects.filter(user=request.user, date__range=[start, end])}
     meals = {}
     for m in VivirMeal.objects.filter(user=request.user, date__range=[start, end]):
@@ -819,7 +825,7 @@ def vivir_week(request):
             agg['kcal'] += m.kcal
             agg['kcal_known'] += 1
     days = []
-    for i in range(7):
+    for i in range((end - start).days + 1):
         d = start + timedelta(days=i)
         days.append({'date': d.isoformat(), **_session_dict(sessions.get(d)),
                      'meals': meals.get(d, {'count': 0, 'kcal': 0, 'kcal_known': 0, 'protein': 0})})

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=6">
+    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=7">
 </head>
 
 <body>
@@ -34,8 +34,13 @@
 
         <!-- INICIO: resumen semanal -->
         <section class="panel active" id="panel-inicio">
+            <div class="seg" role="group" aria-label="Vista">
+                <button type="button" class="seg-btn" data-view="day">Día</button>
+                <button type="button" class="seg-btn" data-view="week">Semana</button>
+                <button type="button" class="seg-btn" data-view="month">Mes</button>
+            </div>
             <div class="card day-nav">
-                <button class="icon-btn" id="week-prev" aria-label="Semana anterior">
+                <button class="icon-btn" id="week-prev" aria-label="Anterior">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
                 <div class="day-nav-center">
@@ -43,13 +48,17 @@
                     <span class="day-nav-sub" id="week-sub"></span>
                     <button class="link-btn hidden" id="week-today">Volver a esta semana</button>
                 </div>
-                <button class="icon-btn" id="week-next" aria-label="Semana siguiente">
+                <button class="icon-btn" id="week-next" aria-label="Siguiente">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
 
             <div class="card" id="week-summary"><div class="loading">Cargando…</div></div>
             <div class="card week-days" id="week-days"></div>
+
+            <button type="button" class="fab" id="add-fab" aria-label="Agregar entrenamiento, comida o agua" title="Agregar">
+                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 5v14M5 12h14"></path></svg>
+            </button>
 
             <div class="cycle-line">
                 <span>Ciclo de {{ weeks }} semanas desde el <strong id="cycle-start">—</strong></span>
@@ -203,7 +212,7 @@
             weightDelete: "{% url 'vivir_weight_delete' 0 %}".replace(/0$/, '')
         };
     </script>
-    <script src="{% static 'pastapp/js/vivir.js' %}?v=6"></script>
+    <script src="{% static 'pastapp/js/vivir.js' %}?v=7"></script>
 </body>
 
 </html>
