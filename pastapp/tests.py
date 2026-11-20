@@ -184,3 +184,11 @@ class VivirTests(TestCase):
         self.assertTrue(res['days'][26]['done'])
         dec = self.client.get(reverse('vivir_week'), {'date': '2026-12-31', 'span': 'month'}).json()
         self.assertEqual((dec['start'], dec['end']), ('2026-12-01', '2026-12-31'))
+
+    def test_walk_items_keep_steps(self):
+        items = [{'name': 'Caminata rápida', 'met': 4.3, 'minutes': 30, 'mode': 'cardio', 'km': 3.2, 'steps': 4100}]
+        saved = self.post('vivir_session', {'date': '2026-11-18', 'items': items}).json()['session']['items']
+        self.assertEqual((saved[0]['steps'], saved[0]['km']), (4100, 3.2))
+        bad = [{'name': 'Caminata rápida', 'met': 4.3, 'minutes': 30, 'steps': -5}]
+        self.assertEqual(self.post('vivir_session', {'date': '2026-11-18', 'items': bad}).status_code, 400)
+        self.assertEqual(self.client.get(reverse('vivir_data')).json()['last']['Caminata rápida']['steps'], 4100)

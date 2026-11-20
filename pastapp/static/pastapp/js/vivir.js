@@ -22,7 +22,7 @@
     ];
     const MODES = [
         { key: 'reps', label: 'Series y repeticiones' },
-        { key: 'cardio', label: 'Cardio (minutos, km, rpm)' },
+        { key: 'cardio', label: 'Cardio (minutos, km, rpm o pasos)' },
         { key: 'free', label: 'Solo minutos' },
     ];
 
@@ -166,7 +166,10 @@
         return [];
     }
 
-    // Lo registrado de un ítem ("3 × 10 · 20 kg", "35 min · 12,4 km · 80 rpm") o '' si no hay nada.
+    // Las caminatas registran pasos en lugar de rpm.
+    const isWalk = (name) => /camin/i.test(name || '');
+
+    // Lo registrado de un ítem ("3 × 10 · 20 kg", "35 min · 12,4 km · 80 rpm", "… · 8.000 pasos") o '' si no hay nada.
     function loggedText(it) {
         const sl = setsOf(it);
         if (it.mode === 'reps' && sl.length) {
@@ -175,8 +178,9 @@
             const hasKg = sl.some((x) => x.kg);
             return `${sl.map((x) => `${x.reps ?? '?'}${hasKg ? `×${x.kg ? fmtNum(x.kg) : '–'}` : ''}`).join(' · ')}${hasKg ? ' kg' : ' reps'}`;
         }
-        if (it.mode === 'cardio' && (it.km || it.rpm)) {
-            return [`${it.minutes} min`, it.km ? `${fmtNum(it.km, 2)} km` : '', it.rpm ? `${it.rpm} rpm` : ''].filter(Boolean).join(' · ');
+        if (it.mode === 'cardio' && (it.km || it.rpm || it.steps)) {
+            return [`${it.minutes} min`, it.km ? `${fmtNum(it.km, 2)} km` : '', it.rpm ? `${it.rpm} rpm` : '',
+                it.steps ? `${fmtNum(it.steps, 0)} pasos` : ''].filter(Boolean).join(' · ');
         }
         return '';
     }
@@ -584,7 +588,7 @@
         if (e.target.id === 'day-min') saveSession(selected, { minutes: e.target.value || 0 });
     });
 
-    // Anotar lo hecho en un ítem: series/reps/kg (fuerza), minutos/km/rpm (cardio) o minutos.
+    // Anotar lo hecho en un ítem: series/reps/kg (fuerza), minutos/km/rpm o pasos (cardio) o minutos.
     function openItemEditor(index) {
         const items = itemsFor(day.session, selected);
         const it = items[index];
@@ -623,7 +627,9 @@
                 <div class="grid-3">
                     <div class="field"><label for="ie-min">Minutos</label><input type="number" id="ie-min" class="input" min="0" max="600" inputmode="numeric" value="${val(it.minutes)}"></div>
                     <div class="field"><label for="ie-km">Km</label><input type="number" id="ie-km" class="input" min="0" max="500" step="0.1" inputmode="decimal" value="${val(it.km)}" placeholder="opcional"></div>
-                    <div class="field"><label for="ie-rpm">RPM</label><input type="number" id="ie-rpm" class="input" min="0" max="300" inputmode="numeric" value="${val(it.rpm)}" placeholder="opcional"></div>
+                    ${isWalk(it.name)
+                        ? `<div class="field"><label for="ie-steps">Pasos</label><input type="number" id="ie-steps" class="input" min="0" max="200000" step="1" inputmode="numeric" value="${val(it.steps)}" placeholder="opcional"></div>`
+                        : `<div class="field"><label for="ie-rpm">RPM</label><input type="number" id="ie-rpm" class="input" min="0" max="300" inputmode="numeric" value="${val(it.rpm)}" placeholder="opcional"></div>`}
                 </div>`;
         } else {
             fields = `<div class="field"><label for="ie-min">Minutos</label><input type="number" id="ie-min" class="input" min="0" max="600" inputmode="numeric" value="${val(it.minutes)}"></div>`;
@@ -660,7 +666,8 @@
                     next.minutes = numOrNull(q('#ie-min').value) || 0;
                     if (mode === 'cardio') {
                         next.km = numOrNull(q('#ie-km').value);
-                        next.rpm = numOrNull(q('#ie-rpm').value);
+                        if (isWalk(it.name)) next.steps = numOrNull(q('#ie-steps').value);
+                        else next.rpm = numOrNull(q('#ie-rpm').value);
                         const baseMet = ex ? ex.met : it.met;
                         const fromSpeed = next.km && next.minutes ? metForSpeed(it.name, next.km / (next.minutes / 60)) : null;
                         next.met = fromSpeed || baseMet;

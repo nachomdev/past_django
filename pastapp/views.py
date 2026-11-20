@@ -497,7 +497,7 @@ def flexiones_logout(request):
 #
 # - VIVIR_EXERCISES: catálogo fijo. "met" es el esfuerzo (MET) y "minutes" la
 #   duración estimada del volumen indicado. "mode": reps (series × reps, kg),
-#   cardio (minutos, km, rpm) o libre (solo minutos).
+#   cardio (minutos, km y rpm; pasos en las caminatas) o libre (solo minutos).
 # - VIVIR_FOODS: comidas sugeridas con kcal por porción; el usuario suma las suyas.
 #   Base del cálculo de kcal:
 #   kcal = MET × 3.5 × kg / 200 × minutos (kg = último peso registrado).
@@ -722,7 +722,7 @@ def _clean_items(raw):
             'minutes': minutes,
             'mode': mode,
         }
-        # Lo registrado: series/reps/kg (fuerza) o km/rpm (cardio). per_rep = minutos por repetición.
+        # Lo registrado: series/reps/kg (fuerza) o km/rpm/pasos (cardio). per_rep = minutos por repetición.
         extra = {
             'sets': _num(it.get('sets'), int, 0, 50),
             'reps': _num(it.get('reps'), int, 0, 500),
@@ -730,6 +730,7 @@ def _clean_items(raw):
             'per_rep': _num(it.get('per_rep'), float, 0, 10),
             'km': _num(it.get('km'), float, 0, 500),
             'rpm': _num(it.get('rpm'), int, 0, 300),
+            'steps': _num(it.get('steps'), int, 0, 200000),
         }
         item.update({k: (round(v, 3) if isinstance(v, float) else v) for k, v in extra.items() if v is not None})
         # Series con reps y kg distintos: [{'reps': 12, 'kg': 20}, ...]
@@ -789,9 +790,9 @@ def vivir_data(request):
     for sess in sessions:
         for it in sess.items or []:
             name = it.get('name')
-            if name and name not in last and any(k in it for k in ('set_list', 'kg', 'sets', 'reps', 'km', 'rpm')):
+            if name and name not in last and any(k in it for k in ('set_list', 'kg', 'sets', 'reps', 'km', 'rpm', 'steps')):
                 last[name] = {'date': sess.date.isoformat(),
-                              **{k: it[k] for k in ('set_list', 'sets', 'reps', 'kg', 'km', 'rpm', 'minutes') if k in it}}
+                              **{k: it[k] for k in ('set_list', 'sets', 'reps', 'kg', 'km', 'rpm', 'steps', 'minutes') if k in it}}
 
     return JsonResponse({
         'today': today.isoformat(),

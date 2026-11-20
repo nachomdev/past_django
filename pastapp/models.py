@@ -92,7 +92,7 @@ class VivirExercise(models.Model):
     met = models.DecimalField(max_digits=4, decimal_places=1)  # esfuerzo (MET)
     minutes = models.PositiveIntegerField(default=10)
     volume = models.CharField(max_length=50, blank=True)
-    # Cómo se registra: series y reps, cardio (minutos, km, rpm) o libre (minutos).
+    # Cómo se registra: series y reps, cardio (minutos, km, rpm o pasos) o libre (minutos).
     MODES = [('reps', 'Series y repeticiones'), ('cardio', 'Cardio'), ('free', 'Libre')]
     mode = models.CharField(max_length=10, choices=MODES, default='free')
 
