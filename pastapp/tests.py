@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import VivirPlan, VivirSession, VivirBodyWeight, VivirExercise, VivirMeal
+from .models import VivirPlan, VivirSession, VivirBodyWeight, VivirExercise, VivirMeal, VivirFood
 
 
 @override_settings(STORAGES={
@@ -23,29 +23,36 @@ class VivirTests(TestCase):
         self.client.logout()
         res = self.client.get(reverse('vivir'))
         self.assertRedirects(res, reverse('flexiones_login') + '?next=/vivir', fetch_redirect_response=False)
+        # El login muestra la marca de la app a la que vuelve.
+        self.assertContains(self.client.get(reverse('flexiones_login'), {'next': '/vivir'}), '<h1>Vivir</h1>', html=True)
+        self.assertContains(self.client.get(reverse('flexiones_login')), '<h1>Flexiones</h1>', html=True)
 
     def test_page_renders(self):
         res = self.client.get(reverse('vivir'))
         self.assertContains(res, 'Cómo progresar')
+        self.assertContains(res, 'Entrenamiento')
 
     def test_data_creates_plan_on_monday_of_current_week(self):
         # 2026-11-19 es jueves -> el ciclo arranca el lunes 16
         data = self.client.get(reverse('vivir_data'), {'date': '2026-11-19'}).json()
         self.assertEqual(data['start_date'], '2026-11-16')
-        self.assertEqual(len(data['weeks']), 4)
-        self.assertEqual(len(data['weeks'][0]['days']), 7)
+        self.assertEqual((data['custom_foods'], data['last']), ([], {}))
 
-    def test_session_upsert_and_weekly_totals(self):
-        VivirPlan.objects.create(user=self.user, start_date='2026-11-16')
+    def test_week_summary_sessions_and_meals(self):
         self.post('vivir_session', {'date': '2026-11-17', 'done': True, 'minutes': 40})
         self.post('vivir_session', {'date': '2026-11-17', 'minutes': 45})
         self.post('vivir_session', {'date': '2026-11-24', 'done': True, 'minutes': 30})
         self.assertEqual(VivirSession.objects.count(), 2)
-        data = self.client.get(reverse('vivir_data'), {'date': '2026-11-24'}).json()
-        self.assertEqual(data['weeks'][1]['start'], '2026-11-23')
-        self.assertEqual((data['weeks'][0]['done_count'], data['weeks'][0]['minutes_total']), (1, 45))
-        self.assertEqual((data['weeks'][1]['done_count'], data['weeks'][1]['minutes_total']), (1, 30))
-        self.assertTrue(data['weeks'][1]['days'][1]['done'])
+        self.post('vivir_meal_add', {'date': '2026-11-17', 'meal_type': 'almuerzo', 'description': 'Milanesa de carne', 'kcal': 350, 'protein': True})
+        self.post('vivir_meal_add', {'date': '2026-11-17', 'meal_type': 'cena', 'description': 'Sopa'})
+        week = self.client.get(reverse('vivir_week'), {'date': '2026-11-19'}).json()
+        self.assertEqual((week['start'], week['end']), ('2026-11-16', '2026-11-22'))
+        tue = week['days'][1]
+        self.assertEqual((tue['done'], tue['minutes']), (True, 45))
+        self.assertEqual(tue['meals'], {'count': 2, 'kcal': 350, 'kcal_known': 1, 'protein': 1})
+        self.assertEqual(week['days'][0]['meals']['count'], 0)
+        nxt = self.client.get(reverse('vivir_week'), {'date': '2026-11-24'}).json()
+        self.assertEqual(nxt['days'][1]['minutes'], 30)
 
     def test_new_cycle_normalizes_to_monday(self):
         res = self.post('vivir_start', {'date': '2026-12-03'})
@@ -115,7 +122,38 @@ class VivirTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(self.post('vivir_meal_add', {'meal_type': 'brunch', 'description': 'x'}).status_code, 400)
         self.assertEqual(self.post('vivir_meal_add', {'meal_type': 'cena', 'description': ''}).status_code, 400)
+        self.assertEqual(self.post('vivir_meal_add', {'meal_type': 'cena', 'description': 'x', 'portions': 0}).status_code, 400)
         meals = self.client.get(reverse('vivir_day'), {'date': '2026-11-19'}).json()['meals']
-        self.assertEqual((meals[0]['kcal'], meals[0]['protein']), (450, True))
+        self.assertEqual((meals[0]['kcal'], meals[0]['protein'], meals[0]['portions']), (450, True, 1.0))
         self.assertEqual(self.post('vivir_meal_delete', {}, res.json()['id']).status_code, 200)
         self.assertFalse(VivirMeal.objects.exists())
+
+    def test_new_food_is_saved_to_user_list_and_portions_scale_kcal(self):
+        res = self.post('vivir_meal_add', {'date': '2026-11-19', 'meal_type': 'cena', 'description': 'Tortilla de papas', 'kcal': 300, 'portions': 1.5, 'protein': True}).json()
+        self.assertEqual(VivirMeal.objects.get().kcal, 450)
+        self.assertEqual(res['food']['name'], 'Tortilla de papas')
+        # La misma comida otra vez (otra mayúscula) actualiza, no duplica.
+        self.post('vivir_meal_add', {'date': '2026-11-20', 'meal_type': 'cena', 'description': 'tortilla de papas', 'kcal': 320, 'protein': True})
+        food = VivirFood.objects.get()
+        self.assertEqual(food.kcal, 320)
+        # Las sugeridas no se copian a la lista propia.
+        self.post('vivir_meal_add', {'date': '2026-11-20', 'meal_type': 'cena', 'description': 'Empanada', 'kcal': 280})
+        self.assertEqual(VivirFood.objects.count(), 1)
+        data = self.client.get(reverse('vivir_data')).json()
+        self.assertEqual([f['name'] for f in data['custom_foods']], ['Tortilla de papas'])
+        self.assertEqual(self.post('vivir_food_delete', {}, food.id).status_code, 200)
+        self.assertFalse(VivirFood.objects.exists())
+
+    def test_items_keep_sets_reps_kg_and_cardio_fields(self):
+        items = [
+            {'name': 'Remo', 'met': 3.5, 'minutes': 9, 'mode': 'reps', 'sets': 3, 'reps': 12, 'kg': 22.5, 'per_rep': 0.25},
+            {'name': 'Bici', 'met': 6, 'minutes': 35, 'mode': 'cardio', 'km': 12.4, 'rpm': 80},
+        ]
+        res = self.post('vivir_session', {'date': '2026-11-18', 'items': items}).json()
+        saved = res['session']['items']
+        self.assertEqual((saved[0]['sets'], saved[0]['reps'], saved[0]['kg']), (3, 12, 22.5))
+        self.assertEqual((saved[1]['km'], saved[1]['rpm'], saved[1]['mode']), (12.4, 80, 'cardio'))
+        bad = [{'name': 'Remo', 'met': 3.5, 'minutes': 9, 'sets': 999}]
+        self.assertEqual(self.post('vivir_session', {'date': '2026-11-18', 'items': bad}).status_code, 400)
+        last = self.client.get(reverse('vivir_data')).json()['last']
+        self.assertEqual((last['Remo']['kg'], last['Bici']['km']), (22.5, 12.4))

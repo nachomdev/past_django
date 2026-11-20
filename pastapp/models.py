@@ -87,9 +87,23 @@ class VivirExercise(models.Model):
     met = models.DecimalField(max_digits=4, decimal_places=1)  # esfuerzo (MET)
     minutes = models.PositiveIntegerField(default=10)
     volume = models.CharField(max_length=50, blank=True)
+    # Cómo se registra: series y reps, cardio (minutos, km, rpm) o libre (minutos).
+    MODES = [('reps', 'Series y repeticiones'), ('cardio', 'Cardio'), ('free', 'Libre')]
+    mode = models.CharField(max_length=10, choices=MODES, default='free')
 
     def __str__(self):
         return f"{self.user.username} - {self.name} ({self.met} MET)"
+
+
+class VivirFood(models.Model):
+    """Comida propia del usuario (se guarda al registrar una nueva) con sus kcal por porción."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    kcal = models.PositiveIntegerField(null=True, blank=True)  # por porción
+    protein = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name} ({self.kcal} kcal)"
 
 class VivirMeal(models.Model):
     MEAL_TYPES = [
@@ -103,7 +117,8 @@ class VivirMeal(models.Model):
     date = models.DateField()
     meal_type = models.CharField(max_length=20, choices=MEAL_TYPES)
     description = models.CharField(max_length=200)
-    kcal = models.PositiveIntegerField(null=True, blank=True)
+    kcal = models.PositiveIntegerField(null=True, blank=True)  # total (kcal por porción × porciones)
+    portions = models.DecimalField(max_digits=4, decimal_places=2, default=1)
     protein = models.BooleanField(default=False)
     timestamp = models.DateTimeField(default=timezone.now)
 

@@ -5,22 +5,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vivir - Rutina semanal</title>
+    <title>Vivir</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'pastapp/css/vivir.css' %}?v=5">
 </head>
 
 <body>
     <div class="app-container">
         <header>
-            <a href="{% url 'index' %}" class="icon-btn" title="Volver al inicio" aria-label="Volver al inicio">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            </a>
+            <span class="icon-btn header-spacer" aria-hidden="true"></span>
             <div class="title">
                 <h1>Vivir</h1>
-                <p>2 días de gym + 5 en casa. Algo todos los días.</p>
+                <p>Entrená, comé bien y seguí tu progreso, un día a la vez.</p>
             </div>
             <a href="{% url 'flexiones_logout' %}" class="icon-btn" title="Cerrar sesión ({{ user.username }})" aria-label="Cerrar sesión">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -28,14 +26,46 @@
         </header>
 
         <nav class="tabs" role="tablist">
-            <button class="tab active" data-tab="hoy" role="tab">Hoy</button>
+            <button class="tab active" data-tab="inicio" role="tab">Inicio</button>
+            <button class="tab" data-tab="entrenamiento" role="tab">Entrenamiento</button>
             <button class="tab" data-tab="comidas" role="tab">Comidas</button>
-            <button class="tab" data-tab="seguimiento" role="tab">Seguimiento</button>
             <button class="tab" data-tab="pesos" role="tab">Pesos</button>
         </nav>
 
-        <!-- Navegación de días (compartida por Hoy y Comidas) -->
-        <div class="card day-nav" id="day-nav">
+        <!-- INICIO: resumen semanal -->
+        <section class="panel active" id="panel-inicio">
+            <div class="card day-nav">
+                <button class="icon-btn" id="week-prev" aria-label="Semana anterior">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="day-nav-center">
+                    <span class="day-nav-title no-picker" id="week-title">—</span>
+                    <span class="day-nav-sub" id="week-sub"></span>
+                    <button class="link-btn hidden" id="week-today">Volver a esta semana</button>
+                </div>
+                <button class="icon-btn" id="week-next" aria-label="Semana siguiente">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+
+            <div class="card" id="week-summary"><div class="loading">Cargando…</div></div>
+            <div class="card week-days" id="week-days"></div>
+
+            <div class="cycle-line">
+                <span>Ciclo de {{ weeks }} semanas desde el <strong id="cycle-start">—</strong></span>
+                <details class="cycle-more">
+                    <summary>Cambiar</summary>
+                    <div class="cycle-form">
+                        <label for="cycle-date">Empezar un ciclo nuevo la semana del</label>
+                        <input type="date" id="cycle-date" class="input">
+                        <button class="btn-ghost" id="cycle-save">Empezar ciclo nuevo</button>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <!-- Navegación de días (compartida por Entrenamiento y Comidas) -->
+        <div class="card day-nav hidden" id="day-nav">
             <button class="icon-btn" id="day-prev" aria-label="Día anterior">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
             </button>
@@ -52,8 +82,8 @@
             </button>
         </div>
 
-        <!-- HOY -->
-        <section class="panel active" id="panel-hoy">
+        <!-- ENTRENAMIENTO -->
+        <section class="panel" id="panel-entrenamiento">
             <div class="card day-card" id="session-card">
                 <div class="loading">Cargando…</div>
             </div>
@@ -73,25 +103,32 @@
 
             <form class="card" id="meal-form" autocomplete="off">
                 <h2>Registrar comida</h2>
+                <div class="field">
+                    <label for="m-type">Comida</label>
+                    <select id="m-type" class="input" required>
+                        {% for key, label in meal_types %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="field food-field">
+                    <label for="m-desc">¿Qué comiste?</label>
+                    <input type="text" id="m-desc" class="input" maxlength="200" required placeholder="Buscá o escribí una comida nueva" role="combobox" aria-expanded="false" aria-controls="food-suggest">
+                    <div class="suggest-list food-suggest hidden" id="food-suggest" role="listbox"></div>
+                </div>
                 <div class="grid-2">
                     <div class="field">
-                        <label for="m-type">Comida</label>
-                        <select id="m-type" class="input" required>
-                            {% for key, label in meal_types %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
-                        </select>
+                        <label for="m-kcal">kcal por porción</label>
+                        <input type="number" id="m-kcal" class="input" min="0" max="10000" inputmode="numeric" placeholder="opcional">
                     </div>
                     <div class="field">
-                        <label for="m-kcal">Calorías (opcional)</label>
-                        <input type="number" id="m-kcal" class="input" min="0" max="10000" inputmode="numeric" placeholder="kcal">
+                        <label for="m-portions">Porciones</label>
+                        <input type="number" id="m-portions" class="input" min="0.25" max="20" step="0.25" value="1" inputmode="decimal" required>
                     </div>
                 </div>
-                <div class="field">
-                    <label for="m-desc">¿Qué comiste?</label>
-                    <input type="text" id="m-desc" class="input" maxlength="200" required placeholder="Ej: 2 huevos revueltos, tostada y café">
-                </div>
-                <label class="check"><input type="checkbox" id="m-protein"> Tuvo proteína (carne, huevo, lácteos, legumbres)</label>
+                <label class="check"><input type="checkbox" id="m-protein"> Tiene proteína (carne, huevo, lácteos, legumbres)</label>
+                <div class="meal-total muted" id="m-total"></div>
                 <button type="submit" class="btn">Agregar</button>
                 <div class="form-error" id="m-error"></div>
+                <small class="muted">Las comidas nuevas quedan guardadas con sus kcal para elegirlas la próxima vez.</small>
             </form>
 
             <div class="card">
@@ -100,26 +137,10 @@
             </div>
         </section>
 
-        <!-- SEGUIMIENTO -->
-        <section class="panel" id="panel-seguimiento">
-            <div class="card">
-                <h2>Seguimiento — {{ weeks }} semanas</h2>
-                <p class="muted">Marcá la casilla al completar la sesión y anotá los minutos. Tocá un día para ver el detalle.</p>
-                <div class="cycle-row">
-                    <span>Ciclo desde el <strong id="cycle-start">—</strong></span>
-                    <button class="btn-ghost" id="new-cycle-btn">Nuevo ciclo</button>
-                </div>
-                <div class="cycle-form hidden" id="cycle-form">
-                    <label for="cycle-date">Empieza la semana del</label>
-                    <input type="date" id="cycle-date" class="input">
-                    <button class="btn" id="cycle-save">Guardar</button>
-                </div>
-            </div>
-            <div id="weeks-list"></div>
-        </section>
-
-        <!-- PESOS -->
+        <!-- PESOS: peso corporal -->
         <section class="panel" id="panel-pesos">
+            <div class="card" id="weight-now"></div>
+
             <form class="card" id="weight-form" autocomplete="off">
                 <h2>Registrar peso</h2>
                 <div class="grid-2">
@@ -138,18 +159,18 @@
                 </div>
                 <button type="submit" class="btn">Guardar</button>
                 <div class="form-error" id="w-error"></div>
-                <small class="muted" id="w-hint">Un registro por día: si ya pesaste ese día, se reemplaza. El último peso se usa para estimar las calorías.</small>
+                <small class="muted" id="w-hint">Un registro por día. El último peso se usa para estimar las calorías.</small>
             </form>
 
             <div class="card">
                 <h2>Evolución</h2>
-                <div id="weights-summary"></div>
+                <div id="weights-chart"></div>
                 <div id="weights-list"></div>
             </div>
         </section>
     </div>
 
-    <!-- Hoja inferior reutilizable (elegir rutina, agregar ítem, peso corporal) -->
+    <!-- Hoja inferior reutilizable (elegir rutina, agregar ítem, editar ítem, peso corporal) -->
     <div class="sheet-backdrop hidden" id="sheet">
         <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
             <div class="sheet-head">
@@ -169,17 +190,19 @@
         window.VIVIR.urls = {
             data: "{% url 'vivir_data' %}",
             day: "{% url 'vivir_day' %}",
+            week: "{% url 'vivir_week' %}",
             session: "{% url 'vivir_session' %}",
             start: "{% url 'vivir_start' %}",
             exercise: "{% url 'vivir_exercise_add' %}",
             exerciseDelete: "{% url 'vivir_exercise_delete' 0 %}".replace(/0$/, ''),
             meal: "{% url 'vivir_meal_add' %}",
             mealDelete: "{% url 'vivir_meal_delete' 0 %}".replace(/0$/, ''),
+            foodDelete: "{% url 'vivir_food_delete' 0 %}".replace(/0$/, ''),
             weight: "{% url 'vivir_weight_add' %}",
             weightDelete: "{% url 'vivir_weight_delete' 0 %}".replace(/0$/, '')
         };
     </script>
-    <script src="{% static 'pastapp/js/vivir.js' %}?v=3"></script>
+    <script src="{% static 'pastapp/js/vivir.js' %}?v=5"></script>
 </body>
 
 </html>
